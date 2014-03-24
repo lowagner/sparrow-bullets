@@ -1,7 +1,8 @@
 sparrow-bullets
 ===============
 
-attempting to get sparrow3d working with bullet physics.
+attempting to get sparrow3d working with bullet physics. The
+project is in its infant stages.
 
 sparrow3d is a C library, and bullet physics is mostly C++.  So
 what you will find here is a C++ game framework which wraps
@@ -21,14 +22,12 @@ Download sparrow3d from https://github.com/theZiz/sparrow3d.
 
 Compile it.  You may need to install extra libraries such as
 `libsdl-ttf2.0-dev`, `libsdl-mixer1.2-dev`, `libsdl-net1.2-dev`,
-`libsdl-gfx1.2-dev`, and what not.
+`libsdl-gfx1.2-dev`, and what not.  For sparrow-bullets, you'll 
+also need `libbullet-dev` so grab that while you're at it.
 
 After compiling the sparrow3d library, head back to sparrow-bullets
-and change the Makefile:  put in the correct sparrow3d location. 
-
-
-You will also need to install bullet.  Install `libbullet-dev`.
-
+and change the Makefile:  put in the correct sparrow3d location.  
+You should be able to compile it and run it.
 
 Eventually:  to compile for open source hardware such as the OpenPandora,
 you will need to follow the roadmap in this thread:
