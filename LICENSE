@@ -1,16 +1,17 @@
-The MIT License (MIT)
+The Do Whatever License 
 
-Copyright (c) 2014 Lucas O. Wagner
+Hoping you can learn from my mistakes and progress.  
+ 
+ The contents of these files are subject to the "do whatever you like"-license.
+ That means: Do, whatver you want, this file is under public domain. It is an
+ example for sparrow3d (with bullet3d). Copy it and learn from it for your 
+ project and release it under every license you want. ;-)
+ 
+ For feedback and questions about my Files and Projects please mail me,
+ Alexander Matthes (Ziz) , zizsdl_at_googlemail.com - sparrow3d business
+ added to by Lucas Wagner (lowagner), low agner _at_ gmail.com
+ mostly for the bullets.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
