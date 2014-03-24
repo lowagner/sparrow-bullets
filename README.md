@@ -27,12 +27,12 @@ After compiling the sparrow3d library, head back to sparrow-bullets
 and change the Makefile:  put in the correct sparrow3d location. 
 
 
-Eventually for bullet (not needed presently).  Install `libbullet-dev`
-and change `LIB_BULLET_SRC` to /usr/local/include/bullet.  That
-maybe will work!  
+You will also need to install bullet.  Install `libbullet-dev`.
 
 
 Eventually:  to compile for open source hardware such as the OpenPandora,
 you will need to follow the roadmap in this thread:
 http://boards.openpandora.org/topic/7147-crosscompiler-toolchain-based-on-openpandoraorg-ipks/
+You would also need to compile the Bullet physics library natively for the 
+Pandora (to get the libBullet\*.so) , and that currently is not in my skill set. 
 
