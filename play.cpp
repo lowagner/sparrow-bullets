@@ -14,16 +14,22 @@
 #include <strings.h>
 #include <string>
 using std::string;
+#include <iostream>
 
 Play::Play()
 {
     font=NULL;
 
     //input.push_back("");
+    pause = 0;
     iamdone = 0;
     threading = 0;
+    play_light = 1;
+    play_perspective = 0;
 
-    world = World();
+    // initialize the physics land and world drawing class
+    // THIS IS UNNECESSARY, since World already created itself in Play variables.
+    //world = World();
 }
 
 char* 
@@ -158,8 +164,9 @@ int Play::update( Uint32 dt )
 	}
 
     // updatey type things
+    //std::cout << " dt = " << dt << std::endl;
     if (!(pause))
-        world.update( float(dt) );
+        world.update( 1.0*dt/100 );
 
     // return a value
     if (iamdone)

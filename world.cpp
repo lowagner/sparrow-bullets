@@ -1,6 +1,7 @@
 #include "world.h"
+#include <iostream>
 
-World::World( float x, float y, float z ) // gravity is set by x,y,z
+World::World() 
 {
     // non physics type stuff
 	checkertexture = spLoadSurfaceZoom( "./data/check.png", spFloatToFixed(1.0f));
@@ -23,8 +24,7 @@ World::World( float x, float y, float z ) // gravity is set by x,y,z
                                                    m_collisionConfiguration );
 	//m_dynamicsWorld->setDebugDrawer(&gDebugDraw);
 	
-	m_dynamicsWorld->setGravity( btVector3(x,y,z) );
-
+	m_dynamicsWorld->setGravity( btVector3(0,0,-10) );
 }
 
 void
@@ -60,10 +60,12 @@ World::add_box( float x, float y, float z,
 }
 
 void
-World::update( Uint32 dt )
+World::update( float dt )
 {
     // get the dynamics world to go through the time steps
-    m_dynamicsWorld->stepSimulation( float(dt), 7 );  
+    //std::cout << "World  dt = " << dt << std::endl;
+
+    m_dynamicsWorld->stepSimulation( dt, 7 );  
     // second argument has to do with how many frames we do no matter what.
 }
 

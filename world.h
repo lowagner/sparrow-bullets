@@ -32,10 +32,10 @@ private:
     
 public:
 
-    World( float x=0, float y=0, float z=-10  ); // direction of gravity
+    World();
 
     void
-    update( Uint32 dt );
+    update( float dt );
 
     void
     add_box( float x=0, float y=0, float z=0, 
