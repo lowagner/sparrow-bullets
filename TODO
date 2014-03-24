@@ -1,0 +1,19 @@
+wrap up the physics into a class, too.
+
+Physics
+addBox  // some box added to world physics
+addObserverBox // some box which will send a signal to whatever method when something collides with it
+        // given some point in space (which can be updated), and some size.
+
+figure out how the physics connects with positions, orientations, etc.
+
+render a small map
+square with walls - or no walls
+
+player moving around, getting input
+
+camera position - looks good for now, but give
+it a player config file so players can move it where they want.
+
+figure out world to relative coordinates, and also how to
+do orientations of the players wrt the physics class.
