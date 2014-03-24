@@ -17,12 +17,13 @@ using std::string;
 
 Play::Play()
 {
+    font=NULL;
+
     //input.push_back("");
     iamdone = 0;
     threading = 0;
 
-    // having textured difficulties
-	//play_check = spLoadSurfaceZoom( "./data/check.png", spFloatToFixed(1.0f));
+    world = World();
 }
 
 char* 
@@ -52,75 +53,6 @@ Play::settings_play(char* caption,int button)
 	}
 	return caption;
 }
-
-void 
-Play::draw_textured_box( Sint32 halfsize, Uint16 color )
-{
-
-	spBindTexture( play_check );
-    // Top / Bottom
-	spQuadTex3D( -halfsize, halfsize, halfsize, 0, play_check->h,
-				-halfsize, -halfsize, halfsize, 0, 0,
-				halfsize, -halfsize, halfsize,  play_check->w, 0,
-				halfsize, halfsize, halfsize,   play_check->w, play_check->h, color );
-	spQuadTex3D( halfsize, halfsize, -halfsize,  0, play_check->h,
-				halfsize, -halfsize, -halfsize,  0, 0,
-				-halfsize, -halfsize, -halfsize, play_check->w, 0,
-				-halfsize, halfsize, -halfsize,  play_check->w, play_check->h, color );
-	//Left / Right
-	spQuadTex3D( -halfsize, halfsize, halfsize,  0, play_check->h,
-				-halfsize, halfsize, -halfsize,  0, 0,
-				-halfsize, -halfsize, -halfsize, play_check->w, 0,
-				-halfsize, -halfsize, halfsize,  play_check->w, play_check->h, color );
-	spQuadTex3D( halfsize, -halfsize, halfsize,  0, play_check->h,
-				halfsize, -halfsize, -halfsize,  0, 0,
-				halfsize, halfsize, -halfsize,   play_check->w, 0,
-				halfsize, halfsize, halfsize,    play_check->w, play_check->h, color );
-	//Up / Down  // play_texture->w - 1, play_texture->h - 1, 
-	spQuadTex3D( halfsize, halfsize, halfsize,   0, play_check->h,
-				halfsize, halfsize, -halfsize,   0, 0,
-				-halfsize, halfsize, -halfsize,  play_check->w, 0,
-				-halfsize, halfsize, halfsize,   play_check->w, play_check->h, color );
-	spQuadTex3D( -halfsize, -halfsize, halfsize,  0, play_check->h,
-				-halfsize, -halfsize, -halfsize,  0, 0,
-				halfsize, -halfsize, -halfsize,   play_check->w, 0,
-				halfsize, -halfsize, halfsize,    play_check->w, play_check->h, color );
-}
-
-
-void 
-Play::draw_box( Sint32 halfsize, Uint16 color )
-{
-    // Top / Bottom
-    Uint16 topcolor = 0xFFFF;
-	spQuad3D( -halfsize, halfsize, halfsize,    
-				-halfsize, -halfsize, halfsize, 
-				halfsize, -halfsize, halfsize,  
-				halfsize, halfsize, halfsize,   topcolor );
-	spQuad3D( halfsize, halfsize, -halfsize,     
-				halfsize, -halfsize, -halfsize,  
-				-halfsize, -halfsize, -halfsize, 
-				-halfsize, halfsize, -halfsize,  color );
-	//Left / Right
-	spQuad3D( -halfsize, halfsize, halfsize,    
-				-halfsize, halfsize, -halfsize, 
-				-halfsize, -halfsize, -halfsize,
-				-halfsize, -halfsize, halfsize, color );
-	spQuad3D( halfsize, -halfsize, halfsize,   
-				halfsize, -halfsize, -halfsize,
-				halfsize, halfsize, -halfsize, 
-				halfsize, halfsize, halfsize,  color );
-	//Up / Down  // play_texture->w - 1, play_texture->h - 1, 
-	spQuad3D( halfsize, halfsize, halfsize,    
-				halfsize, halfsize, -halfsize, 
-				-halfsize, halfsize, -halfsize,
-				-halfsize, halfsize, halfsize, color );
-	spQuad3D( -halfsize, -halfsize, halfsize,   
-				-halfsize, -halfsize, -halfsize,
-				halfsize, -halfsize, -halfsize, 
-				halfsize, -halfsize, halfsize,  color );
-}
-
 
 void Play::draw( SDL_Surface* screen )
 {
@@ -169,35 +101,8 @@ void Play::draw( SDL_Surface* screen )
 
 
     // now we actually draw the scene...
-
-
-
 	spSetPerspectiveTextureMapping( play_perspective );
-	spSetLight( play_light );
-	spSetAlphaTest( 0 );  // this makes purple not invisible
-	
-    spTranslate( 0, 0, spFloatToFixed( -12.0f ) );
-	spRotateX( spFloatToFixed(-1.25f) );
-    spTranslate( 0, 0, spFloatToFixed( -1.0f ) ); // go a bit up from the player
-	//spRotateY( rotation );
-    //spRotateZ( rotation );
-
-    Sint32 size = spFloatToFixed ( 1.5f );
-    Uint16 color = 0x8F2F;
-	spSetAlphaPattern4x4(200,8);
-    draw_box( size, color );
-	
-	spTranslate( spFloatToFixed ( -3.0f ), 0, 0 );
-    
-    size = SP_ONE;
-    color = 0x8F2F;
-	spRotateX( 0.5*rotation );
-	spSetAlphaPattern4x4(255,8);  // max is 255.  not sure what the second arg does.  seems to help with texture.
-
-    //draw_textured_box( size, color );
-
-	spDeactivatePattern();
-	spSetPerspectiveTextureMapping(0);
+    world.draw();
 }
 
 
@@ -254,7 +159,7 @@ int Play::update( Uint32 dt )
 
     // updatey type things
     if (!(pause))
-        rotation += dt*32;
+        world.update( float(dt) );
 
     // return a value
     if (iamdone)

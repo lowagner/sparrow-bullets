@@ -44,11 +44,11 @@ void init()
 	//sparrow3D Init
 	//spSetDefaultWindowSize( 800, 480 ); //Creates a 800x480 window at PC instead of 320x240
 	spInitCore();
+	//Setup
+	screen = spCreateDefaultWindow();
 
     gamechunk = new Play();
 
-	//Setup
-	screen = spCreateDefaultWindow();
 	spUsePrecalculatedNormals(0);
 	resize( screen->w, screen->h );
 	

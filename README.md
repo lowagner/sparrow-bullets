@@ -8,14 +8,14 @@ what you will find here is a C++ game framework which wraps
 the sparrow3d library in an extern C bracket.
 
 
-
-
-Requirements
-------------
+Compiling
+---------
 
 I have compiled this on a Linux distribution, but if someone
 with another distro has a roadmap, send it my way.
 
+
+### Linux
 
 Download sparrow3d from https://github.com/theZiz/sparrow3d.
 

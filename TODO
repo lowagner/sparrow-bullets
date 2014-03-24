@@ -12,6 +12,8 @@ square with walls - or no walls
 
 player moving around, getting input
 
+player jump - if in contact with ground, allow for mostly vertical force.
+
 camera position - looks good for now, but give
 it a player config file so players can move it where they want.
 

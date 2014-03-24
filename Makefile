@@ -1,14 +1,15 @@
 PROGRAM=sparrow-bullet
 SPARROW_FOLDER = /home/lowagner/code/sparrow3d
-BULLET_SRC_DIR=. #/home/lowagner/code/bullet2/src
-BULLET_INCLUDE=. #/usr/local/include -I$(BULLET_SRC_DIR)
-BULLET_DYNAMIC_LIB= #-rdynamic $(BULLET_SRC_DIR)/BulletDynamics/libBulletDynamics.so $(BULLET_SRC_DIR)/BulletCollision/libBulletCollision.so $(BULLET_SRC_DIR)/LinearMath/libLinearMath.so -Wl,-rpath,$(BULLET_SRC_DIR)/BulletDynamics:$(BULLET_SRC_DIR)/BulletCollision:$(BULLET_SRC_DIR)/LinearMath
+BULLET_SRC_DIR=/usr/local/include/bullet#/home/lowagner/code/bullet2/src
+BULLET_SO_DIR=/usr/local/lib
+BULLET_INCLUDE=/usr/local/include -I$(BULLET_SRC_DIR)
+BULLET_DYNAMIC_LIB= -rdynamic $(BULLET_SO_DIR)/libBulletDynamics.so $(BULLET_SO_DIR)/libBulletCollision.so $(BULLET_SO_DIR)/libLinearMath.so -Wl,-rpath,$(BULLET_SRC_DIR)/BulletDynamics:$(BULLET_SRC_DIR)/BulletCollision:$(BULLET_SRC_DIR)/LinearMath
 
 #==stuff linked to
 DYNAMIC = -lSDL_ttf -lSDL_mixer -lSDL_image -lSDL -lm
 #==global Flags. Even on the gp2x with 16 kb Cache, -O3 is much better then -Os
 #CFLAGS = -O3 -fsingle-precision-constant -fPIC -Wno-write-strings
-CFLAGS = -O3 -DNDEBUG -Wno-write-strings
+CFLAGS = -O3 -DNDEBUG -fsingle-precision-constant -fPIC -Wno-write-strings
 CDEBUGFLAGS = -O1 -g -fsingle-precision-constant -fPIC
 # Testtweaks: -fgcse-lm -fgcse-sm -fsched-spec-load -fmodulo-sched -funsafe-loop-optimizations -Wunsafe-loop-optimizations -fgcse-las -fgcse-after-reload -fvariable-expansion-in-unroller -ftracer -fbranch-target-load-optimize
 GENERAL_TWEAKS =  -ffast-math
@@ -35,11 +36,17 @@ all: main.cpp
 targets:
 	@echo "The targets are the same like for sparrow3d. :P"
 
-main.cpp: copySparrow play.o makeBuildDir meta.h
-	$(CPP) $(CFLAGS) play.o main.cpp $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(LIB) $(SDL_LIB) $(STATIC) $(DYNAMIC) -o $(BUILD)/$(PROGRAM) $(BULLET_DYNAMIC_LIB)
+main.cpp: copySparrow play.o world.o main.o makeBuildDir meta.h
+	$(CPP) $(CFLAGS) play.o world.o main.o $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(LIB) $(SDL_LIB) $(STATIC) $(DYNAMIC) -o $(BUILD)/$(PROGRAM) $(BULLET_DYNAMIC_LIB)
 
-play.o: play.cpp play.h gamestates.h meta.h
+main.o: play.h world.h gamestates.h meta.h
+	$(CPP) $(CFLAGS) -c main.cpp $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE)
+
+play.o: play.cpp play.h world.h gamestates.h meta.h
 	$(CPP) $(CFLAGS) -c play.cpp $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE)
+
+world.o: world.cpp world.h meta.h
+	$(CPP) $(CFLAGS) -c world.cpp $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE)
 
 makeBuildDir:
 	 #@if [ ! -d $(BUILD:/$(PROGRAM)=/) ]; then mkdir $(BUILD:/$(PROGRAM)=/);fi

@@ -9,7 +9,7 @@
 #ifndef __PLAY__
 #define __PLAY__
 
-#include "meta.h"
+#include "world.h"
 //#include <string>
 //using std::string;
 
@@ -26,7 +26,6 @@ private:
     //std::string input;
     char input[32];
 
-    SDL_Surface* play_check;
     int play_light;
     int play_perspective;
 
@@ -34,13 +33,12 @@ private:
     char* caption_play(char* caption);
     
     int iamdone;
+    World world;
 
 public:
 
     Play();
 
-    void draw_textured_box( Sint32 halfsize = SP_ONE, Uint16 color = 0xFFF );
-    void draw_box( Sint32 halfsize = SP_ONE, Uint16 color = 0xFFF );
     void draw( SDL_Surface* screen );
     int update( Uint32 dt );
     void resize( Uint16 w, Uint16 h );
