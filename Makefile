@@ -1,9 +1,6 @@
 PROGRAM=sparrow-bullet
-SPARROW_FOLDER = /home/lowagner/code/sparrow3d
-BULLET_SRC_DIR=/usr/local/include/bullet#/home/lowagner/code/bullet2/src
-BULLET_SO_DIR=/usr/local/lib
-BULLET_INCLUDE=/usr/local/include -I$(BULLET_SRC_DIR)
-BULLET_DYNAMIC_LIB= -rdynamic $(BULLET_SO_DIR)/libBulletDynamics.so $(BULLET_SO_DIR)/libBulletCollision.so $(BULLET_SO_DIR)/libLinearMath.so -Wl,-rpath,$(BULLET_SRC_DIR)/BulletDynamics:$(BULLET_SRC_DIR)/BulletCollision:$(BULLET_SRC_DIR)/LinearMath
+include options.mk
+BULLET_DYNAMIC_LIB= -rdynamic $(BULLET_LIB_DIR)/libBulletDynamics.so $(BULLET_LIB_DIR)/libBulletCollision.so $(BULLET_LIB_DIR)/libLinearMath.so -Wl,-rpath,$(BULLET_SRC_DIR)/BulletDynamics:$(BULLET_SRC_DIR)/BulletCollision:$(BULLET_SRC_DIR)/LinearMath
 
 #==stuff linked to
 DYNAMIC = -lSDL_ttf -lSDL_mixer -lSDL_image -lSDL -lm

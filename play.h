@@ -10,6 +10,7 @@
 #define __PLAY__
 
 #include "world.h"
+#include "meta.h"
 //#include <string>
 //using std::string;
 
@@ -20,6 +21,9 @@ private:
     Sint32 rotation;
 
     spFontPointer font;
+
+    Cube hero;
+
     int pause;
     int threading;
     int no_movement;

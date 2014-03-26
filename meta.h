@@ -1,15 +1,7 @@
 #ifndef __META__
 #define __META__
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-#include <sparrow3d.h>
-#ifdef __cplusplus
-}
-#endif
-
+#include "csparrow.h"
 
 class GameChunk
 {

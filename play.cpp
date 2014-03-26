@@ -30,6 +30,9 @@ Play::Play()
     // initialize the physics land and world drawing class
     // THIS IS UNNECESSARY, since World already created itself in Play variables.
     //world = World();
+    world.add_box(10,10,1, 0,0,-1); // add the floor
+    hero = Cube(0,0,10);
+    hero.add_to_world( world );
 }
 
 char* 
@@ -167,6 +170,11 @@ int Play::update( Uint32 dt )
     //std::cout << " dt = " << dt << std::endl;
     if (!(pause))
         world.update( 1.0*dt/100 );
+
+    btVector3 heropos;
+    btQuaternion herorot;
+    hero.get_position_orientation( heropos, herorot );
+    std::cout << " hero z = " << heropos.z() << std::endl;
 
     // return a value
     if (iamdone)

@@ -1,17 +1,18 @@
 The Do Whatever License 
 
-Hoping you can learn from my mistakes and progress.  
+Hoping you can learn from my mistakes and progress, and that you might share your own.
  
  The contents of these files are subject to the "do whatever you like"-license.
- That means: Do, whatver you want, this file is under public domain. It is an
- example for sparrow3d (with bullet3d). Copy it and learn from it for your 
- project and release it under every license you want. ;-)
- 
- For feedback and questions about my Files and Projects please mail me,
- Alexander Matthes (Ziz) , zizsdl_at_googlemail.com - sparrow3d business
- added to by Lucas Wagner (lowagner), low agner _at_ gmail.com
- mostly for the bullets.
+ That means: Do whatver you want, these files are under the public domain. It is a
+ simple example for Sparrow3D (with Bullet Physics). Copy it and learn from it for 
+ your project and release it under every license you want. ;). 
 
+Note: Bullet Physics and Sparrow3D have their own licenses.
+
+ Bullet is a 3D Collision Detection and Rigid Body Dynamics Library for games and animation.
+ Free for commercial use, including Playstation 3, open source under the ZLib License.
+
+ Sparrow3D is licensed under the (L)GPL.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,

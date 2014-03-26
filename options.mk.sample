@@ -1,0 +1,14 @@
+### User configurable options
+
+SPARROW_FOLDER=$(HOME)/code/sparrow3d
+BULLET_SRC_DIR=/usr/local/include/bullet
+# if you install bullet by hand, you may need to use something like this:
+#BULLET_SRC_DIR=$(HOME)/code/bullet2/src
+
+# I don't think you need to touch these, but they are here if you need them.
+# BULLET_LIB_DIR is where the libBullet*.so files are.
+BULLET_LIB_DIR=/usr/local/lib
+
+# various important things...
+BULLET_INCLUDE=/usr/local/include -I$(BULLET_SRC_DIR)
+# LUCAS: - see if /usr/local/include can be removed.
