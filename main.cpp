@@ -47,6 +47,8 @@ void init()
     //Setup
     screen = spCreateDefaultWindow();
 
+    // set gamestate and gamechunk to the right variables...
+    gamestate = GAMESTATEplay;
     gamechunk = new Play();
 
     spUsePrecalculatedNormals(0);
@@ -61,12 +63,27 @@ void init()
 
 int update( Uint32 dt )
 {
-    gamestate = gamechunk->update( dt );
+    int newgamestate = gamechunk->update( dt );
 
-    if (gamestate == GAMESTATEquit)
+    if (newgamestate == GAMESTATEquit)
+    {
         return 1;
+    }
     else
+    {    
+        if (newgamestate != gamestate)
+        {
+            // this shouldn't actually return 1 here.
+            return 1;
+            // instead, it should actually kill the previous gamechunk:
+            // delete gamechunk;
+            // and move to the new gamechunk
+            // gamechunk = new GameChunk
+            // based on the newgamestate.
+        }
+        gamestate = newgamestate;
         return 0;
+    }
 }
 
 
