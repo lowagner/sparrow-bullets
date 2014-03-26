@@ -70,20 +70,18 @@ int update( Uint32 dt )
         return 1;
     }
     else
-    {    
-        if (newgamestate != gamestate)
-        {
-            // this shouldn't actually return 1 here.
-            return 1;
-            // instead, it should actually kill the previous gamechunk:
-            // delete gamechunk;
-            // and move to the new gamechunk
-            // gamechunk = new GameChunk
-            // based on the newgamestate.
-        }
+    if (newgamestate != gamestate)
+    {
+        // this shouldn't actually return 1 here.
+        return 1;
+        // instead, it should actually kill the previous gamechunk:
+        // delete gamechunk;
+        // and move to the new gamechunk
+        // gamechunk = new GameChunk
+        // based on the newgamestate.
         gamestate = newgamestate;
-        return 0;
     }
+    return 0;
 }
 
 
@@ -95,7 +93,6 @@ void exit() // destructor
     delete gamechunk;
     // this is where the gamechunk destructor method ~GameChunk is called.
 
-    //Winter Wrap up, Winter Wrap up 
     spQuitCore();
 }
 

@@ -1,9 +1,6 @@
 #include "world.h"
 #include <iostream>
 
-#include "btBulletDynamicsCommon.h"
-#include "csparrow.h" // for sparrow stuff
-
 World::World() 
 {
     // non physics type stuff
@@ -372,6 +369,7 @@ Cube::~Cube()
 {
     if (m_dworld)
         remove_from_world();
+    m_dworld = NULL;
 }
 
 

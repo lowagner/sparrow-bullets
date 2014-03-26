@@ -10,7 +10,6 @@
 */
 
 #include "play.h"
-#include "gamestates.h"
 //#include <strings.h>
 #include <string>
 //using std::string;
@@ -245,6 +244,7 @@ void Play::handle( SDL_Event* event )
 Play::~Play()
 {
     std::cout << " exiting play mode " << std::endl;
+    delete font;
 	//spDeleteSurface(play_texture);
 	//spDeleteSurface(play_check);
 }

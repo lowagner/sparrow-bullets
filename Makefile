@@ -36,13 +36,13 @@ targets:
 main.cpp: copySparrow play.o world.o main.o makeBuildDir meta.h
 	$(CPP) $(CFLAGS) play.o world.o main.o $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(LIB) $(SDL_LIB) $(STATIC) $(DYNAMIC) -o $(BUILD)/$(PROGRAM) $(BULLET_DYNAMIC_LIB)
 
-main.o: play.h world.h gamestates.h meta.h
+main.o: main.cpp play.h world.h meta.h
 	$(CPP) $(CFLAGS) -c main.cpp $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE)
 
-play.o: play.cpp play.h world.h gamestates.h meta.h
+play.o: play.cpp play.h world.h meta.h
 	$(CPP) $(CFLAGS) -c play.cpp $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE)
 
-world.o: world.cpp world.h meta.h
+world.o: world.cpp world.h
 	$(CPP) $(CFLAGS) -c world.cpp $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE)
 
 makeBuildDir:
