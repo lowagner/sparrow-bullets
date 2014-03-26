@@ -13,22 +13,4 @@ public:
     virtual void draw( SDL_Surface* screen ) {};    
 };
 
-
-
-//
-//class Game
-//{
-//public:
-//// various variables...
-//
-//// various methods.
-//    Game(); // constructor
-//
-//    int update( Uint32 dt ); // dt measured in milliseconds
-//    // define update in main.cpp
-//
-//
-//    ~Game(); // destructor
-//};
-
 #endif

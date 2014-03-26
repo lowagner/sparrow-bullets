@@ -41,21 +41,21 @@ void handle( SDL_Event* event )
 
 void init()
 {
-	//sparrow3D Init
-	//spSetDefaultWindowSize( 800, 480 ); //Creates a 800x480 window at PC instead of 320x240
-	spInitCore();
-	//Setup
-	screen = spCreateDefaultWindow();
+    //sparrow3D Init
+    //spSetDefaultWindowSize( 800, 480 ); //Creates a 800x480 window at PC instead of 320x240
+    spInitCore();
+    //Setup
+    screen = spCreateDefaultWindow();
 
     gamechunk = new Play();
 
-	spUsePrecalculatedNormals(0);
-	resize( screen->w, screen->h );
-	
-	spSelectRenderTarget(screen);
+    spUsePrecalculatedNormals(0);
+    resize( screen->w, screen->h );
 
-	spSetAffineTextureHack(0);
-	//spSetLight(1);
+    spSelectRenderTarget(screen);
+
+    spSetAffineTextureHack(0);
+    //spSetLight(1);
 }
 
 
@@ -78,8 +78,8 @@ void exit() // destructor
     delete gamechunk;
     // this is where the gamechunk destructor method ~GameChunk is called.
 
-	//Winter Wrap up, Winter Wrap up 
-	spQuitCore();
+    //Winter Wrap up, Winter Wrap up 
+    spQuitCore();
 }
 
 
@@ -88,37 +88,5 @@ int main( int argc, char **argv )
     init();
     spLoop( draw, update, 10, resize, handle );
     exit();
-	return 0;
+    return 0;
 }
-
-
-
-
-
-
-
-
-//int main( int argc, char **argv )
-//{
-//    
-//    game = Game();
-//
-//
-//	//Main loop
-//    // calls draw methods, update methods given a time lapse,
-//    // attempts to get a certain fps, has a method for resize, 
-//    // and allows handling all SDL events with another method...
-//	spLoop( game.draw, game.update, 10, game.resize, game.handle ); // 10 means attempt to get 100 fps.
-//	
-//	//Winter Wrap up, Winter Wrap up 
-//	spFontDelete( font );
-//	quit_play();
-//	spQuitCore();
-//
-//
-//
-//
-//
-//
-//	return 0;
-//}
