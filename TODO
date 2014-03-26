@@ -1,21 +1,82 @@
-wrap up the physics into a class, too.
+TOP PRIORITY
 
-Physics
-addBox  // some box added to world physics
-addObserverBox // some box which will send a signal to whatever method when something collides with it
-        // given some point in space (which can be updated), and some size.
+how to draw things:
 
-figure out how the physics connects with positions, orientations, etc.
+figure out world to relative coordinates, and also how to
+do orientations of the players wrt the physics class.
 
-render a small map
-square with walls - or no walls
+
+LESS IMPORTANT STUFF.  REALLY BORING, ACTUALLY
 
 player moving around, getting input
+NEED TO KNOW how much contact the player has with the ground.
+let that factor into how well he can navigate.
+
+ALso about collisions:
+Need to know if player hit his head or landed on his feet.
+
+
+
+
+Unordered other things.
+
+
+Physics World
+add_observer_box // some box which will send a signal to whatever method when something collides with it
+                 // given some point in space (which can be updated), and some size.
+
+
 
 player jump - if in contact with ground, allow for mostly vertical force.
 
 camera position - looks good for now, but give
 it a player config file so players can move it where they want.
 
-figure out world to relative coordinates, and also how to
-do orientations of the players wrt the physics class.
+
+
+Player Physics:
+
+Need to somehow cancel out momentum in whatever direction the player is traveling,
+
+//btVector3 correctedImpulse = -mass*boxRigidBody->getLinearVelocity();
+//boxRigidBody->applyCentralImpulse(correctedImpulse);
+
+and then add a force which pushes them in the direction in which the player faces.
+
+//btVector3 relativeForce = btVector3(Xforce,Yforce,Zforce); // force in body frame
+//btMatrix3x3& boxRot = boxRigidBody->getWorldTransform().getBasis();
+//btVector3 correctedForce = boxRot * relativeForce;
+//boxRigidBody->applyCentralForce(correctedForce);
+
+For the above:
+maybe correct for how much contact the player has with the ground.  
+full contact = coefficient = 1 for the above.
+partial contact = coefficient < 1.
+
+also can use the above to apply a jump force.
+
+When player changes direction, let camera transition smoothly from where it is to
+where the player's next direction is.
+
+// collision mechanics, even with "ghost" particles
+http://www.bulletphysics.org/mediawiki-1.5.8/index.php/Collision_Callbacks_and_Triggers
+
+Move a box by fiat:
+
+btTransform transform;
+rigidBody->getMotionState()->getWorldTransform(transform);
+transform.setOrigin(btVector3(X, Y, Z));  // or whatever
+rigidBody->getMotionState()->setWorldTransform(transform);
+rigidBody->setCenterOfMassTransform(transform);
+
+Can also setRotation instead of setOrigin
+
+get origin:
+
+btTransform transform;
+rigidBody->getMotionState()->getWorldTransform(transform);
+btVector3 origin = transform.getOrigin();
+btQuaternion rot = transform.getRotation();
+
+
+
