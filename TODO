@@ -8,6 +8,11 @@ do orientations of the players wrt the physics class.
 int *array = new int[10]; // to get the opengl matrix multipliaction...
 
 
+BUGS
+
+none currently known.
+
+
 
 LESS IMPORTANT STUFF.  REALLY BORING, ACTUALLY
 

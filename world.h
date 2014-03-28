@@ -1,9 +1,7 @@
 #ifndef __WORLD__
 #define __WORLD__
 
-//#include "objects.h"
-#include "btBulletDynamicsCommon.h"
-#include "csparrow.h"
+#include "basic.h"
 
 class World
 {
@@ -14,8 +12,6 @@ public:
 	btDynamicsWorld*		m_dworld;
 
 private:
-    SDL_Surface* checkertexture;
-
     // more physics classes
 
     // this collision shapes holds all the unique collision shapes.
@@ -42,9 +38,6 @@ private:
 	
 // drawing methods, hidden to the metaworld.
 
-    void draw_textured_box( Sint32 halfsize = SP_ONE, Uint16 color = 0xFFF );
-    void draw_box( Sint32 halfsize = SP_ONE, Uint16 color = 0xFFF );
-    
 public:
 
     World();
@@ -53,16 +46,14 @@ public:
     update( float dt );
 
     btRigidBody*
-    add_cube( float x=0, float y=0, float z=0 );
+    add_cube( sbVector3 pos );
 
     btRigidBody*
     add_box( float size_x, float size_y, float size_z,
-             float x=0, float y=0, float z=0, 
+             sbVector3 pos,
              float mass_=0.0f );
 
     void remove_body( btRigidBody* rb );
-
-    void draw();
 
     ~World();
 };
@@ -72,19 +63,21 @@ class Cube
 private:
     int iamdone;
     Uint16 color;
-    float lastx, lasty, lastz;
+
+    sbVector3 lastpos;
+    btQuaternion lastrot;
+
     btDynamicsWorld* m_dworld;
     btRigidBody* m_rb;
 
 public:
-    Cube( float x=0, float y=0, float z=0, 
-          Uint16 color_=0xFFF );
+    Cube( sbVector3 pos=sbVector3(), Uint16 color_=0xFFF );
 
     void remove();
     
     int done(); // am i done and can be removed?
     
-    void get_position_orientation( btVector3& pos, btQuaternion& rot );
+    void get_position_orientation( sbVector3& pos, btQuaternion& rot );
 
     void add_to_world( World& world );
 

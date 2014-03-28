@@ -17,6 +17,9 @@
 
 Play::Play()
 {
+    // non physics type stuff
+	checkertexture = spLoadSurface("./data/check.png");
+
     font=NULL;
 
     //input.push_back("");
@@ -29,9 +32,25 @@ Play::Play()
     // initialize the physics land and world drawing class
     // THIS IS UNNECESSARY, since World already created itself in Play variables.
     //world = World();
-    world.add_box(10,10,1, 0,0,-1); // add the floor
-    hero = Cube(0,0,10);
+    world.add_box( 10,10,1, sbVector3(0,0,-1) ); // add the floor
+    hero = Cube( sbVector3(0,0,10) );
     hero.add_to_world( world );
+
+//// debugging adding things to world.  this seems to work fine.
+//    Cube asdf(sbVector3(1,2,3));
+//    asdf.add_to_world( world );
+//    sbVector3 pos;
+//    btQuaternion rot;
+//    asdf.get_position_orientation( pos, rot );
+//    std::cout << " asdf fell to " << pos.z() << std::endl;
+//    world.update(0.1);
+//    asdf.get_position_orientation( pos, rot );
+//    std::cout << " asdf fell to " << pos.z() << std::endl;
+//    asdf.remove_from_world();
+//    world.update(0.1);
+//    asdf.get_position_orientation( pos, rot );
+//    std::cout << " asdf fell to " << pos.z() << std::endl;
+//    asdf.remove_from_world();
 }
 
 char* 
@@ -61,6 +80,79 @@ Play::settings_play(char* caption,int button)
 	}
 	return caption;
 }
+
+
+void 
+Play::draw_textured_box( Sint32 halfsize, Uint16 color )
+{
+
+	spBindTexture( checkertexture );
+    // Top / Bottom
+	spQuadTex3D( -halfsize, halfsize, halfsize, 0, checkertexture->h,
+				-halfsize, -halfsize, halfsize, 0, 0,
+				halfsize, -halfsize, halfsize,  checkertexture->w, 0,
+				halfsize, halfsize, halfsize,   checkertexture->w, checkertexture->h, color );
+	spQuadTex3D( halfsize, halfsize, -halfsize,  0, checkertexture->h,
+				halfsize, -halfsize, -halfsize,  0, 0,
+				-halfsize, -halfsize, -halfsize, checkertexture->w, 0,
+				-halfsize, halfsize, -halfsize,  checkertexture->w, checkertexture->h, color );
+	//Left / Right
+	spQuadTex3D( -halfsize, halfsize, halfsize,  0, checkertexture->h,
+				-halfsize, halfsize, -halfsize,  0, 0,
+				-halfsize, -halfsize, -halfsize, checkertexture->w, 0,
+				-halfsize, -halfsize, halfsize,  checkertexture->w, checkertexture->h, color );
+	spQuadTex3D( halfsize, -halfsize, halfsize,  0, checkertexture->h,
+				halfsize, -halfsize, -halfsize,  0, 0,
+				halfsize, halfsize, -halfsize,   checkertexture->w, 0,
+				halfsize, halfsize, halfsize,    checkertexture->w, checkertexture->h, color );
+	//Up / Down  // play_texture->w - 1, play_texture->h - 1, 
+	spQuadTex3D( halfsize, halfsize, halfsize,   0, checkertexture->h,
+				halfsize, halfsize, -halfsize,   0, 0,
+				-halfsize, halfsize, -halfsize,  checkertexture->w, 0,
+				-halfsize, halfsize, halfsize,   checkertexture->w, checkertexture->h, color );
+	spQuadTex3D( -halfsize, -halfsize, halfsize,  0, checkertexture->h,
+				-halfsize, -halfsize, -halfsize,  0, 0,
+				halfsize, -halfsize, -halfsize,   checkertexture->w, 0,
+				halfsize, -halfsize, halfsize,    checkertexture->w, checkertexture->h, color );
+}
+
+void 
+Play::draw_box( Sint32 halfsize, Uint16 color )
+{
+    // Top / Bottom
+    Uint16 topcolor = 0xFFFF;
+	spQuad3D( -halfsize, halfsize, halfsize,    
+				-halfsize, -halfsize, halfsize, 
+				halfsize, -halfsize, halfsize,  
+				halfsize, halfsize, halfsize,   topcolor );
+	spQuad3D( halfsize, halfsize, -halfsize,     
+				halfsize, -halfsize, -halfsize,  
+				-halfsize, -halfsize, -halfsize, 
+				-halfsize, halfsize, -halfsize,  color );
+	//Left / Right
+	spQuad3D( -halfsize, halfsize, halfsize,    
+				-halfsize, halfsize, -halfsize, 
+				-halfsize, -halfsize, -halfsize,
+				-halfsize, -halfsize, halfsize, color );
+	spQuad3D( halfsize, -halfsize, halfsize,   
+				halfsize, -halfsize, -halfsize,
+				halfsize, halfsize, -halfsize, 
+				halfsize, halfsize, halfsize,  color );
+	//Up / Down  // play_texture->w - 1, play_texture->h - 1, 
+	spQuad3D( halfsize, halfsize, halfsize,    
+				halfsize, halfsize, -halfsize, 
+				-halfsize, halfsize, -halfsize,
+				-halfsize, halfsize, halfsize, color );
+	spQuad3D( -halfsize, -halfsize, halfsize,   
+				-halfsize, -halfsize, -halfsize,
+				halfsize, -halfsize, -halfsize, 
+				halfsize, -halfsize, halfsize,  color );
+}
+
+
+
+
+
 
 void Play::draw( SDL_Surface* screen )
 {
@@ -110,7 +202,35 @@ void Play::draw( SDL_Surface* screen )
 
     // now we actually draw the scene...
 	spSetPerspectiveTextureMapping( play_perspective );
-    world.draw();
+
+////  spMulMatrix(Sint32* matrix); 
+//  vector<Sint32> matrix;
+//  spMulMatrix( &matrix ); 
+
+//
+	spSetLight( 0 ); // or 1
+	spSetAlphaTest( 0 );  // this makes purple not invisible
+	
+    spTranslate( 0, 0, spFloatToFixed( -12.0f ) );
+	spRotateX( spFloatToFixed(-1.25f) );
+    spTranslate( 0, 0, spFloatToFixed( -1.0f ) ); // go a bit up from the player
+
+	//spDeactivatePattern();
+	spSetPerspectiveTextureMapping(0);
+
+    Sint32 size = spFloatToFixed ( 1.5f );
+    Uint16 color = 0x8F2F;
+	spSetAlphaPattern4x4(200,8);
+    draw_box( size, color );
+	
+	spTranslate( spFloatToFixed ( -3.0f ), 0, 0 );
+    
+    size = SP_ONE;
+    color = 0x8F2F;
+	spSetAlphaPattern4x4(255,8);  // max is 255.  not sure what the second arg does.  seems to help with texture.
+
+    draw_textured_box( size, color );
+
 }
 
 
@@ -168,12 +288,19 @@ int Play::update( Uint32 dt )
     // updatey type things
     //std::cout << " dt = " << dt << std::endl;
     if (!(pause))
+    {
         world.update( 1.0*dt/100 );
 
-    btVector3 heropos;
-    btQuaternion herorot;
-    hero.get_position_orientation( heropos, herorot );
-    std::cout << " hero z = " << heropos.z() << std::endl;
+        sbVector3 heropos;
+        btQuaternion herorot;
+        hero.get_position_orientation( heropos, herorot );
+        if (float(heropos.z) < spFloatToFixed(1.01))
+        {
+            std::cout << " hero fell to less than 1.01 " << std::endl;
+            hero.remove_from_world();
+        }
+        //std::cout << " hero z = " << heropos.z() << std::endl;
+    }
 
     // return a value
     if (iamdone)

@@ -3,8 +3,6 @@
 
 World::World() 
 {
-    // non physics type stuff
-	checkertexture = spLoadSurface("./data/check.png");
 
     //initialization
 	///use the default collision dispatcher. For parallel processing you can use a diffent dispatcher (see Extras/BulletMultiThreaded)
@@ -18,9 +16,9 @@ World::World()
     m_solver = new btSequentialImpulseConstraintSolver;
 
 	m_dworld = new btDiscreteDynamicsWorld( m_dispatcher,
-                                                   m_broadphase,
-                                                   m_solver,
-                                                   m_colconfig );
+                                            m_broadphase,
+                                            m_solver,
+                                            m_colconfig );
 	//m_dworld->setDebugDrawer(&gDebugDraw);
 	
 	m_dworld->setGravity( btVector3(0,0,-10) );
@@ -36,17 +34,19 @@ World::World()
     cubeinertia = btVector3(0,0,0);
     // give the shape a mass and inertia
     cubeshape->calculateLocalInertia( btScalar(1), // mass of these boxes
-                                        cubeinertia ); // "local" inertia.  moment of inertia???
+                                      cubeinertia ); // "local" inertia.  moment of inertia???
     // that probably makes cubeinertia be something else!
 }
 
 
 btRigidBody*
-World::add_cube( float x, float y, float z )
+World::add_cube( sbVector3 pos )
 {
 	btTransform transform;
 	transform.setIdentity();
-	transform.setOrigin( btVector3(x,y,z) );
+	transform.setOrigin(   btVector3( spFixedToFloat(pos.x),
+                                      spFixedToFloat(pos.y),
+                                      spFixedToFloat(pos.z) )   );
 
     //using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
     btDefaultMotionState* myMotionState = new btDefaultMotionState( transform );
@@ -62,7 +62,7 @@ World::add_cube( float x, float y, float z )
 
 btRigidBody*
 World::add_box( float size_x, float size_y, float size_z, 
-                float x, float y, float z, 
+                sbVector3 pos,
                 float mass_ )
 {
 	btBoxShape* newbox = new btBoxShape( btVector3(size_x, size_y, size_z) );
@@ -71,7 +71,10 @@ World::add_box( float size_x, float size_y, float size_z,
 
 	btTransform transform;
 	transform.setIdentity();
-	transform.setOrigin( btVector3(x,y,z) );
+	transform.setOrigin(   btVector3( spFixedToFloat(pos.x),
+                                      spFixedToFloat(pos.y),
+                                      spFixedToFloat(pos.z) )   );
+
 
     btScalar mass(mass_);
 
@@ -109,8 +112,6 @@ World::update( float dt )
     //std::cout << "World  dt = " << dt << std::endl;
     m_dworld->stepSimulation( dt, 7 );  
     // second argument has to do with how many frames we do no matter what.
-    
-    // now check for anything we should remove...
 
 }
 
@@ -174,109 +175,6 @@ World::update( float dt )
 
 
 
-void 
-World::draw_textured_box( Sint32 halfsize, Uint16 color )
-{
-
-	spBindTexture( checkertexture );
-    // Top / Bottom
-	spQuadTex3D( -halfsize, halfsize, halfsize, 0, checkertexture->h,
-				-halfsize, -halfsize, halfsize, 0, 0,
-				halfsize, -halfsize, halfsize,  checkertexture->w, 0,
-				halfsize, halfsize, halfsize,   checkertexture->w, checkertexture->h, color );
-	spQuadTex3D( halfsize, halfsize, -halfsize,  0, checkertexture->h,
-				halfsize, -halfsize, -halfsize,  0, 0,
-				-halfsize, -halfsize, -halfsize, checkertexture->w, 0,
-				-halfsize, halfsize, -halfsize,  checkertexture->w, checkertexture->h, color );
-	//Left / Right
-	spQuadTex3D( -halfsize, halfsize, halfsize,  0, checkertexture->h,
-				-halfsize, halfsize, -halfsize,  0, 0,
-				-halfsize, -halfsize, -halfsize, checkertexture->w, 0,
-				-halfsize, -halfsize, halfsize,  checkertexture->w, checkertexture->h, color );
-	spQuadTex3D( halfsize, -halfsize, halfsize,  0, checkertexture->h,
-				halfsize, -halfsize, -halfsize,  0, 0,
-				halfsize, halfsize, -halfsize,   checkertexture->w, 0,
-				halfsize, halfsize, halfsize,    checkertexture->w, checkertexture->h, color );
-	//Up / Down  // play_texture->w - 1, play_texture->h - 1, 
-	spQuadTex3D( halfsize, halfsize, halfsize,   0, checkertexture->h,
-				halfsize, halfsize, -halfsize,   0, 0,
-				-halfsize, halfsize, -halfsize,  checkertexture->w, 0,
-				-halfsize, halfsize, halfsize,   checkertexture->w, checkertexture->h, color );
-	spQuadTex3D( -halfsize, -halfsize, halfsize,  0, checkertexture->h,
-				-halfsize, -halfsize, -halfsize,  0, 0,
-				halfsize, -halfsize, -halfsize,   checkertexture->w, 0,
-				halfsize, -halfsize, halfsize,    checkertexture->w, checkertexture->h, color );
-}
-
-void
-World::draw()
-{
-////  spMulMatrix(Sint32* matrix); 
-//  vector<Sint32> matrix;
-//  spMulMatrix( &matrix ); 
-
-//
-	spSetLight( 0 ); // or 1
-	spSetAlphaTest( 0 );  // this makes purple not invisible
-	
-    spTranslate( 0, 0, spFloatToFixed( -12.0f ) );
-	spRotateX( spFloatToFixed(-1.25f) );
-    spTranslate( 0, 0, spFloatToFixed( -1.0f ) ); // go a bit up from the player
-	//spRotateY( rotation );
-    //spRotateZ( rotation );
-
-	//spDeactivatePattern();
-	spSetPerspectiveTextureMapping(0);
-
-    Sint32 size = spFloatToFixed ( 1.5f );
-    Uint16 color = 0x8F2F;
-	spSetAlphaPattern4x4(200,8);
-    draw_box( size, color );
-	
-	spTranslate( spFloatToFixed ( -3.0f ), 0, 0 );
-    
-    size = SP_ONE;
-    color = 0x8F2F;
-	//spRotateX( 0.5*rotation );
-	spSetAlphaPattern4x4(255,8);  // max is 255.  not sure what the second arg does.  seems to help with texture.
-
-    draw_textured_box( size, color );
-}
-
-void 
-World::draw_box( Sint32 halfsize, Uint16 color )
-{
-    // Top / Bottom
-    Uint16 topcolor = 0xFFFF;
-	spQuad3D( -halfsize, halfsize, halfsize,    
-				-halfsize, -halfsize, halfsize, 
-				halfsize, -halfsize, halfsize,  
-				halfsize, halfsize, halfsize,   topcolor );
-	spQuad3D( halfsize, halfsize, -halfsize,     
-				halfsize, -halfsize, -halfsize,  
-				-halfsize, -halfsize, -halfsize, 
-				-halfsize, halfsize, -halfsize,  color );
-	//Left / Right
-	spQuad3D( -halfsize, halfsize, halfsize,    
-				-halfsize, halfsize, -halfsize, 
-				-halfsize, -halfsize, -halfsize,
-				-halfsize, -halfsize, halfsize, color );
-	spQuad3D( halfsize, -halfsize, halfsize,   
-				halfsize, -halfsize, -halfsize,
-				halfsize, halfsize, -halfsize, 
-				halfsize, halfsize, halfsize,  color );
-	//Up / Down  // play_texture->w - 1, play_texture->h - 1, 
-	spQuad3D( halfsize, halfsize, halfsize,    
-				halfsize, halfsize, -halfsize, 
-				-halfsize, halfsize, -halfsize,
-				-halfsize, halfsize, halfsize, color );
-	spQuad3D( -halfsize, -halfsize, halfsize,   
-				-halfsize, -halfsize, -halfsize,
-				halfsize, -halfsize, -halfsize, 
-				halfsize, -halfsize, halfsize,  color );
-}
-
-
 
 
 World::~World()
@@ -318,12 +216,10 @@ World::~World()
 
 
 
-Cube::Cube( float x, float y, float z, 
+Cube::Cube( sbVector3 pos, 
           Uint16 color_ )
 {
-    lastx = x;
-    lasty = y;
-    lastz = z;
+    lastpos = pos;
     color = color_;
     m_dworld = NULL;
 }
@@ -332,30 +228,44 @@ Cube::Cube( float x, float y, float z,
 void
 Cube::add_to_world( World& world )
 {	
-    m_dworld = world.m_dworld;
-    m_rb = world.add_cube( lastx, lasty, lastz );
+    if (m_dworld)
+    {
+        // do we want to readd it by destroying it first?
+        // just ignore for now.
+    }
+    else
+    {
+        m_dworld = world.m_dworld;
+        m_rb = world.add_cube( lastpos );
+    }
 }
 
 
 void
-Cube::get_position_orientation( btVector3& pos, btQuaternion& rot )
+Cube::get_position_orientation( sbVector3& pos, btQuaternion& rot )
 {
-    btTransform transform;
-    m_rb->getMotionState()->getWorldTransform(transform);
-    pos = transform.getOrigin();
-    rot = transform.getRotation();
-    lastx = spFloatToFixed( float(pos.x()) );
-    lasty = spFloatToFixed( float(pos.y()) );
-    lastz = spFloatToFixed( float(pos.z()) );
+    if (m_dworld)
+    {
+        btTransform transform;
+        m_rb->getMotionState()->getWorldTransform( transform );
+        lastpos = sbVector3( transform.getOrigin() );
+        lastrot = transform.getRotation();
+    }
+    pos = lastpos;
+    rot = lastrot;
 }
 
 
 void
 Cube::remove_from_world()
 {
-    m_dworld->removeRigidBody(m_rb);
-    delete m_rb->getMotionState();
-    delete m_rb;
+    if (m_dworld)
+    {
+        m_dworld->removeRigidBody(m_rb);
+        delete m_rb->getMotionState();
+        delete m_rb;
+        m_dworld = NULL;
+    }
 }
 
 
@@ -367,9 +277,7 @@ Cube::done()
 
 Cube::~Cube()
 {
-    if (m_dworld)
-        remove_from_world();
-    m_dworld = NULL;
+    remove_from_world();
 }
 
 

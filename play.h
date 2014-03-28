@@ -18,7 +18,7 @@
 class Play : public GameChunk
 {
 private:
-    Sint32 rotation;
+    SDL_Surface* checkertexture;
 
     spFontPointer font;
 
@@ -38,6 +38,11 @@ private:
     
     int iamdone;
     World world;
+    
+    
+    void draw_textured_box( Sint32 halfsize = SP_ONE, Uint16 color = 0xFFF );
+    void draw_box( Sint32 halfsize = SP_ONE, Uint16 color = 0xFFF );
+    
 
 public:
 
