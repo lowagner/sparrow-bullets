@@ -91,7 +91,7 @@ World::World()
                                             m_colconfig );
 	//m_dworld->setDebugDrawer(&gDebugDraw);
 	
-	m_dworld->setGravity( btVector3(0,0,-1) );
+	m_dworld->setGravity( btVector3(0,0,-3) );
 
 
     // standard box shape

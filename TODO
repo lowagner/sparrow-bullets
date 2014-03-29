@@ -43,6 +43,9 @@ Player Physics:
 
 useful methods of bullet physics classes.
 
+determine orientation of player and what face (top, side, bottom) hit the other point.
+
+
 
 Need to somehow cancel out momentum in whatever direction the player is traveling,
 
@@ -88,3 +91,81 @@ btQuaternion rot = transform.getRotation();
 
 
 
+
+// some guy's commentary on how to get collisions
+
+someBody->setCollisionFlags(someBody->getCollisionFlags() |
+btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+someOtherBody->setCollisionFlags(someOtherBody->getCollisionFlags() |
+btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+gContactProcessedCallback = (ContactProcessedCallback)HandleContacts;
+
+
+and in your implementation file declar the extern bullet funct 
+Code:
+extern ContactProcessedCallback gContactProcessedCallback;
+
+
+In your class implement the ContactProcessedCallback as a static private c++ function
+Code:
+static bool HandleContacts(btManifoldPoint& point, btCollisionObject* body0, btCollisionObject* body1);
+//typedef bool (*ContactProcessedCallback)(
+//    btManifoldPoint& cp,
+//        void* body0,void* body1);
+// point->m_appliedImpulse (scalar)
+
+
+
+For which an implementation could vary. The bad thing about this ContactProcessed callback is that bullet seems to call it a random number of times for each collision... not good for sound effects or special effects. So Here is a gift, HandleContacts that enters the collision handling only if enough time has passed between calls. 
+Code:
+static struct timeval start, end;
+bool veryFirst = true;
+bool first = true;
+bool CShell::HandleContacts(btManifoldPoint& point, btCollisionObject* body0, btCollisionObject* body1) {
+btRigidBody* rigidbody0 = dynamic_cast<btRigidBody*>(body0);
+btRigidBody* rigidbody1 = dynamic_cast<btRigidBody*>(body1);
+
+
+float timeThreshold = 350;
+
+float passedTime = 0;
+if ( first){
+first = false;
+if (veryFirst){
+veryFirst = false;
+passedTime = timeThreshold;
+}
+gettimeofday(&start, NULL);
+}
+else {
+long mtime, seconds, useconds;  
+gettimeofday(&end, NULL);
+seconds  = end.tv_sec  - start.tv_sec;
+useconds = end.tv_usec - start.tv_usec;
+
+mtime = ((seconds) * 1000 + useconds/1000.0) + 0.5;
+passedTime = mtime;
+
+if (passedTime >= timeThreshold)
+first = true;
+}
+// ignore calls until enough time has passed. 
+if (passedTime >= timeThreshold)
+if(rigidbody0 && rigidbody1){
+//NSLog(@"past time: %f",passedTime);
+// here you handle your globalBody & otherGlobalBody sound effect or what not derpa
+if ((rigidbody0==globalBody && rigidbody1 == otherGlobalBody) ||(rigidbody1==otherGlobalBody && rigidbody0 == globalBody))
+{
+
+playRandomBounceSfxFromList();
+return true;
+}
+else {
+return false;
+}
+}   
+}
+
+return false;
+
+}
