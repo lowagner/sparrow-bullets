@@ -1,30 +1,37 @@
 #include "basic.h"
 
-sbVector3::sbVector3( int x_, int y_, int z_ )
+sbVector::sbVector()
+{
+    x=0; y=0; z=0;
+}
+
+sbVector::sbVector( int x_, int y_, int z_ )
 {
     x=spIntToFixed(x_);
     y=spIntToFixed(y_);
     z=spIntToFixed(z_);
 }
 
-sbVector3::sbVector3( float x_, float y_, float z_ )
+sbVector::sbVector( float x_, float y_, float z_ )
 {
     x=spFloatToFixed(x_);
     y=spFloatToFixed(y_);
     z=spFloatToFixed(z_);
 }
 
-
-sbVector3::sbVector3( btVector3 v )
+sbVector::sbVector( btVector3 v )
 {
-    x=v.x();
-    y=v.y();
-    z=v.z();
+    x=spFloatToFixed(v.x());
+    y=spFloatToFixed(v.y());
+    z=spFloatToFixed(v.z());
+    
+    //std::cout << " sbVector init z = " << v.z() << " => fp = " << z << std::endl;
+    // all working as it should
 }
 
 
-sbVector3&
-sbVector3::operator = ( const sbVector3& rhs )
+sbVector&
+sbVector::operator = ( const sbVector& rhs )
 {
     if (this != &rhs)
     {
@@ -36,8 +43,8 @@ sbVector3::operator = ( const sbVector3& rhs )
 }
 
 
-sbVector3&
-sbVector3::operator += ( const sbVector3& rhs )
+sbVector&
+sbVector::operator += ( const sbVector& rhs )
 {
     x += rhs.x;
     y += rhs.y;
@@ -46,17 +53,17 @@ sbVector3::operator += ( const sbVector3& rhs )
 }
 
 
-const sbVector3
-sbVector3::operator + ( const sbVector3& rhs )
+const sbVector
+sbVector::operator + ( const sbVector& rhs )
 const
 {
-    sbVector3 result = *this;
+    sbVector result = *this;
     result += rhs;
     return result;
 }
 
-sbVector3&
-sbVector3::operator -= ( const sbVector3& rhs )
+sbVector&
+sbVector::operator -= ( const sbVector& rhs )
 {
     x -= rhs.x;
     y -= rhs.y;
@@ -65,11 +72,11 @@ sbVector3::operator -= ( const sbVector3& rhs )
 }
 
 
-const sbVector3
-sbVector3::operator - ( const sbVector3& rhs )
+const sbVector
+sbVector::operator - ( const sbVector& rhs )
 const
 {
-    sbVector3 result = *this;
+    sbVector result = *this;
     result -= rhs;
     return result;
 }
@@ -77,8 +84,8 @@ const
 
 // multiplication
 
-sbVector3& 
-sbVector3::operator *= ( float& rhs )
+sbVector& 
+sbVector::operator *= ( float& rhs )
 {
     Sint32 rhsfp = spFloatToFixed( rhs );
     x *= rhsfp;
@@ -86,36 +93,36 @@ sbVector3::operator *= ( float& rhs )
     z *= rhsfp;
 }
 
-const sbVector3 
-sbVector3::operator * ( float& rhs ) 
+const sbVector 
+sbVector::operator * ( float& rhs ) 
 const
 {
-    sbVector3 result = *this;
+    sbVector result = *this;
     result *= rhs;
     return result;
 }
 
 
-sbVector3& 
-sbVector3::operator *= ( int& rhs )
+sbVector& 
+sbVector::operator *= ( int& rhs )
 {
     x *= rhs;
     y *= rhs;
     z *= rhs;
 }
 
-const sbVector3 
-sbVector3::operator * ( int& rhs ) 
+const sbVector 
+sbVector::operator * ( int& rhs ) 
 const
 {
-    sbVector3 result = *this;
+    sbVector result = *this;
     result *= rhs;
     return result;
 }
 
 
 bool
-sbVector3::operator == ( const sbVector3& rhs ) 
+sbVector::operator == ( const sbVector& rhs ) 
 const
 {
     if ( x != rhs.x )
@@ -128,7 +135,7 @@ const
 }
 
 bool
-sbVector3::operator != ( const sbVector3& rhs ) 
+sbVector::operator != ( const sbVector& rhs ) 
 const
 {
     return !( *this == rhs );
@@ -136,16 +143,16 @@ const
 
 
 
-sbVector3 
-operator * ( int scalar, const sbVector3 rhs )
+sbVector 
+operator * ( int scalar, const sbVector rhs )
 {
-    sbVector3 result = rhs;
+    sbVector result = rhs;
     return result *= scalar;
 }
 
 
 
-std::ostream& operator << ( std::ostream& os, const sbVector3& v )
+std::ostream& operator << ( std::ostream& os, const sbVector& v )
 {
     os << "< " << spFixedToFloat(v.x) << ", " 
                << spFixedToFloat(v.y) << ", " 

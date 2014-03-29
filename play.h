@@ -20,18 +20,19 @@ class Play : public GameChunk
 private:
     SDL_Surface* checkertexture;
 
+    Sint32 axis;
+    Sint32 rotation;
+    Sint32 distance;
+
     spFontPointer font;
 
     Cube hero;
+    Box floor;
 
     int pause;
-    int threading;
     int no_movement;
     //std::string input;
     char input[32];
-
-    int play_light;
-    int play_perspective;
 
     char* settings_play(char* caption,int button);
     char* caption_play(char* caption);
@@ -40,10 +41,6 @@ private:
     World world;
     
     
-    void draw_textured_box( Sint32 halfsize = SP_ONE, Uint16 color = 0xFFF );
-    void draw_box( Sint32 halfsize = SP_ONE, Uint16 color = 0xFFF );
-    
-
 public:
 
     Play();

@@ -3,6 +3,14 @@
 
 #include "basic.h"
 
+
+void draw_textured_cube( SDL_Surface* texture, Sint32 halfsize = SP_ONE, Uint16 color = 0xFFF );
+void draw_box( Sint32 halfsize_x = SP_ONE, 
+               Sint32 halfsize_y = SP_ONE, 
+               Sint32 halfsize_z = SP_ONE, 
+               Uint16 color = 0xFFF );
+    
+
 class World
 {
 
@@ -36,8 +44,6 @@ private:
     // standard box inertia -- or moment of inertia off-diagonals, not exactly sure!
     btVector3 cubeinertia;
 	
-// drawing methods, hidden to the metaworld.
-
 public:
 
     World();
@@ -46,12 +52,12 @@ public:
     update( float dt );
 
     btRigidBody*
-    add_cube( sbVector3 pos );
+    add_cube( sbVector pos );
 
     btRigidBody*
-    add_box( float size_x, float size_y, float size_z,
-             sbVector3 pos,
-             float mass_=0.0f );
+    add_box( sbVector size, 
+             sbVector pos,
+             Uint32 mass_=0 );
 
     void remove_body( btRigidBody* rb );
 
@@ -64,20 +70,20 @@ private:
     int iamdone;
     Uint16 color;
 
-    sbVector3 lastpos;
+    sbVector lastpos;
     btQuaternion lastrot;
 
     btDynamicsWorld* m_dworld;
     btRigidBody* m_rb;
 
 public:
-    Cube( sbVector3 pos=sbVector3(), Uint16 color_=0xFFF );
+    Cube( sbVector pos=sbVector(), Uint16 color_=0xFFF );
 
     void remove();
     
     int done(); // am i done and can be removed?
     
-    void get_position_orientation( sbVector3& pos, btQuaternion& rot );
+    void get_position_orientation( sbVector& pos, btQuaternion& rot );
 
     void add_to_world( World& world );
 
@@ -85,10 +91,46 @@ public:
 
     int crashed(); // did i crash in the last iteration
 
+    // translate/rotate the model-view matrix and then draw:
+    void change_matrix_and_draw( SDL_Surface* texture = NULL ); 
+
     ~Cube();
 };
 
 
+class Box
+{
+private:
+    int iamdone;
+    Uint16 color;
+
+    sbVector size;
+    sbVector lastpos;
+    btQuaternion lastrot;
+
+    btDynamicsWorld* m_dworld;
+    btRigidBody* m_rb;
+
+public:
+    Box( sbVector size_=sbVector(1,1,1), sbVector pos=sbVector(), Uint16 color_=0xFFF );
+
+    void remove();
+    
+    int done(); // am i done and can be removed?
+    
+    void get_position_orientation( sbVector& pos, btQuaternion& rot );
+
+    void add_to_world( World& world );
+
+    void remove_from_world();
+
+    int crashed(); // did i crash in the last iteration
+
+    // translate/rotate the model-view matrix and then draw:
+    void change_matrix_and_draw(); 
+
+    ~Box();
+};
 
 
 #endif

@@ -1,6 +1,76 @@
 #include "world.h"
 #include <iostream>
 
+
+void 
+draw_textured_cube( SDL_Surface* texture, Sint32 halfsize, Uint16 color )
+{
+
+	spBindTexture( texture );
+    // Top / Bottom
+	spQuadTex3D( -halfsize, halfsize, halfsize, 0, texture->h,
+				-halfsize, -halfsize, halfsize, 0, 0,
+				halfsize, -halfsize, halfsize,  texture->w, 0,
+				halfsize, halfsize, halfsize,   texture->w, texture->h, color );
+	spQuadTex3D( halfsize, halfsize, -halfsize,  0, texture->h,
+				halfsize, -halfsize, -halfsize,  0, 0,
+				-halfsize, -halfsize, -halfsize, texture->w, 0,
+				-halfsize, halfsize, -halfsize,  texture->w, texture->h, color );
+	//Left / Right
+	spQuadTex3D( -halfsize, halfsize, halfsize,  0, texture->h,
+				-halfsize, halfsize, -halfsize,  0, 0,
+				-halfsize, -halfsize, -halfsize, texture->w, 0,
+				-halfsize, -halfsize, halfsize,  texture->w, texture->h, color );
+	spQuadTex3D( halfsize, -halfsize, halfsize,  0, texture->h,
+				halfsize, -halfsize, -halfsize,  0, 0,
+				halfsize, halfsize, -halfsize,   texture->w, 0,
+				halfsize, halfsize, halfsize,    texture->w, texture->h, color );
+	//Up / Down  // play_texture->w - 1, play_texture->h - 1, 
+	spQuadTex3D( halfsize, halfsize, halfsize,   0, texture->h,
+				halfsize, halfsize, -halfsize,   0, 0,
+				-halfsize, halfsize, -halfsize,  texture->w, 0,
+				-halfsize, halfsize, halfsize,   texture->w, texture->h, color );
+	spQuadTex3D( -halfsize, -halfsize, halfsize,  0, texture->h,
+				-halfsize, -halfsize, -halfsize,  0, 0,
+				halfsize, -halfsize, -halfsize,   texture->w, 0,
+				halfsize, -halfsize, halfsize,    texture->w, texture->h, color );
+}
+
+void 
+draw_box( Sint32 halfsize_x, Sint32 halfsize_y, Sint32 halfsize_z,  Uint16 color )
+{
+    // Top / Bottom
+    //Uint16 topcolor = 0xFFFF;
+	spQuad3D( -halfsize_x,  halfsize_y, halfsize_z,    
+			  -halfsize_x, -halfsize_y, halfsize_z, 
+			   halfsize_x, -halfsize_y, halfsize_z,  
+			   halfsize_x,  halfsize_y, halfsize_z, color );
+	spQuad3D(  halfsize_x,  halfsize_y, -halfsize_z,     
+			   halfsize_x, -halfsize_y, -halfsize_z,  
+			  -halfsize_x, -halfsize_y, -halfsize_z, 
+			  -halfsize_x,  halfsize_y, -halfsize_z, color );
+	//Left / Right
+	spQuad3D( -halfsize_x,  halfsize_y,  halfsize_z,    
+			  -halfsize_x,  halfsize_y, -halfsize_z, 
+			  -halfsize_x, -halfsize_y, -halfsize_z,
+			  -halfsize_x, -halfsize_y,  halfsize_z, color );
+	spQuad3D( halfsize_x, -halfsize_y,  halfsize_z,   
+			  halfsize_x, -halfsize_y, -halfsize_z,
+			  halfsize_x,  halfsize_y, -halfsize_z, 
+			  halfsize_x,  halfsize_y,  halfsize_z, color );
+	//Up / Down  // play_texture->w - 1, play_texture->h - 1, 
+	spQuad3D(  halfsize_x, halfsize_y,  halfsize_z,    
+			   halfsize_x, halfsize_y, -halfsize_z, 
+			  -halfsize_x, halfsize_y, -halfsize_z,
+			  -halfsize_x, halfsize_y,  halfsize_z, color );
+	spQuad3D( -halfsize_x, -halfsize_y,  halfsize_z,   
+			  -halfsize_x, -halfsize_y, -halfsize_z,
+			   halfsize_x,   -halfsize_y, -halfsize_z, 
+			   halfsize_x,   -halfsize_y,  halfsize_z, color );
+}
+
+
+
 World::World() 
 {
 
@@ -21,7 +91,7 @@ World::World()
                                             m_colconfig );
 	//m_dworld->setDebugDrawer(&gDebugDraw);
 	
-	m_dworld->setGravity( btVector3(0,0,-10) );
+	m_dworld->setGravity( btVector3(0,0,-1) );
 
 
     // standard box shape
@@ -40,7 +110,7 @@ World::World()
 
 
 btRigidBody*
-World::add_cube( sbVector3 pos )
+World::add_cube( sbVector pos )
 {
 	btTransform transform;
 	transform.setIdentity();
@@ -61,11 +131,13 @@ World::add_cube( sbVector3 pos )
 
 
 btRigidBody*
-World::add_box( float size_x, float size_y, float size_z, 
-                sbVector3 pos,
-                float mass_ )
+World::add_box( sbVector size, 
+                sbVector pos,
+                Uint32 mass_ )
 {
-	btBoxShape* newbox = new btBoxShape( btVector3(size_x, size_y, size_z) );
+	btBoxShape* newbox = new btBoxShape(   btVector3( spFixedToFloat(size.x), 
+                                                      spFixedToFloat(size.y), 
+                                                      spFixedToFloat(size.z) )   );
 	
 	m_colshapes.push_back( newbox );
 
@@ -76,7 +148,7 @@ World::add_box( float size_x, float size_y, float size_z,
                                       spFixedToFloat(pos.z) )   );
 
 
-    btScalar mass(mass_);
+    btScalar mass( spFixedToFloat(mass_) );
 
     //rigidbody is dynamic if and only if mass is non zero, otherwise static
     bool isDynamic = (mass != 0.f);
@@ -216,10 +288,11 @@ World::~World()
 
 
 
-Cube::Cube( sbVector3 pos, 
+Cube::Cube( sbVector pos, 
           Uint16 color_ )
 {
     lastpos = pos;
+    //std::cout << " pos = " << pos.z << std::endl;
     color = color_;
     m_dworld = NULL;
 }
@@ -242,14 +315,15 @@ Cube::add_to_world( World& world )
 
 
 void
-Cube::get_position_orientation( sbVector3& pos, btQuaternion& rot )
+Cube::get_position_orientation( sbVector& pos, btQuaternion& rot )
 {
     if (m_dworld)
     {
         btTransform transform;
         m_rb->getMotionState()->getWorldTransform( transform );
-        lastpos = sbVector3( transform.getOrigin() );
+        lastpos = sbVector( transform.getOrigin() );
         lastrot = transform.getRotation();
+        //std::cout << " cube z = " << lastpos.z << std::endl;
     }
     pos = lastpos;
     rot = lastrot;
@@ -265,9 +339,22 @@ Cube::remove_from_world()
         delete m_rb->getMotionState();
         delete m_rb;
         m_dworld = NULL;
+        std::cout << " i am not physicsy anymore. " << std::endl;
     }
 }
 
+void 
+Cube::change_matrix_and_draw( SDL_Surface* texture )
+{
+    spTranslate( lastpos.x, lastpos.y, lastpos.z );
+	//spSetAlphaPattern4x4(200,8);
+	spSetAlphaPattern4x4(255,8);  // max is 255.  not sure what the second arg does.  seems to help with texture.
+    if (texture)
+        draw_textured_cube( texture, SP_ONE, color );
+    else
+        draw_box( SP_ONE, SP_ONE, SP_ONE, color );
+    spTranslate( -lastpos.x, -lastpos.y, -lastpos.z );
+}
 
 int
 Cube::done()
@@ -279,5 +366,81 @@ Cube::~Cube()
 {
     remove_from_world();
 }
+
+Box::Box( sbVector size_, 
+          sbVector pos, 
+          Uint16 color_ )
+{
+    size = size_;
+    lastpos = pos;
+    color = color_;
+    m_dworld = NULL;
+}
+
+
+void
+Box::add_to_world( World& world )
+{	
+    if (m_dworld)
+    {
+        // do we want to readd it by destroying it first?
+        // just ignore for now.
+    }
+    else
+    {
+        m_dworld = world.m_dworld;
+        m_rb = world.add_box( size, lastpos );
+    }
+}
+
+
+void
+Box::get_position_orientation( sbVector& pos, btQuaternion& rot )
+{
+    if (m_dworld)
+    {
+        btTransform transform;
+        m_rb->getMotionState()->getWorldTransform( transform );
+        lastpos = sbVector( transform.getOrigin() );
+        lastrot = transform.getRotation();
+        std::cout << " box z = " << lastpos.z << std::endl;
+    }
+    pos = lastpos;
+    rot = lastrot;
+}
+
+
+void
+Box::remove_from_world()
+{
+    if (m_dworld)
+    {
+        m_dworld->removeRigidBody(m_rb);
+        delete m_rb->getMotionState();
+        delete m_rb;
+        m_dworld = NULL;
+    }
+}
+
+void
+Box::change_matrix_and_draw()
+{
+    spTranslate( lastpos.x, lastpos.y, lastpos.z );
+    draw_box( size.x, size.y, size.z, color );
+}
+
+
+int
+Box::done()
+{
+    return iamdone;
+}
+
+Box::~Box()
+{
+    remove_from_world();
+}
+
+
 
 

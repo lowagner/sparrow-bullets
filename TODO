@@ -1,16 +1,14 @@
-TOP PRIORITY
+PRIORITY
 
 how to draw things:
+orientations of the players wrt the physics class.
 
-figure out world to relative coordinates, and also how to
-do orientations of the players wrt the physics class.
-
-int *array = new int[10]; // to get the opengl matrix multipliaction...
 
 
 BUGS
 
-none currently known.
+SEGFAULT after exiting program.
+
 
 
 
@@ -23,6 +21,8 @@ let that factor into how well he can navigate.
 ALso about collisions:
 Need to know if player hit his head or landed on his feet.
 
+check out "HitFraction"
+btScalar btCollisionObject::getHitFraction  (       )    const
 
 
 
@@ -37,12 +37,12 @@ add_observer_box // some box which will send a signal to whatever method when so
 
 player jump - if in contact with ground, allow for mostly vertical force.
 
-camera position - looks good for now, but give
-it a player config file so players can move it where they want.
-
 
 
 Player Physics:
+
+useful methods of bullet physics classes.
+
 
 Need to somehow cancel out momentum in whatever direction the player is traveling,
 

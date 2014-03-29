@@ -5,44 +5,45 @@
 #include "csparrow.h"
 #include <iostream>
 
-class sbVector3
+class sbVector
 {
 public:
     Sint32 x, y, z;
 
     // conversions from all the different things you could put in
-    sbVector3( int x_=0, int y_=0, int z_=0 );
-    sbVector3( float x_, float y_, float z_ );
-    sbVector3( btVector3 v );
+    sbVector(); // default constructor = zero vector
+    sbVector( int x_, int y_, int z_ );
+    sbVector( float x_, float y_, float z_ );
+    sbVector( btVector3 v );
 
     // assignment operator
-    sbVector3& operator = ( const sbVector3 &rhs );
+    sbVector& operator = ( const sbVector &rhs );
 
     // addition
-    sbVector3& operator += ( const sbVector3 &rhs );
-    const sbVector3 operator + ( const sbVector3 &rhs ) const;
+    sbVector& operator += ( const sbVector &rhs );
+    const sbVector operator + ( const sbVector &rhs ) const;
 
     // subtraction
-    sbVector3& operator -= ( const sbVector3 &rhs );
-    const sbVector3 operator - ( const sbVector3 &rhs ) const;
+    sbVector& operator -= ( const sbVector &rhs );
+    const sbVector operator - ( const sbVector &rhs ) const;
    
     // multiplication
-//    sbVector3& operator *= ( const sbVector3 &rhs );
-//    const sbVector3 operator * ( const sbVector3 &rhs ) const;
-    sbVector3& operator *= ( float& rhs );
-    const sbVector3 operator * ( float& rhs ) const;
-    sbVector3& operator *= ( int& rhs );
-    const sbVector3 operator * ( int& rhs ) const;
+//    sbVector& operator *= ( const sbVector &rhs );
+//    const sbVector operator * ( const sbVector &rhs ) const;
+    sbVector& operator *= ( float& rhs );
+    const sbVector operator * ( float& rhs ) const;
+    sbVector& operator *= ( int& rhs );
+    const sbVector operator * ( int& rhs ) const;
 
     // equality checks
-    bool operator == ( const sbVector3& rhs ) const;
-    bool operator != ( const sbVector3& rhs ) const;
+    bool operator == ( const sbVector& rhs ) const;
+    bool operator != ( const sbVector& rhs ) const;
 
-    friend std::ostream& operator << ( std::ostream&, const sbVector3& v );
+    friend std::ostream& operator << ( std::ostream&, const sbVector& v );
 };
 
 
-sbVector3 operator * ( int scalar, sbVector3 rhs );
+sbVector operator * ( int scalar, sbVector rhs );
 
 
 #endif

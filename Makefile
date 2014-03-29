@@ -33,7 +33,7 @@ all: main.cpp
 targets:
 	@echo "The targets are the same like for sparrow3d. :P"
 
-main.cpp: copySparrow play.o world.o main.o basic.o makeBuildDir meta.h basic.h
+main.cpp: copySparrow play.o world.o main.o basic.o makeBuildDir play.h world.h meta.h basic.h
 	$(CPP) $(CFLAGS) main.o play.o world.o basic.o $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(LIB) $(SDL_LIB) $(STATIC) $(DYNAMIC) -o $(BUILD)/$(PROGRAM) $(BULLET_DYNAMIC_LIB)
 
 main.o: play.h world.h meta.h basic.h

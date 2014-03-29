@@ -18,28 +18,33 @@
 Play::Play()
 {
     // non physics type stuff
-	checkertexture = spLoadSurface("./data/check.png");
+    checkertexture = spLoadSurface("./data/check.png");
 
     font=NULL;
+    distance = spFloatToFixed( -25.0f );
+    axis = 0;
+    rotation = spFloatToFixed( -1.5f ); // closer to zero - more from top down.
 
     //input.push_back("");
-    pause = 0;
+    pause = 1;
     iamdone = 0;
-    threading = 0;
-    play_light = 1;
-    play_perspective = 0;
 
     // initialize the physics land and world drawing class
     // THIS IS UNNECESSARY, since World already created itself in Play variables.
     //world = World();
-    world.add_box( 10,10,1, sbVector3(0,0,-1) ); // add the floor
-    hero = Cube( sbVector3(0,0,10) );
+    floor = Box( sbVector(10,10,1), sbVector(0,0,-10), 0x000 );
+    floor.add_to_world( world );
+    //world.add_box( 10,10,2, sbVector(0,0,-1) ); // add the floor
+    hero = Cube( sbVector(0,0,10) );
     hero.add_to_world( world );
+	
+    spDrawInExtraThread(0);
+    //spDrawInExtraThread(1);
 
 //// debugging adding things to world.  this seems to work fine.
-//    Cube asdf(sbVector3(1,2,3));
+//    Cube asdf(sbVector(1,2,3));
 //    asdf.add_to_world( world );
-//    sbVector3 pos;
+//    sbVector pos;
 //    btQuaternion rot;
 //    asdf.get_position_orientation( pos, rot );
 //    std::cout << " asdf fell to " << pos.z() << std::endl;
@@ -53,105 +58,6 @@ Play::Play()
 //    asdf.remove_from_world();
 }
 
-char* 
-Play::caption_play(char* caption)
-{
-	sprintf(caption,"non-Rotating Cube");
-	return caption;
-}
-
-char* 
-Play::settings_play(char* caption,int button)
-{
-	switch (button)
-	{
-		case SP_BUTTON_A:
-			if (play_perspective)
-				sprintf(caption,"[A] Perspective fix");
-			else
-				sprintf(caption,"[A] Wobbly texture");
-			break;
-		case SP_BUTTON_B:
-			if (play_light)
-				sprintf(caption,"[B] Light on");
-			else
-				sprintf(caption,"[B] Light off");
-			break;
-	}
-	return caption;
-}
-
-
-void 
-Play::draw_textured_box( Sint32 halfsize, Uint16 color )
-{
-
-	spBindTexture( checkertexture );
-    // Top / Bottom
-	spQuadTex3D( -halfsize, halfsize, halfsize, 0, checkertexture->h,
-				-halfsize, -halfsize, halfsize, 0, 0,
-				halfsize, -halfsize, halfsize,  checkertexture->w, 0,
-				halfsize, halfsize, halfsize,   checkertexture->w, checkertexture->h, color );
-	spQuadTex3D( halfsize, halfsize, -halfsize,  0, checkertexture->h,
-				halfsize, -halfsize, -halfsize,  0, 0,
-				-halfsize, -halfsize, -halfsize, checkertexture->w, 0,
-				-halfsize, halfsize, -halfsize,  checkertexture->w, checkertexture->h, color );
-	//Left / Right
-	spQuadTex3D( -halfsize, halfsize, halfsize,  0, checkertexture->h,
-				-halfsize, halfsize, -halfsize,  0, 0,
-				-halfsize, -halfsize, -halfsize, checkertexture->w, 0,
-				-halfsize, -halfsize, halfsize,  checkertexture->w, checkertexture->h, color );
-	spQuadTex3D( halfsize, -halfsize, halfsize,  0, checkertexture->h,
-				halfsize, -halfsize, -halfsize,  0, 0,
-				halfsize, halfsize, -halfsize,   checkertexture->w, 0,
-				halfsize, halfsize, halfsize,    checkertexture->w, checkertexture->h, color );
-	//Up / Down  // play_texture->w - 1, play_texture->h - 1, 
-	spQuadTex3D( halfsize, halfsize, halfsize,   0, checkertexture->h,
-				halfsize, halfsize, -halfsize,   0, 0,
-				-halfsize, halfsize, -halfsize,  checkertexture->w, 0,
-				-halfsize, halfsize, halfsize,   checkertexture->w, checkertexture->h, color );
-	spQuadTex3D( -halfsize, -halfsize, halfsize,  0, checkertexture->h,
-				-halfsize, -halfsize, -halfsize,  0, 0,
-				halfsize, -halfsize, -halfsize,   checkertexture->w, 0,
-				halfsize, -halfsize, halfsize,    checkertexture->w, checkertexture->h, color );
-}
-
-void 
-Play::draw_box( Sint32 halfsize, Uint16 color )
-{
-    // Top / Bottom
-    Uint16 topcolor = 0xFFFF;
-	spQuad3D( -halfsize, halfsize, halfsize,    
-				-halfsize, -halfsize, halfsize, 
-				halfsize, -halfsize, halfsize,  
-				halfsize, halfsize, halfsize,   topcolor );
-	spQuad3D( halfsize, halfsize, -halfsize,     
-				halfsize, -halfsize, -halfsize,  
-				-halfsize, -halfsize, -halfsize, 
-				-halfsize, halfsize, -halfsize,  color );
-	//Left / Right
-	spQuad3D( -halfsize, halfsize, halfsize,    
-				-halfsize, halfsize, -halfsize, 
-				-halfsize, -halfsize, -halfsize,
-				-halfsize, -halfsize, halfsize, color );
-	spQuad3D( halfsize, -halfsize, halfsize,   
-				halfsize, -halfsize, -halfsize,
-				halfsize, halfsize, -halfsize, 
-				halfsize, halfsize, halfsize,  color );
-	//Up / Down  // play_texture->w - 1, play_texture->h - 1, 
-	spQuad3D( halfsize, halfsize, halfsize,    
-				halfsize, halfsize, -halfsize, 
-				-halfsize, halfsize, -halfsize,
-				-halfsize, halfsize, halfsize, color );
-	spQuad3D( -halfsize, -halfsize, halfsize,   
-				-halfsize, -halfsize, -halfsize,
-				halfsize, -halfsize, -halfsize, 
-				halfsize, -halfsize, halfsize,  color );
-}
-
-
-
-
 
 
 void Play::draw( SDL_Surface* screen )
@@ -160,77 +66,85 @@ void Play::draw( SDL_Surface* screen )
 	spSetZSet( 0 );
 	spSetZTest( 0 );
 	spSetAlphaTest( 1 );
-	spFontDraw( 2, font-> maxheight+2, 0, "[L] Previous", font );
-	spFontDrawRight( screen->w - 2 , font-> maxheight+2, 0, "[R] next", font );
+	spFontDraw( 2, font-> maxheight+2, 0, "[L] rotate up", font );
+	spFontDrawRight( screen->w - 2 , font-> maxheight+2, 0, "[R] rotate down", font );
 	spFontDrawRight( screen->w - 2 , 2, 0, "[S] Exit", font );
-	switch (spIsKeyboardPolled())
+	spFontDrawRight( screen->w - 2, screen->h - 2*font-> maxheight, 0, "[Y] Zoom in", font ); 
+	spFontDrawRight( screen->w - 2, screen->h - 1*font-> maxheight, 0, "[X] Zoom out", font );
+	
+    switch (pause)
 	{
-		case 0: spFontDraw( 2, 2, 0, "[E] Enter Text", font ); break;
-		case 1: spFontDraw( 2, 2, 0, "[E] Finish Text", font ); break;
-	}
-	switch (threading)
-	{
-		case 0: spFontDrawRight( screen->w - 2, screen->h - 1*font-> maxheight, 0, "[X] No draw thread", font ); break;
-		case 1: spFontDrawRight( screen->w - 2, screen->h - 1*font-> maxheight, 0, "[X] Extra draw thread", font ); break;
-	}
-	switch (pause)
-	{
-		case 0: spFontDrawRight( screen->w - 2, screen->h - 2*font-> maxheight, 0, "[Y] Pause", font ); break;
-		case 1: spFontDrawRight( screen->w - 2, screen->h - 2*font-> maxheight, 0, "[Y] Unpause", font ); break;
+		case 0:  spFontDraw( 2, 2, 0, "[E] Pause", font ); break;
+		case 1:  spFontDraw( 2, 2, 0, "[E] Unpause", font ); break;
 	}
 	//spFontDrawMiddle( screen->w /2, screen->h - 2*font-> maxheight, 0, input, font );
 
-	char buffer[256];
-    spFontDrawMiddle( screen->w / 2, font->maxheight + 2, 0, caption_play(buffer), font );
-    spFontDraw( 2, screen->h - 1*font->maxheight,0, settings_play(buffer,SP_BUTTON_A), font);
-    spFontDraw( 2, screen->h - 2*font->maxheight,0, settings_play(buffer,SP_BUTTON_B), font);
-	
+    spFontDrawMiddle( screen->w / 2, font->maxheight + 2, 0, "Falling Cube", font );	
+    spFontDraw( 2, screen->h - 1*font->maxheight,0, "[A] rotate left", font); 
+    spFontDraw( 2, screen->h - 2*font->maxheight,0, "[B] rotate right", font);
+
+    char buffer[64];
     sprintf( buffer, "fps: %i", spGetFPS() );
 	spFontDrawMiddle( screen->w/2, 1, 0, buffer, font );
-	if (spIsKeyboardPolled() && spGetVirtualKeyboardState() == SP_VIRTUAL_KEYBOARD_ALWAYS)
-		spBlitSurface(screen->w/2,screen->h-spGetVirtualKeyboard()->h/2,0,spGetVirtualKeyboard());
+    // this displays everything.
 	spFlip();
-	spResetZBuffer();
-	spClearTarget( spGetRGB(64,64,64) );
-	spIdentity();
+    
 
-	spSetLightPosition(0,spFloatToFixed( 0.875f ),spFloatToFixed( 0.875f ),spFloatToFixed( 0.875f ));
-	spSetLightColor(0,SP_ONE,SP_ONE,SP_ONE);
+    // we predraw things for next time. 
+	spClearTarget( spGetRGB(64,64,64) );
+	spResetZBuffer();
 	spSetZSet( 1 );
 	spSetZTest( 1 );
 
+	spSetLightPosition(0,spFloatToFixed( 0.875f ),spFloatToFixed( 0.875f ),spFloatToFixed( 0.875f ));
+	spSetLightColor(0,SP_ONE,SP_ONE,SP_ONE);
 
-    // now we actually draw the scene...
-	spSetPerspectiveTextureMapping( play_perspective );
+
+	spSetPerspectiveTextureMapping(1);
 
 ////  spMulMatrix(Sint32* matrix); 
-//  vector<Sint32> matrix;
 //  spMulMatrix( &matrix ); 
 
 //
 	spSetLight( 0 ); // or 1
 	spSetAlphaTest( 0 );  // this makes purple not invisible
-	
-    spTranslate( 0, 0, spFloatToFixed( -12.0f ) );
-	spRotateX( spFloatToFixed(-1.25f) );
+
+    // set the camera matrix
+	spIdentity();
+    spTranslate( 0, 0, distance );
+	spRotateX( rotation );
+	spRotateZ( axis );
     spTranslate( 0, 0, spFloatToFixed( -1.0f ) ); // go a bit up from the player
+   
+    // grab the camera matrix for later usage.
+    Sint32 matrix[16]; //pointer to array of 16 Sint32's.
+    memcpy(matrix,spGetMatrix(),16*sizeof(Sint32)); //Save camera matrix for later use.
+
+    floor.change_matrix_and_draw();
+    
+    memcpy(spGetMatrix(),matrix,16*sizeof(Sint32)); //grab old camera matrix
+    hero.change_matrix_and_draw( checkertexture );
 
 	//spDeactivatePattern();
 	spSetPerspectiveTextureMapping(0);
-
-    Sint32 size = spFloatToFixed ( 1.5f );
-    Uint16 color = 0x8F2F;
-	spSetAlphaPattern4x4(200,8);
-    draw_box( size, color );
-	
-	spTranslate( spFloatToFixed ( -3.0f ), 0, 0 );
-    
-    size = SP_ONE;
-    color = 0x8F2F;
-	spSetAlphaPattern4x4(255,8);  // max is 255.  not sure what the second arg does.  seems to help with texture.
-
-    draw_textured_box( size, color );
-
+//
+//    // first we manuever the to world coordinates
+//    floor.setup_worldview();
+//    // then multiply by the camera matrix
+//    floor.draw();
+//    
+//    //copy back the camera matrix
+//    //memcpy(cameramatrix,spGetMatrix(),16*sizeof(Sint32)); //Save camera matrix for later use.
+//    // first we manuever to world coordinates
+//    hero.setup_worldview();
+//    // then multiply by the camera matrix
+//    hero.draw( checkertexture );
+//	
+//    // first we manuever to world coordinates
+//    hero.setup_worldview();
+//    // then multiply by the camera matrix
+//    spMulMatrix( cameramatrix ); 
+//    hero.draw( checkertexture );
 }
 
 
@@ -240,66 +154,61 @@ int Play::update( Uint32 dt )
 	if ( spGetInput()->button[SP_BUTTON_A] )
 	{
 		spGetInput()->button[SP_BUTTON_A] = 0;
-		play_perspective = 1-play_perspective;
+        axis += 10000;
+        std::cout << " axis = " << axis << std::endl;
 	}
 	if ( spGetInput()->button[SP_BUTTON_B] )
 	{
 		spGetInput()->button[SP_BUTTON_B] = 0;
-		play_light = 1-play_light;
+        axis -= 10000;
+        std::cout << " axis = " << axis << std::endl;
 	}
 
 	if ( spGetInput()->button[SP_BUTTON_START] )
         iamdone = 1;
 	
-	if ( spIsKeyboardPolled())
-	{
-		if ( spGetInput()->button[SP_BUTTON_SELECT] )
-		{
-			spGetInput()->button[SP_BUTTON_SELECT] = 0;
-			spStopKeyboardInput();
-		}
-	}
+    if ( spGetInput()->button[SP_BUTTON_SELECT] )
+    {
+        spGetInput()->button[SP_BUTTON_SELECT] = 0;
+        pause = 1-pause;
+    }
 	if ( spGetInput()->button[SP_BUTTON_X] )
 	{
 		spGetInput()->button[SP_BUTTON_X] = 0;
-		threading = (threading+1) % 2;
-		spDrawInExtraThread(threading);
+        distance -= 100000;
+        std::cout << " distance = " << distance << std::endl;
+		//threading = (threading+1) % 2;
+		//spDrawInExtraThread(threading);
 	}
 	if ( spGetInput()->button[SP_BUTTON_Y] )
 	{
 		spGetInput()->button[SP_BUTTON_Y] = 0;
-		pause = 1-pause;
+        distance += 100000;
+        std::cout << " distance = " << distance << std::endl;
 	}
 	if ( spGetInput()->button[SP_BUTTON_R] )
 	{
 		spGetInput()->button[SP_BUTTON_R] = 0;
+        rotation += 10000;
+        std::cout << " rotation = " << rotation << std::endl;
 	}
 	if ( spGetInput()->button[SP_BUTTON_L] )
 	{
 		spGetInput()->button[SP_BUTTON_L] = 0;
-	}
-
-	if ( spGetInput()->button[SP_BUTTON_SELECT] )
-	{
-		spGetInput()->button[SP_BUTTON_SELECT] = 0;
-		//spPollKeyboardInput(input,32,SP_BUTTON_A_MASK | SP_BUTTON_B_MASK);
+        rotation -= 10000;
+        std::cout << " rotation = " << rotation << std::endl;
+        
 	}
 
     // updatey type things
     //std::cout << " dt = " << dt << std::endl;
     if (!(pause))
     {
-        world.update( 1.0*dt/100 );
+        world.update( dt*1.0/100 );
 
-        sbVector3 heropos;
+        sbVector heropos;
         btQuaternion herorot;
         hero.get_position_orientation( heropos, herorot );
-        if (float(heropos.z) < spFloatToFixed(1.01))
-        {
-            std::cout << " hero fell to less than 1.01 " << std::endl;
-            hero.remove_from_world();
-        }
-        //std::cout << " hero z = " << heropos.z() << std::endl;
     }
 
     // return a value
@@ -312,24 +221,6 @@ int Play::update( Uint32 dt )
 void Play::resize( Uint16 w, Uint16 h )
 {
 	spSelectRenderTarget(spGetWindowSurface());
-	//Settings up the onboard keyboard:
-	if (spGetSizeFactor() <= SP_ONE)
-		spSetVirtualKeyboard(SP_VIRTUAL_KEYBOARD_IF_NEEDED,
-                0,h-w*48/320,w,w*48/320,
-                spLoadSurface("./data/keyboard320.png"),
-                spLoadSurface("./data/keyboardShift320.png"));
-	else
-	if (spGetSizeFactor() <= 2*SP_ONE)
-		spSetVirtualKeyboard(SP_VIRTUAL_KEYBOARD_IF_NEEDED,
-                0,h-w*48/320,w,w*48/320,
-                spLoadSurface("./data/keyboard640.png"),
-                spLoadSurface("./data/keyboardShift640.png"));
-	else
-		spSetVirtualKeyboard(SP_VIRTUAL_KEYBOARD_IF_NEEDED,
-                0,h-w*48/320,w,w*48/320,
-                spLoadSurface("./data/keyboard1280.png"),
-                spLoadSurface("./data/keyboardShift1280.png"));
-		
 	//Setup of the new/resized window
 	spSetPerspective( 45.0, ( float )spGetWindowSurface()->w / ( float )spGetWindowSurface()->h, 1.0f, 100.0f );
 
