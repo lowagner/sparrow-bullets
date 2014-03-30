@@ -33,17 +33,26 @@ Play::Play()
     // THIS IS UNNECESSARY, since World already created itself in Play variables.
     //world = World();
     floor = Box( sbVector(10,10,1), sbVector(0,0,-10), 0x000 );
-    floor.add_to_world( world );
+    floor.add_physics( physics );
     //world.add_box( 10,10,2, sbVector(0,0,-1) ); // add the floor
     hero = Cube( sbVector(0,0,10) );
-    hero.add_to_world( world );
+    hero.add_physics( physics );
+
+    for ( int i=0; i<5; i++ )
+    {
+        cargo.push_back(  Cube( sbVector(2*i-3,0,10+2*i), 0xF00F )  );
+    }
+    for ( int i=0; i<5; i++ )
+    {
+        cargo[i].add_physics( physics );
+    }
 	
     spDrawInExtraThread(0);
     //spDrawInExtraThread(1);
 
 //// debugging adding things to world.  this seems to work fine.
 //    Cube asdf(sbVector(1,2,3));
-//    asdf.add_to_world( world );
+//    asdf.add_physics( world );
 //    sbVector pos;
 //    btQuaternion rot;
 //    asdf.get_position_orientation( pos, rot );
@@ -51,11 +60,11 @@ Play::Play()
 //    world.update(0.1);
 //    asdf.get_position_orientation( pos, rot );
 //    std::cout << " asdf fell to " << pos.z() << std::endl;
-//    asdf.remove_from_world();
+//    asdf.remove_physics();
 //    world.update(0.1);
 //    asdf.get_position_orientation( pos, rot );
 //    std::cout << " asdf fell to " << pos.z() << std::endl;
-//    asdf.remove_from_world();
+//    asdf.remove_physics();
 }
 
 
@@ -124,6 +133,13 @@ void Play::draw( SDL_Surface* screen )
     
     memcpy(spGetMatrix(),matrix,16*sizeof(Sint32)); //grab old camera matrix
     hero.change_matrix_and_draw( checkertexture );
+    
+
+    for (int i=0; i<cargo.size(); i++)
+    {
+        memcpy(spGetMatrix(),matrix,16*sizeof(Sint32)); //grab old camera matrix
+        cargo[i].change_matrix_and_draw( checkertexture );
+    }
 
 	//spDeactivatePattern();
 	spSetPerspectiveTextureMapping(0);
@@ -204,11 +220,15 @@ int Play::update( Uint32 dt )
     //std::cout << " dt = " << dt << std::endl;
     if (!(pause))
     {
-        world.update( dt*1.0/100 );
+        physics.update( dt*1.0/100 );
 
         sbVector heropos;
         btQuaternion herorot;
         hero.get_position_orientation( heropos, herorot );
+        for (int i=0; i<cargo.size(); i++)
+        {
+            cargo[i].get_position_orientation( heropos, herorot );
+        }
     }
 
     // return a value

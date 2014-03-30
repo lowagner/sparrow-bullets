@@ -9,8 +9,10 @@
 #ifndef __PLAY__
 #define __PLAY__
 
-#include "world.h"
+#include "physics.h"
+#include "objects.h"
 #include "meta.h"
+#include <vector>
 //#include <string>
 //using std::string;
 
@@ -27,6 +29,7 @@ private:
     spFontPointer font;
 
     Cube hero;
+    std::vector<Cube> cargo;
     Box floor;
 
     int pause;
@@ -38,7 +41,7 @@ private:
     char* caption_play(char* caption);
     
     int iamdone;
-    World world;
+    Physics physics;
     
     
 public:
