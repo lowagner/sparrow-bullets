@@ -3,7 +3,8 @@ sparrow-bullets
 
 Getting sparrow3d talking to bullet physics. The
 project is in its infant stages, but you can compile the code
-and see a box fall from the sky.  Whoo!
+and see boxes fall from the sky.  (Press backspace/select(?) to
+unpause.)
 
 sparrow3d is a C library, and bullet physics is mostly C++.  So
 what you will find here is a C++ game framework which wraps

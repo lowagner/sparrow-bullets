@@ -15,7 +15,7 @@
 //using std::string;
 #include <iostream>
 
-Play::Play()
+Play::Play() // init play class
 {
     // non physics type stuff
     checkertexture = spLoadSurface("./data/check.png");
@@ -46,6 +46,9 @@ Play::Play()
     {
         cargo[i].add_physics( physics );
     }
+
+    sbVector pos; btQuaternion rot;
+    floor.get_position_orientation( pos, rot );
 	
     spDrawInExtraThread(0);
     //spDrawInExtraThread(1);

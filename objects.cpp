@@ -172,6 +172,22 @@ Box::Box( sbVector size_,
 {
     size = size_;
     lastpos = pos;
+    for (int i=0; i<16; i++)
+        lastorientation[i] = 0;
+    for (int i=0; i<4; i++)
+        lastorientation[4*i+i] = SP_ONE;
+    lastorientation[12] = pos.x;
+    lastorientation[13] = pos.y;
+    lastorientation[14] = pos.z;
+
+    //std::cout << "initial box matrix = " << std::endl;
+    //for (int i=0; i<16; i++)
+    //{
+    //    std::cout << lastorientation[i] <<  " ";
+    //}
+    //std::cout << std::endl;
+
+
     color = color_;
     m_dworld = NULL;
 }
@@ -205,11 +221,14 @@ Box::get_position_orientation( sbVector& pos, btQuaternion& rot )
         lastrot = transform.getRotation();
         //std::cout << " box z = " << lastpos.z << std::endl;
         
+        //std::cout << " box matrix = " << std::endl;
         transform.getOpenGLMatrix(m); 
         for (int i=0; i<16; i++)
         {
             lastorientation[i] = spFloatToFixed( m[i] );
+            //std::cout << lastorientation[i] <<  " ";
         }
+        std::cout << std::endl;
 
     }
     pos = lastpos;
