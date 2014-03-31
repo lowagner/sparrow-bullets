@@ -67,6 +67,40 @@ draw_box( Sint32 halfsize_x, Sint32 halfsize_y, Sint32 halfsize_z,  Uint16 color
 			   halfsize_x,   -halfsize_y,  halfsize_z, color );
 }
 
+void 
+draw_ramp( Sint32 sizex, Sint32 sizey, Sint32 sizez,  Uint16 color )
+{
+    // bottom
+	spQuad3D( 0, 0, 0,    
+			  0,  sizey, 0, 
+			  sizex, sizey, 0,  
+			  sizex, 0, 0, 
+              color );
+    // ramp
+	spQuad3D( 0, 0, 0,     
+			  sizex, 0, sizez,  
+			  sizex, sizey, sizez, 
+			  0,  sizey, 0, color );
+    // back part
+	spQuad3D( sizex, 0, 0,     
+			  sizex, sizey, 0,  
+			  sizex, sizey, sizez, 
+			  sizex, 0, sizez, color );
+    // left part
+	spTriangle3D( 0, 0, 0,     
+			      sizex, 0, 0,  
+			      sizex, 0, sizez, 
+			      color );
+    // right part
+	spTriangle3D( 0, sizey, 0,     
+			      sizex, sizey, sizez, 
+			      sizex, sizey, 0,  
+			      color );
+}
+
+
+
+
 
 BaseObject::BaseObject()
 {}
@@ -253,5 +287,59 @@ Box::~Box()
 }
 
 
+Ramp::Ramp( sbVector size_, 
+          sbVector pos, 
+          Uint16 color_ )
+{
+    for (int i=0; i<16; i++)
+        lastpor[i] = 0;
+    for (int i=0; i<4; i++)
+        lastpor[4*i+i] = SP_ONE;
+    lastpor[12] = pos.x;
+    lastpor[13] = pos.y;
+    lastpor[14] = pos.z;
+
+    size = size_;
+    color = color_;
+    m_dworld = NULL;
+}
+
+
+void
+Ramp::add_physics( Physics& physics )
+{	
+    if (m_dworld)
+    {
+        // do we want to readd it by destroying it first?
+        // just ignore for now.
+    }
+    else
+    {
+        m_dworld = physics.m_dworld;
+        m_rb = physics.add_ramp( size, last_position() );
+    }
+}
+
+
+void
+Ramp::update( Uint32 dt )
+{
+    // find where box is now.
+    locate();
+}
+
+void
+Ramp::draw_mess()
+{
+    //spTranslate( lastpos.x, lastpos.y, lastpos.z );
+    spMulMatrix( lastpor );
+    draw_ramp( size.x, size.y, size.z, color );
+}
+
+
+Ramp::~Ramp()
+{
+    remove_physics();
+}
 
 

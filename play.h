@@ -31,6 +31,7 @@ private:
     Cube hero;
     std::vector<Cube> cargo;
     Box floor;
+    Ramp ramp;
 
     int pause;
     int no_movement;

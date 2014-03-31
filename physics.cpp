@@ -62,7 +62,6 @@ Physics::add_cube( sbVector pos )
     return body; // keep track of the bodies however you want
 }
 
-
 btRigidBody*
 Physics::add_box( sbVector size, 
                 sbVector pos,
@@ -84,10 +83,48 @@ Physics::add_box( sbVector size,
     btScalar mass( spFixedToFloat(mass_) );
 
     //rigidbody is dynamic if and only if mass is non zero, otherwise static
-    bool isDynamic = (mass != 0.f);
-
     btVector3 localInertia(0,0,0);
-    if (isDynamic)
+    if (mass != 0.f)
+        newbox->calculateLocalInertia(mass,localInertia);
+
+    //using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
+    btDefaultMotionState* myMotionState = new btDefaultMotionState( transform );
+    btRigidBody::btRigidBodyConstructionInfo rbInfo(mass,myMotionState,newbox,localInertia);
+    btRigidBody* body = new btRigidBody(rbInfo);
+
+    //add the body to the dynamics world
+    m_dworld->addRigidBody(body);
+
+    return body;
+}
+
+btRigidBody*
+Physics::add_ramp( sbVector size, 
+                   sbVector pos,
+                   Uint32 mass_ )
+{
+	btConvexHullShape* newbox = new btConvexHullShape();
+    newbox->addPoint( btVector3(0,0,0) );
+    newbox->addPoint( btVector3(spFixedToFloat(size.x),0,0) );
+    newbox->addPoint( btVector3(spFixedToFloat(size.x),spFixedToFloat(size.y),0) );
+    newbox->addPoint( btVector3(0,spFixedToFloat(size.y),0) );
+    newbox->addPoint( btVector3(spFixedToFloat(size.x),0,spFixedToFloat(size.z)) );
+    newbox->addPoint( btVector3(spFixedToFloat(size.x),spFixedToFloat(size.y),spFixedToFloat(size.z)) );
+	
+	m_colshapes.push_back( newbox );
+
+	btTransform transform;
+	transform.setIdentity();
+	transform.setOrigin(   btVector3( spFixedToFloat(pos.x),
+                                      spFixedToFloat(pos.y),
+                                      spFixedToFloat(pos.z) )   );
+
+
+    btScalar mass( spFixedToFloat(mass_) );
+
+    //rigidbody is dynamic if and only if mass is non zero, otherwise static
+    btVector3 localInertia(0,0,0);
+    if (mass != 0.f)
         newbox->calculateLocalInertia(mass,localInertia);
 
     //using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects

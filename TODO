@@ -14,12 +14,10 @@ methods to figure out:
 
 
 
-
 BUGS
 
 SEGFAULT after exiting program.
     related to not freeing the surface texture?
-    check what's going on with checkertexture.
   doesn't seem to be the problem.
   see if it's not removing the colshape of the box from that physics part.
 

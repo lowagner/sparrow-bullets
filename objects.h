@@ -5,11 +5,15 @@
 #include "csparrow.h"
 
 
-void draw_textured_cube( SDL_Surface* texture, Sint32 halfsize = SP_ONE, Uint16 color = 0xFFF );
+void draw_textured_cube( SDL_Surface* texture, Sint32 halfsize = SP_ONE, Uint16 color = 0xFFFF );
 void draw_box( Sint32 halfsize_x = SP_ONE, 
                Sint32 halfsize_y = SP_ONE, 
                Sint32 halfsize_z = SP_ONE, 
-               Uint16 color = 0xFFF );
+               Uint16 color = 0xFFFF );
+void draw_ramp( Sint32 sizex = SP_ONE, 
+                Sint32 sizey = SP_ONE, 
+                Sint32 sizez = SP_ONE, 
+                Uint16 color = 0xFFFF );
 
 class BaseObject
 {
@@ -69,7 +73,7 @@ class Box : public BaseObject
 protected:
     sbVector size;
 public:
-    Box( sbVector size_=sbVector(1,1,1), sbVector pos=sbVector(), Uint16 color_=0xFFF );
+    Box( sbVector size_=sbVector(1,1,1), sbVector pos=sbVector(), Uint16 color_=0xFFFF );
 
     void update( Uint32 dt );
     
@@ -81,5 +85,21 @@ public:
     ~Box();
 };
 
+class Ramp : public BaseObject
+{
+protected:
+    sbVector size;
+public:
+    Ramp( sbVector size_=sbVector(1,1,1), sbVector pos=sbVector(), Uint16 color_=0xFFFF );
+
+    void update( Uint32 dt );
+    
+    void add_physics( Physics& physics );
+
+    // translate/rotate the model-view matrix and then draw:
+    void draw_mess(); 
+
+    ~Ramp();
+};
 
 #endif

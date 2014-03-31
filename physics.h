@@ -50,6 +50,11 @@ public:
     add_box( sbVector size, 
              sbVector pos,
              Uint32 mass_=0 );
+    
+    btRigidBody*
+    add_ramp( sbVector size, 
+             sbVector pos,
+             Uint32 mass_=0 );
 
     void remove_body( btRigidBody* rb );
 

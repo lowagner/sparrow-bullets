@@ -34,6 +34,10 @@ Play::Play() // init play class
     //world = World();
     floor = Box( sbVector(10,10,1), sbVector(0,0,-5), 0x05FF );
     floor.add_physics( physics );
+
+    ramp = Ramp( sbVector(10,10,3), sbVector(-5,-5,-4), 0xFFFF );
+    ramp.add_physics( physics );
+
     //world.add_box( 10,10,2, sbVector(0,0,-1) ); // add the floor
     hero = Cube( sbVector(0,0,10), 0xF00F, checkertexture );
     hero.add_physics( physics );
@@ -123,6 +127,9 @@ void Play::draw( SDL_Surface* screen )
     memcpy(matrix,spGetMatrix(),16*sizeof(Sint32)); //need to reload this after every draw.
 
     floor.draw_mess(); // remember to reload camera matrix after this.
+    memcpy(spGetMatrix(),matrix,16*sizeof(Sint32)); //reload camera matrix after every draw
+
+    ramp.draw_mess(); // remember to reload camera matrix after this.
     memcpy(spGetMatrix(),matrix,16*sizeof(Sint32)); //reload camera matrix after every draw
 
     hero.draw_mess(); // remember to reload camera matrix after this.
