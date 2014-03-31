@@ -1,14 +1,5 @@
 PRIORITY
 
-how to draw things:
-orientations of the players wrt the physics class.
-use getOpenGL matrix (or something like that)
-and just multiply it against the current matrix.
-
-
-spMullMatrix( openGL )
-
-
 write a Character class.  initialized with 
 mesh and texture
 
