@@ -22,7 +22,7 @@ Play::Play() // init play class
 
     font=NULL;
     distance = spFloatToFixed( -25.0f );
-    axis = 0;
+    axis = SP_PI * 0.1;
     rotation = spFloatToFixed( -1.5f ); // closer to zero - more from top down.
 
     //input.push_back("");
@@ -32,10 +32,10 @@ Play::Play() // init play class
     // initialize the physics land and world drawing class
     // THIS IS UNNECESSARY, since World already created itself in Play variables.
     //world = World();
-    floor = Box( sbVector(10,10,1), sbVector(0,0,-5), 0x05FF );
+    floor = Box( sbVector(10,10,1), sbVector(0,0,-5), 0x05FF ); // half-sizes, pos, color
     floor.add_physics( physics );
 
-    ramp = Ramp( sbVector(10,10,3), sbVector(-5,-5,-4), 0xFFFF );
+    ramp = Ramp( sbVector(10,2.5,8), sbVector(-5,-1.5,-3), 0xFFFF ); // sizes, pos, color
     ramp.add_physics( physics );
 
     //world.add_box( 10,10,2, sbVector(0,0,-1) ); // add the floor

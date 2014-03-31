@@ -1,8 +1,5 @@
 PRIORITY
 
-write a CubeModel class.  initialized with 
-mesh and texture.  inherits from Cube.
-
 in Cube:
 methods to figure out:
     hit fraction with other objects.
@@ -11,6 +8,15 @@ methods to figure out:
         sets a timer, sends out sparks (spLine)
 
     need a "jump" method.
+
+
+Ramp class:
+    or in general all BaseObjects:...
+    implement rotate method.
+
+
+write a CubeModel class.  initialized with 
+mesh and texture.  inherits from Cube.
 
 
 

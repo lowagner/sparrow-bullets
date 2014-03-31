@@ -19,6 +19,49 @@ sbVector::sbVector( float x_, float y_, float z_ )
     z=spFloatToFixed(z_);
 }
 
+sbVector::sbVector( float x_, int y_, int z_ )
+{
+    x=spFloatToFixed(x_);
+    y=spIntToFixed(y_);
+    z=spIntToFixed(z_);
+}
+
+sbVector::sbVector( int x_, float y_, float z_ )
+{
+    x=spIntToFixed(x_);
+    y=spFloatToFixed(y_);
+    z=spFloatToFixed(z_);
+}
+
+sbVector::sbVector( int x_, float y_, int z_ )
+{
+    x=spIntToFixed(x_);
+    y=spFloatToFixed(y_);
+    z=spIntToFixed(z_);
+}
+
+sbVector::sbVector( float x_, int y_, float z_ )
+{
+    x=spFloatToFixed(x_);
+    y=spIntToFixed(y_);
+    z=spFloatToFixed(z_);
+}
+
+sbVector::sbVector( int x_, int y_, float z_ )
+{
+    x=spIntToFixed(x_);
+    y=spIntToFixed(y_);
+    z=spFloatToFixed(z_);
+}
+
+sbVector::sbVector( float x_, float y_, int z_ )
+{
+    x=spFloatToFixed(x_);
+    y=spFloatToFixed(y_);
+    z=spIntToFixed(z_);
+}
+
+
 sbVector::sbVector( btVector3 v )
 {
     x=spFloatToFixed(v.x());

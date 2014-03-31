@@ -14,6 +14,12 @@ public:
     sbVector(); // default constructor = zero vector
     sbVector( int x_, int y_, int z_ );
     sbVector( float x_, float y_, float z_ );
+    sbVector( float x_, int y_, int z_ );
+    sbVector( int x_, float y_, float z_ );
+    sbVector( int x_, float y_, int z_ );
+    sbVector( float x_, int y_, float z_ );
+    sbVector( int x_, int y_, float z_ );
+    sbVector( float x_, float y_, int z_ );
     sbVector( btVector3 v );
 
     // assignment operator
