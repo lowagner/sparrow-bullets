@@ -152,9 +152,10 @@ Physics::update( float dt )
 {
     // get the dynamics world to go through the time steps
     //std::cout << "World  dt = " << dt << std::endl;
-    m_dworld->stepSimulation( dt, 7 );  
-    // second argument has to do with how many frames we do no matter what.
-
+    m_dworld->stepSimulation( dt, 10 );  
+    // second argument has to do with target FPS...?  
+    // not sure, but 10 is good to get fullscreen and small screen
+    // running at the same physicsy time, even if different FPS.
 }
 
 
