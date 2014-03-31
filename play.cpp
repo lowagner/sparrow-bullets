@@ -32,7 +32,7 @@ Play::Play() // init play class
     // initialize the physics land and world drawing class
     // THIS IS UNNECESSARY, since World already created itself in Play variables.
     //world = World();
-    floor = Box( sbVector(10,10,1), sbVector(0,0,-10), 0x050F );
+    floor = Box( sbVector(10,10,1), sbVector(0,0,-5), 0x05FF );
     floor.add_physics( physics );
     //world.add_box( 10,10,2, sbVector(0,0,-1) ); // add the floor
     hero = Cube( sbVector(0,0,10), 0xF00F, checkertexture );
