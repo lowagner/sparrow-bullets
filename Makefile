@@ -27,16 +27,16 @@ endif
 LIB += -L$(SPARROW_LIB) 
 DYNAMIC += -lsparrow3d -lsparrowSound -lsparrowNet #$(BULLET_DYNAMIC_LIB)
 
-all: main.cpp
+all: $(PROGRAM) 
 	@echo "=== Built for Target "$(TARGET)" ==="
 
 targets:
 	@echo "The targets are the same like for sparrow3d. :P"
 
-main.cpp: copySparrow play.o physics.o main.o objects.o basic.o makeBuildDir play.h physics.h meta.h basic.h objects.h
+$(PROGRAM): copySparrow main.cpp play.o physics.o main.o objects.o basic.o makeBuildDir play.h physics.h meta.h basic.h objects.h
 	$(CPP) $(CFLAGS) main.o play.o physics.o objects.o basic.o $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(LIB) $(SDL_LIB) $(STATIC) $(DYNAMIC) -o $(BUILD)/$(PROGRAM) $(BULLET_DYNAMIC_LIB)
 
-main.o: play.h physics.h meta.h basic.h
+main.o: play.h 
 	$(CPP) $(CFLAGS) -c main.cpp $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE)
 
 play.o: play.cpp play.h physics.h meta.h objects.h basic.h
