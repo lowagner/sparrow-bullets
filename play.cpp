@@ -20,6 +20,12 @@ Play::Play() // init play class
     // non physics type stuff
     checkertexture = spLoadSurface("./data/check.png");
 
+    reset();
+}
+
+void
+Play::reset()
+{
     font=NULL;
     distance = spFloatToFixed( -25.0f );
     axis = SP_PI * 0.1;
@@ -32,45 +38,30 @@ Play::Play() // init play class
     // initialize the physics land and world drawing class
     // THIS IS UNNECESSARY, since World already created itself in Play variables.
     //world = World();
-    floor = Box( sbVector(10,10,1), sbVector(0,0,-5), 0x05FF ); // half-sizes, pos, color
-    floor.add_physics( physics );
+    boxes.push_back( Box( sbVector(10,10,1), sbVector(0,0,-5), 0x05FF ) ); // half-sizes, pos, color
 
-    ramp = Ramp( sbVector(10,2.5,8), sbVector(-5,-1.5,-3), 0xFFFF ); // sizes, pos, color
-    ramp.add_physics( physics );
+    ramps.push_back( Ramp( sbVector(10,2.5,8), sbVector(-5,0,-3), 0xF0FF ) ); // sizes, pos, color
 
     //world.add_box( 10,10,2, sbVector(0,0,-1) ); // add the floor
     hero = Cube( sbVector(0,0,10), 0xF00F, checkertexture );
     hero.add_physics( physics );
 
+    // add some blocks pieces
     for ( int i=0; i<5; i++ )
-    {
-        cargo.push_back(  Cube( sbVector(2*i-3,0,10+2*i), 0x0F0F )  );
-    }
-    for ( int i=0; i<5; i++ )
-    {
-        cargo[i].add_physics( physics );
-    }
+        blocks.push_back(  Cube( sbVector(2*i-3,0,10+2*i), 0x0F0F )  );
+
+    for ( int i=0; i<boxes.size(); i++ )
+        boxes[i].add_physics( physics );
+    
+    for ( int i=0; i<ramps.size(); i++ )
+        ramps[i].add_physics( physics );
+
+    for ( int i=0; i<blocks.size(); i++ )
+        blocks[i].add_physics( physics );
 	
     spDrawInExtraThread(0);
     //spDrawInExtraThread(1);
-
-//// debugging adding things to world.  this seems to work fine.
-//    Cube asdf(sbVector(1,2,3));
-//    asdf.add_physics( world );
-//    sbVector pos;
-//    btQuaternion rot;
-//    asdf.get_position_orientation( pos, rot );
-//    std::cout << " asdf fell to " << pos.z() << std::endl;
-//    world.update(0.1);
-//    asdf.get_position_orientation( pos, rot );
-//    std::cout << " asdf fell to " << pos.z() << std::endl;
-//    asdf.remove_physics();
-//    world.update(0.1);
-//    asdf.get_position_orientation( pos, rot );
-//    std::cout << " asdf fell to " << pos.z() << std::endl;
-//    asdf.remove_physics();
 }
-
 
 
 void Play::draw( SDL_Surface* screen )
@@ -126,20 +117,26 @@ void Play::draw( SDL_Surface* screen )
     Sint32 matrix[16]; //pointer to array of 16 Sint32's.
     memcpy(matrix,spGetMatrix(),16*sizeof(Sint32)); //need to reload this after every draw.
 
-    floor.draw_mess(); // remember to reload camera matrix after this.
-    memcpy(spGetMatrix(),matrix,16*sizeof(Sint32)); //reload camera matrix after every draw
+    for (int i=0; i<boxes.size(); i++)
+    {
+        boxes[i].draw_mess(); // remember to reload camera matrix after this.
+        memcpy(spGetMatrix(),matrix,16*sizeof(Sint32)); //reload camera matrix after every draw
+    }
+    
+    for (int i=0; i<boxes.size(); i++)
+    {
+        ramps[i].draw_mess(); // remember to reload camera matrix after this.
+        memcpy(spGetMatrix(),matrix,16*sizeof(Sint32)); //reload camera matrix after every draw
+    }
 
-    ramp.draw_mess(); // remember to reload camera matrix after this.
-    memcpy(spGetMatrix(),matrix,16*sizeof(Sint32)); //reload camera matrix after every draw
+    for (int i=0; i<blocks.size(); i++)
+    {
+        blocks[i].draw_mess(); // remember to reload camera matrix after this.
+        memcpy(spGetMatrix(),matrix,16*sizeof(Sint32)); //reload camera matrix after every draw
+    }
 
     hero.draw_mess(); // remember to reload camera matrix after this.
     memcpy(spGetMatrix(),matrix,16*sizeof(Sint32)); //reload camera matrix after every draw 
-
-    for (int i=0; i<cargo.size(); i++)
-    {
-        cargo[i].draw_mess(); // remember to reload camera matrix after this.
-        memcpy(spGetMatrix(),matrix,16*sizeof(Sint32)); //reload camera matrix after every draw
-    }
     // need to reload camera matrix at the end or lights will go crazy.
 
 	//spDeactivatePattern();
@@ -176,8 +173,6 @@ int Play::update( Uint32 dt )
 		spGetInput()->button[SP_BUTTON_X] = 0;
         distance -= 100000;
         std::cout << " distance = " << distance << std::endl;
-		//threading = (threading+1) % 2;
-		//spDrawInExtraThread(threading);
 	}
 	if ( spGetInput()->button[SP_BUTTON_Y] )
 	{
@@ -196,21 +191,16 @@ int Play::update( Uint32 dt )
 		spGetInput()->button[SP_BUTTON_L] = 0;
         rotation -= 10000;
         std::cout << " rotation = " << rotation << std::endl;
-        
 	}
 
-    // updatey type things
-    //std::cout << " dt = " << dt << std::endl;
     if (!(pause))
     {
         physics.update( dt*1.0/100 );
 
-        sbVector heropos;
-        btQuaternion herorot;
         hero.update( dt );
-        for (int i=0; i<cargo.size(); i++)
+        for (int i=0; i<blocks.size(); i++)
         {
-            cargo[i].update( dt );
+            blocks[i].update( dt );
         }
     }
 

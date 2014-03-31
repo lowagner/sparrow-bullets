@@ -15,12 +15,17 @@ Ramp class:
     implement rotate method.
 
 
+
 write a CubeModel class.  initialized with 
 mesh and texture.  inherits from Cube.
 
 
 
 BUGS
+
+time update.  slower when program is full screen, but the physics
+should happen about the same rate (even if the physics changes a bit)
+ -- possibly fixed this in physics.update function.  more testing.
 
 SEGFAULT after exiting program.
     related to not freeing the surface texture?

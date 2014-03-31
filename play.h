@@ -29,9 +29,9 @@ private:
     spFontPointer font;
 
     Cube hero;
-    std::vector<Cube> cargo;
-    Box floor;
-    Ramp ramp;
+    std::vector<Cube> blocks; // dynamic blocks
+    std::vector<Box> boxes; // static boxes
+    std::vector<Ramp> ramps; // static ramps
 
     int pause;
     int no_movement;
@@ -48,7 +48,7 @@ private:
 public:
 
     Play();
-
+    void reset();
     void draw( SDL_Surface* screen );
     int update( Uint32 dt );
     void resize( Uint16 w, Uint16 h );

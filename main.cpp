@@ -99,7 +99,9 @@ void exit() // destructor
 int main( int argc, char **argv )
 {
     init();
-    spLoop( draw, update, 10, resize, handle ); // 10 means max FPS is 100
+    spLoop( draw, update, 10, resize, handle ); 
+                        // 20 means max FPS is 50
+                        // 10 means max FPS is 100
     exit();
     return 0;
 }
