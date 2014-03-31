@@ -95,29 +95,21 @@ void Play::draw( SDL_Surface* screen )
     char buffer[64];
     sprintf( buffer, "fps: %i", spGetFPS() );
 	spFontDrawMiddle( screen->w/2, 1, 0, buffer, font );
-    // this displays everything.
-	spFlip();
-    
+    // this displays everything. (??)
+	spFlip(); 
 
-    // we predraw things for next time. 
-	spClearTarget( spGetRGB(64,64,64) );
-	spResetZBuffer();
-	spSetZSet( 1 );
-	spSetZTest( 1 );
+    // we predraw things for next time.  (??)
+	spClearTarget( spGetRGB(64,64,64) ); // set background color
+	spResetZBuffer(); // not sure what this is
+	spSetZSet( 1 ); // one of these guys helps with depth perception, i.e.
+	spSetZTest( 1 ); // not drawing background objects in the foreground.
+
+	spSetPerspectiveTextureMapping(1); // textures aren't so weird
+	spSetAlphaTest( 0 );  // this makes purple not invisible
 
 	spSetLightPosition(0,spFloatToFixed( 0.875f ),spFloatToFixed( 0.875f ),spFloatToFixed( 0.875f ));
 	spSetLightColor(0,SP_ONE,SP_ONE,SP_ONE);
-
-
-	spSetPerspectiveTextureMapping(1);
-
-////  spMulMatrix(Sint32* matrix); 
-//  spMulMatrix( &matrix ); 
-
-//
-	//spSetLight( 0 ); // or 1
-    spSetLight( 1 );
-	spSetAlphaTest( 0 );  // this makes purple not invisible
+    spSetLight( 1 ); // 0 for no lights, 1 for lights
 
     // set the camera matrix
 	spIdentity();
@@ -128,41 +120,23 @@ void Play::draw( SDL_Surface* screen )
    
     // grab the camera matrix for later usage.
     Sint32 matrix[16]; //pointer to array of 16 Sint32's.
-    memcpy(matrix,spGetMatrix(),16*sizeof(Sint32)); //Save camera matrix for later use.
+    memcpy(matrix,spGetMatrix(),16*sizeof(Sint32)); //need to reload this after every draw.
 
-    floor.draw_mess();
-    
-    memcpy(spGetMatrix(),matrix,16*sizeof(Sint32)); //grab old camera matrix
-    hero.draw_mess();
-    
+    floor.draw_mess(); // remember to reload camera matrix after this.
+    memcpy(spGetMatrix(),matrix,16*sizeof(Sint32)); //reload camera matrix after every draw
+
+    hero.draw_mess(); // remember to reload camera matrix after this.
+    memcpy(spGetMatrix(),matrix,16*sizeof(Sint32)); //reload camera matrix after every draw 
 
     for (int i=0; i<cargo.size(); i++)
     {
-        memcpy(spGetMatrix(),matrix,16*sizeof(Sint32)); //grab old camera matrix
-        cargo[i].draw_mess();
+        cargo[i].draw_mess(); // remember to reload camera matrix after this.
+        memcpy(spGetMatrix(),matrix,16*sizeof(Sint32)); //reload camera matrix after every draw
     }
+    // need to reload camera matrix at the end or lights will go crazy.
 
-    memcpy(spGetMatrix(),matrix,16*sizeof(Sint32)); //grab old camera matrix
 	//spDeactivatePattern();
 	spSetPerspectiveTextureMapping(0);
-//
-//    // first we manuever the to world coordinates
-//    floor.setup_worldview();
-//    // then multiply by the camera matrix
-//    floor.draw();
-//    
-//    //copy back the camera matrix
-//    //memcpy(cameramatrix,spGetMatrix(),16*sizeof(Sint32)); //Save camera matrix for later use.
-//    // first we manuever to world coordinates
-//    hero.setup_worldview();
-//    // then multiply by the camera matrix
-//    hero.draw( checkertexture );
-//	
-//    // first we manuever to world coordinates
-//    hero.setup_worldview();
-//    // then multiply by the camera matrix
-//    spMulMatrix( cameramatrix ); 
-//    hero.draw( checkertexture );
 }
 
 
