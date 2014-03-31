@@ -286,6 +286,5 @@ Play::~Play()
 {
     std::cout << " exiting play mode " << std::endl;
     delete font;
-	//spDeleteSurface(play_texture);
-	//spDeleteSurface(play_check);
+	spDeleteSurface(checkertexture);
 }

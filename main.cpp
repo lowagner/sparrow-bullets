@@ -19,12 +19,12 @@ int GAMESTATEquit = 0; // quit asap
 int GAMESTATEplay = 1; // play
 
 // NOT IMPLEMENTED YET
-int GAMESTATEsplash = 2; // quit asap
-int GAMESTATEmenu = 3; // play
+int GAMESTATEsplash = 2; // splash screen (first to see)
+int GAMESTATEmenu = 3; // main menu
 
 GameChunk* gamechunk;  // pointer to the currently active game chunk
 SDL_Surface* screen;   // pointer to the screen.
-int gamestate;   // tells you to change gamechunks
+int gamestate;   // which gamestate you are in; can tell you to change gamechunks
 
 void resize( Uint16 w, Uint16 h )
 {
@@ -100,7 +100,7 @@ void exit() // destructor
 int main( int argc, char **argv )
 {
     init();
-    spLoop( draw, update, 10, resize, handle );
+    spLoop( draw, update, 10, resize, handle ); // 10 means max FPS is 100
     exit();
     return 0;
 }

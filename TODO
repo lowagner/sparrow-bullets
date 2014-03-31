@@ -24,9 +24,9 @@ add_to_world -> add_physics
 BUGS
 
 SEGFAULT after exiting program.
-
-related to not freeing the surface texture?
-check what's going on with checkertexture.
+    related to not freeing the surface texture?
+    check what's going on with checkertexture.
+  doesn't seem to be the problem.
 
 
 
