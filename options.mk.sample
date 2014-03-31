@@ -9,6 +9,6 @@ BULLET_SRC_DIR=/usr/local/include/bullet
 # BULLET_LIB_DIR is where the libBullet*.so files are.
 BULLET_LIB_DIR=/usr/local/lib
 
-# various important things...
-BULLET_INCLUDE=/usr/local/include -I$(BULLET_SRC_DIR)
-# LUCAS: - see if /usr/local/include can be removed.
+# in case you have a different src dir than the include dir.
+# not sure that that would ever happen.
+BULLET_INCLUDE=$(BULLET_SRC_DIR)
