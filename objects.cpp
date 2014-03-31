@@ -68,22 +68,88 @@ draw_box( Sint32 halfsize_x, Sint32 halfsize_y, Sint32 halfsize_z,  Uint16 color
 }
 
 
+BaseObject::BaseObject()
+{}
 
-
-Cube::Cube( sbVector pos, 
-          Uint16 color_ )
+BaseObject::~BaseObject()
 {
-    lastpos = pos;
-    for (int i=0; i<16; i++)
-        lastorientation[i] = 0;
-    for (int i=0; i<4; i++)
-        lastorientation[4*i+i] = SP_ONE;
-    lastorientation[12] = pos.x;
-    lastorientation[13] = pos.y;
-    lastorientation[14] = pos.z;
+    remove_physics();
+}
 
-    //std::cout << " pos = " << pos.z << std::endl;
+sbVector 
+BaseObject::last_position()
+{
+    sbVector pos;
+    pos.x = lastpor[12];
+    pos.y = lastpor[13];
+    pos.z = lastpor[14];
+    return pos;
+}
+
+sbVector 
+BaseObject::last_velocity()
+{
+    return lastvelocity;
+}
+
+void
+BaseObject::locate()
+{
+    if (m_dworld)
+    {
+        // get the openGL matrix from the object
+        btScalar m[16];
+        btTransform transform;
+        m_rb->getMotionState()->getWorldTransform( transform );
+        transform.getOpenGLMatrix(m); 
+        // we will use it in the draw_mess method.
+        for (int i=0; i<16; i++)
+        {
+            lastpor[i] = spFloatToFixed( m[i] );
+        }
+    }
+}
+
+void
+BaseObject::add_physics( Physics& physics )
+{}
+
+void
+BaseObject::remove_physics()
+{
+    if (m_dworld)
+    {
+        m_dworld->removeRigidBody(m_rb);
+        delete m_rb->getMotionState();
+        delete m_rb;
+        m_dworld = NULL;
+    }
+}
+
+void
+BaseObject::update( Uint32 dt )
+{}
+
+void
+BaseObject::draw_mess()
+{}
+
+
+
+
+Cube::Cube( sbVector pos, Uint16 color_, SDL_Surface* texture_ )
+{
+    // setup GL orientation/transform matrix
+    for (int i=0; i<16; i++)
+        lastpor[i] = 0;
+    for (int i=0; i<4; i++)
+        lastpor[4*i+i] = SP_ONE;
+    lastpor[12] = pos.x;
+    lastpor[13] = pos.y;
+    lastpor[14] = pos.z;
+
     color = color_;
+    texture = texture_;
     m_dworld = NULL;
 }
 
@@ -99,53 +165,24 @@ Cube::add_physics( Physics& physics )
     else
     {
         m_dworld = physics.m_dworld;
-        m_rb = physics.add_cube( lastpos );
+        m_rb = physics.add_cube( last_position() );
     }
 }
 
 
 void
-Cube::get_position_orientation( sbVector& pos, btQuaternion& rot )
+Cube::update( Uint32 dt )
 {
-    if (m_dworld)
-    {
-        btScalar m[16];
-        btTransform transform;
-        m_rb->getMotionState()->getWorldTransform( transform );
-        lastpos = sbVector( transform.getOrigin() );
-        lastrot = transform.getRotation();
-        transform.getOpenGLMatrix(m);
-        
-        for (int i=0; i<16; i++)
-        {
-            lastorientation[i] = spFloatToFixed( m[i] );
-        }
-
-        //std::cout << " cube z = " << lastpos.z << std::endl;
-    }
-    pos = lastpos;
-    rot = lastrot;
+    // find where cube is now.
+    locate();
 }
 
-
-void
-Cube::remove_physics()
-{
-    if (m_dworld)
-    {
-        m_dworld->removeRigidBody(m_rb);
-        delete m_rb->getMotionState();
-        delete m_rb;
-        m_dworld = NULL;
-        std::cout << " i am not physicsy anymore. " << std::endl;
-    }
-}
 
 void 
-Cube::change_matrix_and_draw( SDL_Surface* texture )
+Cube::draw_mess()
 {
     //spTranslate( lastpos.x, lastpos.y, lastpos.z );
-    spMulMatrix( lastorientation );
+    spMulMatrix( lastpor );
 	//spSetAlphaPattern4x4(200,8);
 	spSetAlphaPattern4x4(255,8);  // max is 255.  not sure what the second arg does.  seems to help with texture.
     if (texture)
@@ -153,12 +190,6 @@ Cube::change_matrix_and_draw( SDL_Surface* texture )
     else
         draw_box( SP_ONE, SP_ONE, SP_ONE, color );
     //spTranslate( -lastpos.x, -lastpos.y, -lastpos.z );
-}
-
-int
-Cube::done()
-{
-    return iamdone;
 }
 
 Cube::~Cube()
@@ -170,24 +201,15 @@ Box::Box( sbVector size_,
           sbVector pos, 
           Uint16 color_ )
 {
-    size = size_;
-    lastpos = pos;
     for (int i=0; i<16; i++)
-        lastorientation[i] = 0;
+        lastpor[i] = 0;
     for (int i=0; i<4; i++)
-        lastorientation[4*i+i] = SP_ONE;
-    lastorientation[12] = pos.x;
-    lastorientation[13] = pos.y;
-    lastorientation[14] = pos.z;
+        lastpor[4*i+i] = SP_ONE;
+    lastpor[12] = pos.x;
+    lastpor[13] = pos.y;
+    lastpor[14] = pos.z;
 
-    //std::cout << "initial box matrix = " << std::endl;
-    //for (int i=0; i<16; i++)
-    //{
-    //    std::cout << lastorientation[i] <<  " ";
-    //}
-    //std::cout << std::endl;
-
-
+    size = size_;
     color = color_;
     m_dworld = NULL;
 }
@@ -204,64 +226,26 @@ Box::add_physics( Physics& physics )
     else
     {
         m_dworld = physics.m_dworld;
-        m_rb = physics.add_box( size, lastpos );
+        m_rb = physics.add_box( size, last_position() );
     }
 }
 
 
 void
-Box::get_position_orientation( sbVector& pos, btQuaternion& rot )
+Box::update( Uint32 dt )
 {
-    if (m_dworld)
-    {
-        btScalar m[16];
-        btTransform transform;
-        m_rb->getMotionState()->getWorldTransform( transform );
-        lastpos = sbVector( transform.getOrigin() );
-        lastrot = transform.getRotation();
-        //std::cout << " box z = " << lastpos.z << std::endl;
-        
-        //std::cout << " box matrix = " << std::endl;
-        transform.getOpenGLMatrix(m); 
-        for (int i=0; i<16; i++)
-        {
-            lastorientation[i] = spFloatToFixed( m[i] );
-            //std::cout << lastorientation[i] <<  " ";
-        }
-        std::cout << std::endl;
-
-    }
-    pos = lastpos;
-    rot = lastrot;
-}
-
-
-void
-Box::remove_physics()
-{
-    if (m_dworld)
-    {
-        m_dworld->removeRigidBody(m_rb);
-        delete m_rb->getMotionState();
-        delete m_rb;
-        m_dworld = NULL;
-    }
+    // find where box is now.
+    locate();
 }
 
 void
-Box::change_matrix_and_draw()
+Box::draw_mess()
 {
     //spTranslate( lastpos.x, lastpos.y, lastpos.z );
-    spMulMatrix( lastorientation );
+    spMulMatrix( lastpor );
     draw_box( size.x, size.y, size.z, color );
 }
 
-
-int
-Box::done()
-{
-    return iamdone;
-}
 
 Box::~Box()
 {

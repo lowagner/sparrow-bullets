@@ -11,72 +11,72 @@ void draw_box( Sint32 halfsize_x = SP_ONE,
                Sint32 halfsize_z = SP_ONE, 
                Uint16 color = 0xFFF );
 
-class Cube
+class BaseObject
 {
-private:
+protected:
     int iamdone;
     Uint16 color;
 
-    sbVector lastpos;
-    btQuaternion lastrot;
-    Sint32 lastorientation[16];
+    Sint32 lastpor[16]; // last position and orientation (rotation).  stored as openGL matrix.
+    sbVector lastvelocity;
 
     btDynamicsWorld* m_dworld;
     btRigidBody* m_rb;
 
+    void locate();
+
 public:
-    Cube( sbVector pos=sbVector(), Uint16 color_=0xFFFF );
+    BaseObject();
 
-    void remove();
-    
-    int done(); // am i done and can be removed?
-    
-    void get_position_orientation( sbVector& pos, btQuaternion& rot );
+    virtual void update( Uint32 dt );
 
-    void add_physics( Physics& physics );
+    sbVector last_position();
+    
+    sbVector last_velocity();
+
+    virtual void add_physics( Physics& physics );
 
     void remove_physics();
 
-    int crashed(); // did i crash in the last iteration
+    // translate/rotate the model-view matrix and then draw:
+    virtual void draw_mess(); 
+
+    virtual ~BaseObject();
+};
+
+
+class Cube : public BaseObject
+{ 
+protected:
+    SDL_Surface* texture;
+
+public:
+    Cube( sbVector pos=sbVector(), Uint16 color_=0xFFFF, SDL_Surface* texture_ = NULL );
+
+    void update( Uint32 dt );
+
+    void add_physics( Physics& physics );
 
     // translate/rotate the model-view matrix and then draw:
-    void change_matrix_and_draw( SDL_Surface* texture = NULL ); 
+    void draw_mess(); 
 
     ~Cube();
 };
 
 
-class Box
+class Box : public BaseObject
 {
-private:
-    int iamdone;
-    Uint16 color;
-
+protected:
     sbVector size;
-    sbVector lastpos;
-    btQuaternion lastrot;
-    Sint32 lastorientation[16];
-
-    btDynamicsWorld* m_dworld;
-    btRigidBody* m_rb;
-
 public:
     Box( sbVector size_=sbVector(1,1,1), sbVector pos=sbVector(), Uint16 color_=0xFFF );
 
-    void remove();
+    void update( Uint32 dt );
     
-    int done(); // am i done and can be removed?
-    
-    void get_position_orientation( sbVector& pos, btQuaternion& rot );
-
     void add_physics( Physics& physics );
 
-    void remove_physics();
-
-    int crashed(); // did i crash in the last iteration
-
     // translate/rotate the model-view matrix and then draw:
-    void change_matrix_and_draw(); 
+    void draw_mess(); 
 
     ~Box();
 };

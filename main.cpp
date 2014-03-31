@@ -57,7 +57,6 @@ void init()
     spSelectRenderTarget(screen);
 
     spSetAffineTextureHack(0);
-    //spSetLight(1);
 }
 
 

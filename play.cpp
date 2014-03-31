@@ -32,23 +32,20 @@ Play::Play() // init play class
     // initialize the physics land and world drawing class
     // THIS IS UNNECESSARY, since World already created itself in Play variables.
     //world = World();
-    floor = Box( sbVector(10,10,1), sbVector(0,0,-10), 0x000 );
+    floor = Box( sbVector(10,10,1), sbVector(0,0,-10), 0x050F );
     floor.add_physics( physics );
     //world.add_box( 10,10,2, sbVector(0,0,-1) ); // add the floor
-    hero = Cube( sbVector(0,0,10) );
+    hero = Cube( sbVector(0,0,10), 0xF00F, checkertexture );
     hero.add_physics( physics );
 
     for ( int i=0; i<5; i++ )
     {
-        cargo.push_back(  Cube( sbVector(2*i-3,0,10+2*i), 0xF00F )  );
+        cargo.push_back(  Cube( sbVector(2*i-3,0,10+2*i), 0x0F0F )  );
     }
     for ( int i=0; i<5; i++ )
     {
         cargo[i].add_physics( physics );
     }
-
-    sbVector pos; btQuaternion rot;
-    floor.get_position_orientation( pos, rot );
 	
     spDrawInExtraThread(0);
     //spDrawInExtraThread(1);
@@ -118,7 +115,8 @@ void Play::draw( SDL_Surface* screen )
 //  spMulMatrix( &matrix ); 
 
 //
-	spSetLight( 0 ); // or 1
+	//spSetLight( 0 ); // or 1
+    spSetLight( 1 );
 	spSetAlphaTest( 0 );  // this makes purple not invisible
 
     // set the camera matrix
@@ -132,18 +130,19 @@ void Play::draw( SDL_Surface* screen )
     Sint32 matrix[16]; //pointer to array of 16 Sint32's.
     memcpy(matrix,spGetMatrix(),16*sizeof(Sint32)); //Save camera matrix for later use.
 
-    floor.change_matrix_and_draw();
+    floor.draw_mess();
     
     memcpy(spGetMatrix(),matrix,16*sizeof(Sint32)); //grab old camera matrix
-    hero.change_matrix_and_draw( checkertexture );
+    hero.draw_mess();
     
 
     for (int i=0; i<cargo.size(); i++)
     {
         memcpy(spGetMatrix(),matrix,16*sizeof(Sint32)); //grab old camera matrix
-        cargo[i].change_matrix_and_draw( checkertexture );
+        cargo[i].draw_mess();
     }
 
+    memcpy(spGetMatrix(),matrix,16*sizeof(Sint32)); //grab old camera matrix
 	//spDeactivatePattern();
 	spSetPerspectiveTextureMapping(0);
 //
@@ -227,10 +226,10 @@ int Play::update( Uint32 dt )
 
         sbVector heropos;
         btQuaternion herorot;
-        hero.get_position_orientation( heropos, herorot );
+        hero.update( dt );
         for (int i=0; i<cargo.size(); i++)
         {
-            cargo[i].get_position_orientation( heropos, herorot );
+            cargo[i].update( dt );
         }
     }
 
