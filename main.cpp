@@ -1,10 +1,8 @@
 /*
- The contents of this file are subject to the "do whatever you like"-license.
- That means: Do, whatver you want, this file is under public domain. It is an
- example for sparrow3d. Copy it and learn from it for your project and release
- it under every license you want. ;-)
- For feedback and questions about my Files and Projects please mail me,
- Alexander Matthes (Ziz) , zizsdl_at_googlemail.com
+ The contents of these files are subject to the "do whatever you like"-license.
+ That means: Do whatver you want, these files are under the public domain. It is a
+ simple example for Sparrow3D (with Bullet Physics). Copy it and learn from it for 
+ your project and release it under every license you want. ;). 
 */
 #include "play.h"
 #include <SDL_image.h>
@@ -52,10 +50,7 @@ void init()
     gamechunk = new Play();
 
     spUsePrecalculatedNormals(0);
-    std::cout << " asdf2 " << std::endl;
     resize( screen->w, screen->h );
-
-    std::cout << " asdf " << std::endl;
     spSelectRenderTarget(screen);
 
     spSetAffineTextureHack(0);

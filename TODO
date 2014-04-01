@@ -1,5 +1,7 @@
 PRIORITY
 
+Kill boxes that fly off screen
+
 BaseObject:
 methods to figure out:
     hit fraction with other objects.
