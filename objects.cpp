@@ -98,16 +98,18 @@ draw_ramp( Sint32 sizex, Sint32 sizey, Sint32 sizez,  Uint16 color )
 			      color );
 }
 
-
-
-
-
 BaseObject::BaseObject()
 {}
 
-BaseObject::~BaseObject()
+void
+BaseObject::remove()
 {
     remove_physics();
+}
+
+BaseObject::~BaseObject()
+{
+    remove();
 }
 
 sbVector 
@@ -331,6 +333,18 @@ void
 BaseObject::add_physics( Physics& physics )
 {}
 
+bool
+BaseObject::out_of_bounds( sbVector outofbounds )
+{
+    if ( fabs(lastpor[14]) > outofbounds.z )
+        return true;
+    if ( fabs(lastpor[12]) > outofbounds.x )
+        return true;
+    if ( fabs(lastpor[13]) > outofbounds.y )
+        return true;
+    return false;
+}
+
 void
 BaseObject::remove_physics()
 {
@@ -342,6 +356,7 @@ BaseObject::remove_physics()
         m_dworld = NULL;
     }
 }
+
 
 void
 BaseObject::update( Uint32 dt )
@@ -410,7 +425,8 @@ Cube::draw_mess()
     //spTranslate( -lastpos.x, -lastpos.y, -lastpos.z );
 }
 
-Cube::~Cube()
+void
+Cube::remove()
 {
     remove_physics();
 }
@@ -465,8 +481,8 @@ Box::draw_mess()
     draw_box( size.x, size.y, size.z, color );
 }
 
-
-Box::~Box()
+void
+Box::remove()
 {
     remove_physics();
 }
@@ -522,8 +538,8 @@ Ramp::draw_mess()
     draw_ramp( size.x, size.y, size.z, color );
 }
 
-
-Ramp::~Ramp()
+void
+Ramp::remove()
 {
     remove_physics();
 }

@@ -17,27 +17,57 @@
 
 Play::Play() // init play class
 {
-    // non physics type stuff
-    checkertexture = spLoadSurface("./data/check.png");
+    distance = spFloatToFixed( -25.0f );
+    axis = SP_PI * 0.1;
+    rotation = spFloatToFixed( -1.5f ); // closer to zero - more from top down.
+
+    //input.push_back("");
+    iamdone = 0;
 
     reset();
+}
+
+void
+Play::deinit()
+{
+    hero.remove();
+
+    for ( int i=0; i<blocks.size(); i++ )
+        blocks[i].remove();
+    blocks.clear();
+    
+    for ( int i=0; i<boxes.size(); i++ )
+        boxes[i].remove();
+    boxes.clear();
+    
+    for ( int i=0; i<ramps.size(); i++ )
+        ramps[i].remove();
+    ramps.clear();
+   
+    if ( font )
+        delete font;
+    font=NULL;
+
+    if ( checkertexture )
+	    spDeleteSurface(checkertexture);
+    checkertexture=NULL;
 }
 
 void
 Play::reset()
 {
     font=NULL;
-    distance = spFloatToFixed( -25.0f );
-    axis = SP_PI * 0.1;
-    rotation = spFloatToFixed( -1.5f ); // closer to zero - more from top down.
+    checkertexture=NULL;
 
-    //input.push_back("");
+    deinit();
+
     pause = 1;
-    iamdone = 0;
+    checkertexture = spLoadSurface("./data/check.png");
 
     // initialize the physics land and world drawing class
     // THIS IS UNNECESSARY, since World already created itself in Play variables.
     //world = World();
+    outofbounds = sbVector(20,20,20); //anything outside of these half-lengths is considered OB!
     boxes.push_back( Box( sbVector(10,10,1), sbVector(0,0,-5), 0x05FF ) ); // half-sizes, pos, color
 
     ramps.push_back( Ramp( sbVector(10,2.5,8), sbVector(-5,0,-3), 0xF0FF ) ); // sizes, pos, color
@@ -65,16 +95,21 @@ Play::reset()
 	
     spDrawInExtraThread(0);
     //spDrawInExtraThread(1);
+    
+
 }
 
 
 void Play::draw( SDL_Surface* screen )
 {
+    if (!(font))
+	    font = spFontLoad( "./font/Play-Bold.ttf", spFixedToInt(10 * spGetSizeFactor()));
+
     // the first part of this stuff is drawing buttons and what not.
 	spSetZSet( 0 );
 	spSetZTest( 0 );
 	spSetAlphaTest( 1 );
-	spFontDraw( 2, font-> maxheight+2, 0, "[L] N/A", font );
+	spFontDraw( 2, font-> maxheight+2, 0, "[L] reset", font );
 	spFontDrawRight( screen->w - 2 , font-> maxheight+2, 0, "[R] N/A", font );
 	spFontDrawRight( screen->w - 2 , 2, 0, "[S] Exit", font );
 	spFontDrawRight( screen->w - 2, screen->h - 2*font-> maxheight, 0, "[Y] Zoom in", font ); 
@@ -180,33 +215,53 @@ int Play::update( Uint32 dt )
 		//spGetInput()->button[SP_BUTTON_X] = 0;
         distance -= 1000*dt;
 	}
-	if ( spGetInput()->button[SP_BUTTON_Y] )
+	else if ( spGetInput()->button[SP_BUTTON_Y] )
 	{
 		//spGetInput()->button[SP_BUTTON_Y] = 0;
         distance += 1000*dt;
 	}
 
-	//if ( spGetInput()->button[SP_BUTTON_R] )
     if ( spGetInput()->axis[1] == 1 )
 	{
-		//spGetInput()->button[SP_BUTTON_R] = 0;
         rotation += 100*dt;
 	}
-	//if ( spGetInput()->button[SP_BUTTON_L] )
     else if ( spGetInput()->axis[1] == -1 )
 	{
-		//spGetInput()->button[SP_BUTTON_L] = 0;
         rotation -= 100*dt;
 	}
+
+	if ( spGetInput()->button[SP_BUTTON_R] )
+    {
+        // randomize
+		spGetInput()->button[SP_BUTTON_R] = 0;
+    }
+	if ( spGetInput()->button[SP_BUTTON_L] )
+    {
+		spGetInput()->button[SP_BUTTON_L] = 0;
+        reset();
+    }
+
 
     if (!(pause))
     {
         physics.update( dt*1.0/100 );
 
         hero.update( dt );
-        for (int i=0; i<blocks.size(); i++)
+        int i=0;
+        while ( i < blocks.size() )
         {
             blocks[i].update( dt );
+            if (  blocks[i].out_of_bounds( outofbounds )   )
+            {
+                std::cout << " block is out of bounds " << std::endl;
+                blocks[i].remove();
+                blocks.erase(blocks.begin() + i);
+                std::cout << " end block is out of bounds " << std::endl;
+            }
+            else
+            {
+                i++;
+            }
         }
     }
 
@@ -261,10 +316,8 @@ void Play::handle( SDL_Event* event )
 	}
 }
 
-
 Play::~Play()
 {
     std::cout << " exiting play mode " << std::endl;
-    delete font;
-	spDeleteSurface(checkertexture);
+    deinit();
 }

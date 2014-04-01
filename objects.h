@@ -41,6 +41,8 @@ public:
 
     virtual void add_physics( Physics& physics );
 
+    bool out_of_bounds( sbVector outofbounds );
+
     void translate( sbVector dist );
 
     void rotateZ( Sint32 angle );
@@ -52,10 +54,12 @@ public:
 
     void remove_physics();
 
+    virtual void remove();
+
     // translate/rotate the model-view matrix and then draw:
     virtual void draw_mess(); 
 
-    virtual ~BaseObject();
+    ~BaseObject();
 };
 
 
@@ -74,7 +78,7 @@ public:
     // translate/rotate the model-view matrix and then draw:
     void draw_mess(); 
 
-    ~Cube();
+    void remove();
 };
 
 
@@ -92,7 +96,7 @@ public:
     // translate/rotate the model-view matrix and then draw:
     void draw_mess(); 
 
-    ~Box();
+    void remove();
 };
 
 class Ramp : public BaseObject
@@ -109,7 +113,7 @@ public:
     // translate/rotate the model-view matrix and then draw:
     void draw_mess(); 
 
-    ~Ramp();
+    void remove();
 };
 
 #endif

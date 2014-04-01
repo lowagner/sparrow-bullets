@@ -25,6 +25,7 @@ private:
     Sint32 axis;
     Sint32 rotation;
     Sint32 distance;
+    sbVector outofbounds;
 
     spFontPointer font;
 
@@ -53,7 +54,7 @@ public:
     int update( Uint32 dt );
     void resize( Uint16 w, Uint16 h );
     void handle( SDL_Event* event );
-
+    void deinit();
     ~Play();
 };
 
