@@ -41,6 +41,10 @@ Play::reset()
     boxes.push_back( Box( sbVector(10,10,1), sbVector(0,0,-5), 0x05FF ) ); // half-sizes, pos, color
 
     ramps.push_back( Ramp( sbVector(10,2.5,8), sbVector(-5,0,-3), 0xF0FF ) ); // sizes, pos, color
+    ramps[0].rotateZ( SP_PI*0.5 );
+    //ramps[0].rotate( sbVector(0,0,1), SP_PI*0.5 );
+    ramps.push_back( Ramp( sbVector(5,2.5,3), sbVector(-1,0,-4), 0xFFFF ) ); // sizes, pos, color
+    ramps[1].rotateZ( SP_PI*0.1 );
 
     //world.add_box( 10,10,2, sbVector(0,0,-1) ); // add the floor
     hero = Cube( sbVector(0,0,10), 0xF00F, checkertexture );
@@ -70,8 +74,8 @@ void Play::draw( SDL_Surface* screen )
 	spSetZSet( 0 );
 	spSetZTest( 0 );
 	spSetAlphaTest( 1 );
-	spFontDraw( 2, font-> maxheight+2, 0, "[L] rotate up", font );
-	spFontDrawRight( screen->w - 2 , font-> maxheight+2, 0, "[R] rotate down", font );
+	spFontDraw( 2, font-> maxheight+2, 0, "[L] N/A", font );
+	spFontDrawRight( screen->w - 2 , font-> maxheight+2, 0, "[R] N/A", font );
 	spFontDrawRight( screen->w - 2 , 2, 0, "[S] Exit", font );
 	spFontDrawRight( screen->w - 2, screen->h - 2*font-> maxheight, 0, "[Y] Zoom in", font ); 
 	spFontDrawRight( screen->w - 2, screen->h - 1*font-> maxheight, 0, "[X] Zoom out", font );
@@ -84,8 +88,8 @@ void Play::draw( SDL_Surface* screen )
 	//spFontDrawMiddle( screen->w /2, screen->h - 2*font-> maxheight, 0, input, font );
 
     spFontDrawMiddle( screen->w / 2, font->maxheight + 2, 0, "Falling Cube", font );	
-    spFontDraw( 2, screen->h - 1*font->maxheight,0, "[A] rotate left", font); 
-    spFontDraw( 2, screen->h - 2*font->maxheight,0, "[B] rotate right", font);
+    spFontDraw( 2, screen->h - 1*font->maxheight,0, "D-pad rotate view", font); 
+    //spFontDraw( 2, screen->h - 2*font->maxheight,0, "[B] rotate right", font);
 
     char buffer[64];
     sprintf( buffer, "fps: %i", spGetFPS() );
@@ -123,7 +127,7 @@ void Play::draw( SDL_Surface* screen )
         memcpy(spGetMatrix(),matrix,16*sizeof(Sint32)); //reload camera matrix after every draw
     }
     
-    for (int i=0; i<boxes.size(); i++)
+    for (int i=0; i<ramps.size(); i++)
     {
         ramps[i].draw_mess(); // remember to reload camera matrix after this.
         memcpy(spGetMatrix(),matrix,16*sizeof(Sint32)); //reload camera matrix after every draw
@@ -147,17 +151,19 @@ void Play::draw( SDL_Surface* screen )
 int Play::update( Uint32 dt )
 {
     // inputy type things
-	if ( spGetInput()->button[SP_BUTTON_A] )
+	//if ( spGetInput()->button[SP_BUTTON_A] )
+    if ( spGetInput()->axis[0]==-1 )
 	{
 		spGetInput()->button[SP_BUTTON_A] = 0;
-        axis += 10000;
-        std::cout << " axis = " << axis << std::endl;
+        axis -= 150*dt;
+        //std::cout << " axis = " << axis << std::endl;
 	}
-	if ( spGetInput()->button[SP_BUTTON_B] )
+	//if ( spGetInput()->button[SP_BUTTON_B] )
+    else if ( spGetInput()->axis[0]==1 )
 	{
 		spGetInput()->button[SP_BUTTON_B] = 0;
-        axis -= 10000;
-        std::cout << " axis = " << axis << std::endl;
+        axis += 150*dt;
+        //std::cout << " axis = " << axis << std::endl;
 	}
 
 	if ( spGetInput()->button[SP_BUTTON_START] )
@@ -168,29 +174,29 @@ int Play::update( Uint32 dt )
         spGetInput()->button[SP_BUTTON_SELECT] = 0;
         pause = 1-pause;
     }
+
 	if ( spGetInput()->button[SP_BUTTON_X] )
 	{
-		spGetInput()->button[SP_BUTTON_X] = 0;
-        distance -= 100000;
-        std::cout << " distance = " << distance << std::endl;
+		//spGetInput()->button[SP_BUTTON_X] = 0;
+        distance -= 1000*dt;
 	}
 	if ( spGetInput()->button[SP_BUTTON_Y] )
 	{
-		spGetInput()->button[SP_BUTTON_Y] = 0;
-        distance += 100000;
-        std::cout << " distance = " << distance << std::endl;
+		//spGetInput()->button[SP_BUTTON_Y] = 0;
+        distance += 1000*dt;
 	}
-	if ( spGetInput()->button[SP_BUTTON_R] )
+
+	//if ( spGetInput()->button[SP_BUTTON_R] )
+    if ( spGetInput()->axis[1] == 1 )
 	{
-		spGetInput()->button[SP_BUTTON_R] = 0;
-        rotation += 10000;
-        std::cout << " rotation = " << rotation << std::endl;
+		//spGetInput()->button[SP_BUTTON_R] = 0;
+        rotation += 100*dt;
 	}
-	if ( spGetInput()->button[SP_BUTTON_L] )
+	//if ( spGetInput()->button[SP_BUTTON_L] )
+    else if ( spGetInput()->axis[1] == -1 )
 	{
-		spGetInput()->button[SP_BUTTON_L] = 0;
-        rotation -= 10000;
-        std::cout << " rotation = " << rotation << std::endl;
+		//spGetInput()->button[SP_BUTTON_L] = 0;
+        rotation -= 100*dt;
 	}
 
     if (!(pause))
@@ -215,7 +221,11 @@ void Play::resize( Uint16 w, Uint16 h )
 {
 	spSelectRenderTarget(spGetWindowSurface());
 	//Setup of the new/resized window
-	spSetPerspective( 45.0, ( float )spGetWindowSurface()->w / ( float )spGetWindowSurface()->h, 1.0f, 100.0f );
+	spSetPerspective( 30.0,  // kinda like the zoom factor
+                      ( float )spGetWindowSurface()->w / ( float )spGetWindowSurface()->h, 
+                      0.5f, 100.0f ); // z near and z far
+	//spSetPerspective( 45.0, ( float )spGetWindowSurface()->w / ( float )spGetWindowSurface()->h, 
+    //                  1.0f, 100.0f );
 
 	//Font Loading
 	spFontShadeButtons(1);

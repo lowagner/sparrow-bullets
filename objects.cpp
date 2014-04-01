@@ -144,6 +144,189 @@ BaseObject::locate()
     }
 }
 
+void 
+BaseObject::rotate( sbVector axis, Sint32 angle )
+{
+    btScalar btm[16]; // old transform matrix in btScalar form
+    for (int i=0; i<16; i++)
+    {
+        btm[i] = spFixedToFloat( lastpor[i] );
+    }
+    btTransform transform;
+    transform.setFromOpenGLMatrix( btm ); 
+    btQuaternion qrot = transform.getRotation();
+    btQuaternion dqrot( btVector3( spFixedToFloat(axis.x),
+                                   spFixedToFloat(axis.y),
+                                   spFixedToFloat(axis.z) ), spFixedToFloat(angle) );
+    qrot *= dqrot;
+    // perform the transformation 
+    transform.setRotation( qrot );
+    
+    // set the transformation back into the lastpor open GL orientation matrix
+    transform.getOpenGLMatrix( btm );
+    for (int i=0; i<16; i++)
+    {
+        lastpor[i] = spFloatToFixed( btm[i] );
+    }
+
+    if (m_dworld)
+    {
+        // get the openGL matrix from the object
+        m_rb->getMotionState()->setWorldTransform( transform );
+        m_rb->setCenterOfMassTransform( transform );
+    }
+}
+
+void 
+BaseObject::rotateZ( Sint32 rad )
+{
+//Rotation matrix: (from sparrowRender spRotateZ)
+    Sint32 s = spSin( rad );
+    Sint32 c = spCos( rad );
+
+    Sint32 rotate[16];
+    rotate[ 0] = c;
+    rotate[ 4] = -s;
+    rotate[ 8] = 0;
+    rotate[12] = 0;
+    rotate[ 1] = s;
+    rotate[ 5] = c;
+    rotate[ 9] = 0;
+    rotate[13] = 0;
+    rotate[ 2] = 0;
+    rotate[ 6] = 0;
+    rotate[10] = SP_ONE;
+    rotate[14] = 0;
+    rotate[ 3] = 0;
+    rotate[ 7] = 0;
+    rotate[11] = 0;
+    rotate[15] = SP_ONE;
+
+    Sint32 result[8];
+    result[ 0] = spMul( lastpor[0], rotate[0] ) + spMul( lastpor[4], rotate[1] );
+    result[ 1] = spMul( lastpor[1], rotate[0] ) + spMul( lastpor[5], rotate[1] );
+    result[ 2] = spMul( lastpor[2], rotate[0] ) + spMul( lastpor[6], rotate[1] );
+    result[ 3] = spMul( lastpor[3], rotate[0] ) + spMul( lastpor[7], rotate[1] );
+
+    result[ 4] = spMul( lastpor[0], rotate[4] ) + spMul( lastpor[4], rotate[5] );
+    result[ 5] = spMul( lastpor[1], rotate[4] ) + spMul( lastpor[5], rotate[5] );
+    result[ 6] = spMul( lastpor[2], rotate[4] ) + spMul( lastpor[6], rotate[5] );
+    result[ 7] = spMul( lastpor[3], rotate[4] ) + spMul( lastpor[7], rotate[5] );
+
+    memcpy( lastpor, result, sizeof(Sint32)*8 );
+
+    if (m_dworld)
+    {
+        btScalar btm[16]; // transform matrix in btScalar form
+        for (int i=0; i<16; i++)
+        {
+            btm[i] = spFixedToFloat( lastpor[i] );
+        }
+        btTransform transform;
+        transform.setFromOpenGLMatrix( btm ); 
+        // get the openGL matrix from the object
+        m_rb->getMotionState()->setWorldTransform( transform );
+        m_rb->setCenterOfMassTransform( transform );
+    }
+}
+
+
+
+void
+BaseObject::translate( sbVector dist )
+{
+    lastpor[12] += dist.x;
+    lastpor[13] += dist.y;
+    lastpor[14] += dist.z;
+
+    if (m_dworld)
+    {
+        btScalar btm[16]; // transform matrix in btScalar form
+        for (int i=0; i<16; i++)
+        {
+            btm[i] = spFixedToFloat( lastpor[i] );
+        }
+
+        btTransform transform;
+        transform.setFromOpenGLMatrix( btm ); 
+        // get the openGL matrix from the object
+        m_rb->getMotionState()->setWorldTransform( transform );
+        m_rb->setCenterOfMassTransform( transform );
+    }
+}
+
+void
+BaseObject::transform( Sint32* m )
+{
+    btScalar dbtm[16]; // transformation matrix in btScalar form
+    btScalar obtm[16]; // old transform matrix in btScalar form
+    for (int i=0; i<16; i++)
+    {
+        dbtm[i] = spFixedToFloat( m[i] );
+        obtm[i] = spFixedToFloat( lastpor[i] );
+    }
+    btTransform transform;
+    transform.setFromOpenGLMatrix( obtm ); 
+    btTransform dtransform;
+    dtransform.setFromOpenGLMatrix( dbtm ); 
+    // perform the transformation 
+    transform *= dtransform;
+    
+    // set the transformation back into the lastpor open GL orientation matrix
+    transform.getOpenGLMatrix( obtm );
+    for (int i=0; i<16; i++)
+    {
+        lastpor[i] = spFloatToFixed( obtm[i] );
+    }
+
+    if (m_dworld)
+    {
+        // get the openGL matrix from the object
+        m_rb->getMotionState()->setWorldTransform( transform );
+        m_rb->setCenterOfMassTransform( transform );
+    }
+}
+
+void
+BaseObject::set_por( Sint32* m )
+{
+    if (m_dworld)
+    {
+        btScalar btm[16]; // transform matrix in btScalar form
+        for (int i=0; i<16; i++)
+        {
+            lastpor[i] = m[i];
+            btm[i] = spFixedToFloat( m[i] );
+        }
+        btTransform transform;
+        transform.setFromOpenGLMatrix( btm ); 
+
+        // get the openGL matrix from the object
+        m_rb->getMotionState()->setWorldTransform( transform );
+        m_rb->setCenterOfMassTransform( transform );
+    }
+    else
+    {
+        for (int i=0; i<16; i++)
+            lastpor[i] = m[i];
+    }
+}
+
+btTransform
+BaseObject::my_transform()
+{
+    btScalar btm[16]; // transform matrix in btScalar form
+    for (int i=0; i<16; i++)
+    {
+        btm[i] = spFixedToFloat( lastpor[i] );
+    }
+    btTransform transform;
+    // get the openGL matrix from the lastpor, now in btscalar form
+    transform.setFromOpenGLMatrix( btm ); 
+    return transform;
+}
+
+
 void
 BaseObject::add_physics( Physics& physics )
 {}
@@ -199,7 +382,8 @@ Cube::add_physics( Physics& physics )
     else
     {
         m_dworld = physics.m_dworld;
-        m_rb = physics.add_cube( last_position() );
+        m_rb = physics.add_cube( my_transform() );
+        //init_physics_por();
     }
 }
 
@@ -260,7 +444,8 @@ Box::add_physics( Physics& physics )
     else
     {
         m_dworld = physics.m_dworld;
-        m_rb = physics.add_box( size, last_position() );
+        m_rb = physics.add_box( my_transform(), size );
+        //init_physics_por();
     }
 }
 
@@ -316,7 +501,8 @@ Ramp::add_physics( Physics& physics )
     else
     {
         m_dworld = physics.m_dworld;
-        m_rb = physics.add_ramp( size, last_position() );
+        m_rb = physics.add_ramp( my_transform(), size );
+        //init_physics_por();
     }
 }
 

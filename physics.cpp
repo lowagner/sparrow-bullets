@@ -23,7 +23,7 @@ Physics::Physics()
                                             m_colconfig );
 	//m_dworld->setDebugDrawer(&gDebugDraw);
 	
-	m_dworld->setGravity( btVector3(0,0,-3) ); // -3 is pretty good.
+	m_dworld->setGravity( btVector3(0,0,-2.5) ); // -2 to -3 is pretty good.
     // gravity should be greater (in magnitude) than about 0.4
 
 
@@ -43,14 +43,8 @@ Physics::Physics()
 
 
 btRigidBody*
-Physics::add_cube( sbVector pos )
+Physics::add_cube( btTransform transform )
 {
-	btTransform transform;
-	transform.setIdentity();
-	transform.setOrigin(   btVector3( spFixedToFloat(pos.x),
-                                      spFixedToFloat(pos.y),
-                                      spFixedToFloat(pos.z) )   );
-
     //using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
     btDefaultMotionState* myMotionState = new btDefaultMotionState( transform );
     btRigidBody::btRigidBodyConstructionInfo rbInfo(btScalar(1),myMotionState,cubeshape,cubeinertia);
@@ -63,9 +57,8 @@ Physics::add_cube( sbVector pos )
 }
 
 btRigidBody*
-Physics::add_box( sbVector size, 
-                sbVector pos,
-                Uint32 mass_ )
+Physics::add_box( btTransform transform, sbVector size, 
+                  Uint32 mass_ )
 {
 	btBoxShape* newbox = new btBoxShape(   btVector3( spFixedToFloat(size.x), 
                                                       spFixedToFloat(size.y), 
@@ -73,11 +66,9 @@ Physics::add_box( sbVector size,
 	
 	m_colshapes.push_back( newbox );
 
-	btTransform transform;
-	transform.setIdentity();
-	transform.setOrigin(   btVector3( spFixedToFloat(pos.x),
-                                      spFixedToFloat(pos.y),
-                                      spFixedToFloat(pos.z) )   );
+	//btTransform transform;
+	//transform.setIdentity();
+	//transform.setOrigin(   btVector3()   );
 
 
     btScalar mass( spFixedToFloat(mass_) );
@@ -99,8 +90,7 @@ Physics::add_box( sbVector size,
 }
 
 btRigidBody*
-Physics::add_ramp( sbVector size, 
-                   sbVector pos,
+Physics::add_ramp( btTransform transform, sbVector size, 
                    Uint32 mass_ )
 {
 	btConvexHullShape* newbox = new btConvexHullShape();
@@ -113,11 +103,9 @@ Physics::add_ramp( sbVector size,
 	
 	m_colshapes.push_back( newbox );
 
-	btTransform transform;
-	transform.setIdentity();
-	transform.setOrigin(   btVector3( spFixedToFloat(pos.x),
-                                      spFixedToFloat(pos.y),
-                                      spFixedToFloat(pos.z) )   );
+	//btTransform transform;
+	//transform.setIdentity();
+	//transform.setOrigin(   btVector3()   );
 
 
     btScalar mass( spFixedToFloat(mass_) );
@@ -152,9 +140,9 @@ Physics::update( float dt )
 {
     // get the dynamics world to go through the time steps
     //std::cout << "World  dt = " << dt << std::endl;
-    m_dworld->stepSimulation( dt, 10 );  
+    m_dworld->stepSimulation( dt, 13 );  
     // second argument has to do with target FPS...?  
-    // not sure, but 10 is good to get fullscreen and small screen
+    // not sure, but higher is good to get fullscreen and small screen
     // running at the same physicsy time, even if different FPS.
 }
 

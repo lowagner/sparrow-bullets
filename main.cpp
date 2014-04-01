@@ -52,8 +52,10 @@ void init()
     gamechunk = new Play();
 
     spUsePrecalculatedNormals(0);
+    std::cout << " asdf2 " << std::endl;
     resize( screen->w, screen->h );
 
+    std::cout << " asdf " << std::endl;
     spSelectRenderTarget(screen);
 
     spSetAffineTextureHack(0);

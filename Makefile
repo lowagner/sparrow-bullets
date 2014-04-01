@@ -35,6 +35,7 @@ targets:
 
 $(PROGRAM): copySparrow main.cpp play.o physics.o main.o objects.o basic.o makeBuildDir play.h physics.h meta.h basic.h objects.h
 	$(CPP) $(CFLAGS) main.o play.o physics.o objects.o basic.o $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(LIB) $(SDL_LIB) $(STATIC) $(DYNAMIC) -o $(BUILD)/$(PROGRAM) $(BULLET_DYNAMIC_LIB)
+	rm main.o
 
 main.o: play.h 
 	$(CPP) $(CFLAGS) -c main.cpp $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE)

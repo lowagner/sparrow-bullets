@@ -28,6 +28,7 @@ protected:
     btRigidBody* m_rb;
 
     void locate();
+    btTransform my_transform();
 
 public:
     BaseObject();
@@ -39,6 +40,15 @@ public:
     sbVector last_velocity();
 
     virtual void add_physics( Physics& physics );
+
+    void translate( sbVector dist );
+
+    void rotateZ( Sint32 angle );
+    void rotate( sbVector axis, Sint32 angle );
+
+    void transform( Sint32* m );
+    
+    void set_por( Sint32* m );
 
     void remove_physics();
 

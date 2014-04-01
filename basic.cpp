@@ -131,9 +131,9 @@ sbVector&
 sbVector::operator *= ( float& rhs )
 {
     Sint32 rhsfp = spFloatToFixed( rhs );
-    x *= rhsfp;
-    y *= rhsfp;
-    z *= rhsfp;
+    x = spMul(x, rhsfp);
+    y = spMul(x, rhsfp);
+    z = spMul(x, rhsfp);
 }
 
 const sbVector 

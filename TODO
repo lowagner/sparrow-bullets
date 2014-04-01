@@ -1,6 +1,6 @@
 PRIORITY
 
-in Cube:
+BaseObject:
 methods to figure out:
     hit fraction with other objects.
     
@@ -8,12 +8,6 @@ methods to figure out:
         sets a timer, sends out sparks (spLine)
 
     need a "jump" method.
-
-
-Ramp class:
-    or in general all BaseObjects:...
-    implement rotate method.
-
 
 
 write a CubeModel class.  initialized with 
@@ -96,11 +90,14 @@ http://www.bulletphysics.org/mediawiki-1.5.8/index.php/Collision_Callbacks_and_T
 
 Move a box by fiat:
 
-btTransform transform;
-rigidBody->getMotionState()->getWorldTransform(transform);
-transform.setOrigin(btVector3(X, Y, Z));  // or whatever
-rigidBody->getMotionState()->setWorldTransform(transform);
-rigidBody->setCenterOfMassTransform(transform);
+NOTE:
+DOESN'T SEEM TO WORK. only works for static "objects" (mass=0) not dynamic.
+will need to delete and recreate dynamic objects.
+    btTransform transform;
+    rigidBody->getMotionState()->getWorldTransform(transform);
+    transform.setOrigin(btVector3(X, Y, Z));  // or whatever
+    rigidBody->getMotionState()->setWorldTransform(transform);
+    rigidBody->setCenterOfMassTransform(transform);
 
 Can also setRotation instead of setOrigin
 

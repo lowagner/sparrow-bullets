@@ -44,17 +44,15 @@ public:
     update( float dt );
 
     btRigidBody*
-    add_cube( sbVector pos );
+    add_cube( btTransform transform );
 
     btRigidBody*
-    add_box( sbVector size, 
-             sbVector pos,
+    add_box( btTransform transform, sbVector size, 
              Uint32 mass_=0 );
     
     btRigidBody*
-    add_ramp( sbVector size, 
-             sbVector pos,
-             Uint32 mass_=0 );
+    add_ramp( btTransform transform, sbVector size, 
+              Uint32 mass_=0 );
 
     void remove_body( btRigidBody* rb );
 
