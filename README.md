@@ -26,7 +26,8 @@ also need to install `libbullet-dev` so grab that while you're at it.
 After compiling the sparrow3d library, head back to sparrow-bullets,
 copy options.mk.sample to options.mk, edit options.mk and put
 in the correct sparrow3d location.  Then go into the `testing` directory
-and you should be able to compile it the code with `make` and run the program.
+and you should be able to compile the code with `make`.  Then run the program
+with `./sparrow-bullet`.
 
 Eventually:  to compile for open source hardware such as the OpenPandora,
 you will need to follow the roadmap in this thread:
