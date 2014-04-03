@@ -1,11 +1,9 @@
 #include "physics.h"
 #include <iostream>
 
-
-
-Physics::Physics() 
+void
+Physics::init()
 {
-
     //initialization
 	///use the default collision dispatcher. For parallel processing you can use a diffent dispatcher (see Extras/BulletMultiThreaded)
     m_colconfig = new btDefaultCollisionConfiguration();
@@ -39,6 +37,15 @@ Physics::Physics()
     cubeshape->calculateLocalInertia( btScalar(1), // mass of these boxes
                                       cubeinertia ); // "local" inertia.  moment of inertia???
     // that probably makes cubeinertia be something else!
+}
+
+Physics::Physics() 
+{
+    m_colconfig = NULL;
+	m_dispatcher = NULL;
+	m_broadphase = NULL;
+    m_solver = NULL;
+	m_dworld =  NULL;
 }
 
 
@@ -204,44 +211,60 @@ Physics::update( float dt )
 //	}
 
 
+void
+Physics::deinit()
+{
+    if ( m_dworld )
+    {
+        //cleanup in the reverse order of creation/initialization
 
+        //remove the rigidbodies from the dynamics world and delete them
+        int i;
+        for (i=m_dworld->getNumCollisionObjects()-1; i>=0 ;i--)
+        {
+            btCollisionObject* obj = m_dworld->getCollisionObjectArray()[i];
+            btRigidBody* body = btRigidBody::upcast(obj);
+            if (body && body->getMotionState())
+            {
+                delete body->getMotionState();
+            }
+            m_dworld->removeCollisionObject( obj );
+            delete obj;
+        }
 
+        //delete collision shapes
+        for (int j=0;j<m_colshapes.size();j++)
+        {
+            btCollisionShape* shape = m_colshapes[j];
+            delete shape;
+        }
+        m_colshapes.clear();
+
+        delete m_dworld;
+    }
+
+    if ( m_solver )
+	    delete m_solver;
+
+    if ( m_broadphase )
+	    delete m_broadphase;
+
+    if ( m_dispatcher )
+	    delete m_dispatcher;
+
+    if ( m_colconfig )
+	    delete m_colconfig;
+    
+    m_colconfig = NULL;
+	m_dispatcher = NULL;
+	m_broadphase = NULL;
+    m_solver = NULL;
+	m_dworld =  NULL;
+}
 
 
 Physics::~Physics()
 {
-	//cleanup in the reverse order of creation/initialization
-
-	//remove the rigidbodies from the dynamics world and delete them
-	int i;
-	for (i=m_dworld->getNumCollisionObjects()-1; i>=0 ;i--)
-	{
-		btCollisionObject* obj = m_dworld->getCollisionObjectArray()[i];
-		btRigidBody* body = btRigidBody::upcast(obj);
-		if (body && body->getMotionState())
-		{
-			delete body->getMotionState();
-		}
-		m_dworld->removeCollisionObject( obj );
-		delete obj;
-	}
-
-	//delete collision shapes
-	for (int j=0;j<m_colshapes.size();j++)
-	{
-		btCollisionShape* shape = m_colshapes[j];
-		delete shape;
-	}
-	m_colshapes.clear();
-
-	delete m_dworld;
-	
-	delete m_solver;
-	
-	delete m_broadphase;
-	
-	delete m_dispatcher;
-
-	delete m_colconfig;
+    deinit();
 }
 

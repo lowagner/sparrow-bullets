@@ -101,15 +101,12 @@ draw_ramp( Sint32 sizex, Sint32 sizey, Sint32 sizez,  Uint16 color )
 BaseObject::BaseObject()
 {}
 
-void
-BaseObject::remove()
-{
-    remove_physics();
-}
-
 BaseObject::~BaseObject()
 {
-    remove();
+    // even in inherited classes, this method is called.
+    remove_physics();
+    // it's called after the inherited class' own destructor.
+    // don't put any virtual methods in it.
 }
 
 sbVector 
@@ -367,8 +364,6 @@ BaseObject::draw_mess()
 {}
 
 
-
-
 Cube::Cube( sbVector pos, Uint16 color_, SDL_Surface* texture_ )
 {
     // setup GL orientation/transform matrix
@@ -425,10 +420,19 @@ Cube::draw_mess()
     //spTranslate( -lastpos.x, -lastpos.y, -lastpos.z );
 }
 
-void
-Cube::remove()
+//void
+//Cube::remove()
+//{
+//    remove_physics();
+//    texture = NULL;
+//}
+// need to duplicate the remove() for the destructor
+Cube::~Cube()
 {
-    remove_physics();
+    //remove_physics();
+    std::cout << " removing cube " << std::endl;
+    texture = NULL;
+    std::cout << " finishing removing cube " << std::endl;
 }
 
 Box::Box( sbVector size_, 
@@ -481,10 +485,16 @@ Box::draw_mess()
     draw_box( size.x, size.y, size.z, color );
 }
 
-void
-Box::remove()
+//void
+//Box::remove()
+//{
+//    remove_physics();
+//}
+// need to duplicate the remove() for the destructor
+Box::~Box()
 {
-    remove_physics();
+    std::cout << " removing box " << std::endl;
+    //remove_physics();
 }
 
 
@@ -538,10 +548,14 @@ Ramp::draw_mess()
     draw_ramp( size.x, size.y, size.z, color );
 }
 
-void
-Ramp::remove()
+//void
+//Ramp::remove()
+//{
+//    remove_physics();
+//}
+// need to duplicate the remove() for the destructor
+Ramp::~Ramp()
 {
-    remove_physics();
+    //remove_physics();
+    std::cout << " removing ramps " << std::endl;
 }
-
-

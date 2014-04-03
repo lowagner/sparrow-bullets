@@ -40,6 +40,9 @@ public:
 
     Physics();
 
+    void init();
+    void deinit();
+
     void
     update( float dt );
 

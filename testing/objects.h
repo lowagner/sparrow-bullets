@@ -2,7 +2,7 @@
 #define __OBJECTS__
 
 #include "physics.h"
-#include "csparrow.h"
+#include "../csparrow.h"
 
 
 void draw_textured_cube( SDL_Surface* texture, Sint32 halfsize = SP_ONE, Uint16 color = 0xFFFF );
@@ -54,12 +54,12 @@ public:
 
     void remove_physics();
 
-    virtual void remove();
+    //virtual void remove();
 
     // translate/rotate the model-view matrix and then draw:
     virtual void draw_mess(); 
 
-    ~BaseObject();
+    virtual ~BaseObject();
 };
 
 
@@ -78,7 +78,9 @@ public:
     // translate/rotate the model-view matrix and then draw:
     void draw_mess(); 
 
-    void remove();
+    //void remove();
+
+    ~Cube();
 };
 
 
@@ -96,7 +98,9 @@ public:
     // translate/rotate the model-view matrix and then draw:
     void draw_mess(); 
 
-    void remove();
+    //void remove();
+
+    ~Box();
 };
 
 class Ramp : public BaseObject
@@ -113,7 +117,9 @@ public:
     // translate/rotate the model-view matrix and then draw:
     void draw_mess(); 
 
-    void remove();
+    //void remove();
+
+    ~Ramp();
 };
 
 #endif

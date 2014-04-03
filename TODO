@@ -1,6 +1,14 @@
 PRIORITY
 
+BUG
 Kill boxes that fly off screen
+SEGFAULT - need to figure out move-assignment operator.
+    operator = for the Cube class.
+
+(this should get rid of flashy green bug)
+
+BUG
+after reseting the game, the font no longer appears
 
 BaseObject:
 methods to figure out:

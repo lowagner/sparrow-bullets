@@ -1,7 +1,7 @@
 #ifndef __META__
 #define __META__
 
-#include "csparrow.h"
+#include "../csparrow.h"
 
 // gamestates, defined in main.c
 extern int GAMESTATEquit; // quit asap

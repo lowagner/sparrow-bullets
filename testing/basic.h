@@ -2,7 +2,7 @@
 #define __BASIC__
 
 #include "btBulletDynamicsCommon.h"
-#include "csparrow.h"
+#include "../csparrow.h"
 #include <iostream>
 
 class sbVector

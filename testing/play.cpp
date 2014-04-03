@@ -24,24 +24,27 @@ Play::Play() // init play class
     //input.push_back("");
     iamdone = 0;
 
+    font=NULL;
+    checkertexture=NULL;
+
     reset();
 }
 
 void
 Play::deinit()
 {
-    hero.remove();
+    //delete hero;
 
-    for ( int i=0; i<blocks.size(); i++ )
-        blocks[i].remove();
+//    for ( int i=0; i<blocks.size(); i++ )
+//        blocks[i]
     blocks.clear();
     
-    for ( int i=0; i<boxes.size(); i++ )
-        boxes[i].remove();
+//    for ( int i=0; i<boxes.size(); i++ )
+//        boxes[i].remove();
     boxes.clear();
     
-    for ( int i=0; i<ramps.size(); i++ )
-        ramps[i].remove();
+//    for ( int i=0; i<ramps.size(); i++ )
+//        ramps[i].remove();
     ramps.clear();
    
     if ( font )
@@ -51,59 +54,59 @@ Play::deinit()
     if ( checkertexture )
 	    spDeleteSurface(checkertexture);
     checkertexture=NULL;
+    
+    physics.deinit();
 }
 
 void
 Play::reset()
 {
-    font=NULL;
-    checkertexture=NULL;
+    deinit(); // kill everything first
 
-    deinit();
-
+    // then rebirth it all...
     pause = 1;
-    checkertexture = spLoadSurface("./data/check.png");
+    checkertexture = spLoadSurface("../data/check.png");
 
-    // initialize the physics land and world drawing class
-    // THIS IS UNNECESSARY, since World already created itself in Play variables.
-    //world = World();
     outofbounds = sbVector(20,20,20); //anything outside of these half-lengths is considered OB!
+
+    // this guy includes the floor.  all static rectangular prisms.
     boxes.push_back( Box( sbVector(10,10,1), sbVector(0,0,-5), 0x05FF ) ); // half-sizes, pos, color
 
-    ramps.push_back( Ramp( sbVector(10,2.5,8), sbVector(-5,0,-3), 0xF0FF ) ); // sizes, pos, color
-    ramps[0].rotateZ( SP_PI*0.5 );
+    ramps.push_back( Ramp( sbVector(10,2,4), sbVector(-3,0,-3), 0xF0FF ) ); // sizes, pos, color
     //ramps[0].rotate( sbVector(0,0,1), SP_PI*0.5 );
     ramps.push_back( Ramp( sbVector(5,2.5,3), sbVector(-1,0,-4), 0xFFFF ) ); // sizes, pos, color
+    ramps[0].rotateZ( SP_PI*0.5 );
     ramps[1].rotateZ( SP_PI*0.1 );
 
     //world.add_box( 10,10,2, sbVector(0,0,-1) ); // add the floor
     hero = Cube( sbVector(0,0,10), 0xF00F, checkertexture );
-    hero.add_physics( physics );
-
+    
     // add some blocks pieces
     for ( int i=0; i<5; i++ )
         blocks.push_back(  Cube( sbVector(2*i-3,0,10+2*i), 0x0F0F )  );
 
+    // now add physics to everybody 
+    physics.init();
+    hero.add_physics( physics );
+
     for ( int i=0; i<boxes.size(); i++ )
         boxes[i].add_physics( physics );
     
-    for ( int i=0; i<ramps.size(); i++ )
-        ramps[i].add_physics( physics );
-
     for ( int i=0; i<blocks.size(); i++ )
         blocks[i].add_physics( physics );
+    
+    for ( int i=0; i<ramps.size(); i++ )
+        ramps[i].add_physics( physics );
 	
     spDrawInExtraThread(0);
     //spDrawInExtraThread(1);
-    
-
 }
 
 
 void Play::draw( SDL_Surface* screen )
 {
     if (!(font))
-	    font = spFontLoad( "./font/Play-Bold.ttf", spFixedToInt(10 * spGetSizeFactor()));
+	    font = spFontLoad( "../font/Play-Bold.ttf", spFixedToInt(10 * spGetSizeFactor()));
 
     // the first part of this stuff is drawing buttons and what not.
 	spSetZSet( 0 );
@@ -248,21 +251,23 @@ int Play::update( Uint32 dt )
 
         hero.update( dt );
         int i=0;
-        while ( i < blocks.size() )
+        int blocksize = blocks.size();
+        while ( i < blocksize )
         {
+            std::cout << i << " ";
             blocks[i].update( dt );
             if (  blocks[i].out_of_bounds( outofbounds )   )
             {
-                std::cout << " block is out of bounds " << std::endl;
-                blocks[i].remove();
-                blocks.erase(blocks.begin() + i);
-                std::cout << " end block is out of bounds " << std::endl;
+                //blocks.erase(blocks.begin() + i);
+                //blocksize --;
+                i++;
             }
             else
             {
                 i++;
             }
         }
+        std::cout << std::endl;
     }
 
     // return a value
@@ -286,7 +291,7 @@ void Play::resize( Uint16 w, Uint16 h )
 	spFontShadeButtons(1);
 	if ( font )
 		spFontDelete( font );
-	font = spFontLoad( "./font/Play-Bold.ttf", spFixedToInt(10 * spGetSizeFactor()));
+	font = spFontLoad( "../font/Play-Bold.ttf", spFixedToInt(10 * spGetSizeFactor()));
 	spFontSetShadeColor(0);
 	spFontAdd( font, SP_FONT_GROUP_ASCII, 65535 ); //whole ASCII
 	spFontAdd( font, "äüöÄÜÖßẞ", 65535 ); //German stuff (same like spFontAdd( font, SP_FONT_GROUP_GERMAN, 0 ); )
