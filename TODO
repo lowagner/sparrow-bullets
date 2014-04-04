@@ -1,8 +1,5 @@
 PRIORITY
 
-BUG
-after reseting the game, the font no longer appears
-
 
 BaseObject:
 methods to figure out:
