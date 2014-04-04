@@ -17,6 +17,8 @@
 
 Play::Play() // init play class
 {
+	spFontShadeButtons(1);
+
     distance = spFloatToFixed( -25.0f );
     axis = SP_PI * 0.1;
     rotation = spFloatToFixed( -1.5f ); // closer to zero - more from top down.
@@ -48,7 +50,7 @@ Play::deinit()
     ramps.clear();
    
     if ( font )
-        delete font;
+		spFontDelete( font );
     font=NULL;
 
     if ( checkertexture )
@@ -119,7 +121,7 @@ Play::reset()
 void Play::draw( SDL_Surface* screen )
 {
     if (!(font))
-	    font = spFontLoad( "../font/Play-Bold.ttf", spFixedToInt(10 * spGetSizeFactor()));
+        load_font();
 
     // the first part of this stuff is drawing buttons and what not.
 	spSetZSet( 0 );
@@ -305,9 +307,14 @@ void Play::resize( Uint16 w, Uint16 h )
     //                  1.0f, 100.0f );
 
 	//Font Loading
-	spFontShadeButtons(1);
 	if ( font )
 		spFontDelete( font );
+
+    load_font();
+}
+
+void Play::load_font()
+{
 	font = spFontLoad( "../font/Play-Bold.ttf", spFixedToInt(10 * spGetSizeFactor()));
 	spFontSetShadeColor(0);
 	spFontAdd( font, SP_FONT_GROUP_ASCII, 65535 ); //whole ASCII
@@ -324,7 +331,6 @@ void Play::resize( Uint16 w, Uint16 h )
 	spFontAddButton( font, 'S', SP_BUTTON_START_NAME, 65535, spGetRGB( 64, 64, 64 ) );
 	spFontAddButton( font, 'E', SP_BUTTON_SELECT_NAME, 65535, spGetRGB( 64, 64, 64 ) );
 }
-
 
 
 void Play::handle( SDL_Event* event )

@@ -51,6 +51,7 @@ public:
     Play();
     void reset();
     void draw( SDL_Surface* screen );
+    void load_font();
     int update( Uint32 dt );
     void resize( Uint16 w, Uint16 h );
     void handle( SDL_Event* event );
