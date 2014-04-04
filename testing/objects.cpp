@@ -99,14 +99,31 @@ draw_ramp( Sint32 sizex, Sint32 sizey, Sint32 sizez,  Uint16 color )
 }
 
 BaseObject::BaseObject()
-{}
+{
+    std::cout << " calling base object constructor " << id << std::endl;
+    m_dworld = NULL;
+    m_rb = NULL;
+}
 
 BaseObject::~BaseObject()
 {
     // even in inherited classes, this method is called.
-    remove_physics();
+    
+    // WARNING WARNING.
+    // remove_physics();
+    // DO NOT UNCOMMENT THE ABOVE LINE.
+    // DO NOT remove_physics in any of the child class destructors, either.
+    // YOU HAVE BEEN WARNED.
+    // we shouldn't remove physics except explicitly:  in a vector of objects,
+    // c++ destroys and recreates all higher elements if you erase an internal element.
+    // you have no way to check if c++ is deleting the physics of an object that should
+    // still exist.
+
+    m_dworld = NULL;
+    m_rb = NULL;
     // it's called after the inherited class' own destructor.
     // don't put any virtual methods in it.
+    std::cout << " finished calling base object " << id << " destructor " << std::endl;
 }
 
 sbVector 
@@ -360,12 +377,13 @@ BaseObject::update( Uint32 dt )
 {}
 
 void
-BaseObject::draw_mess()
+BaseObject::draw_mess( int alpha )
 {}
 
 
 Cube::Cube( sbVector pos, Uint16 color_, SDL_Surface* texture_ )
 {
+    id = 0;
     // setup GL orientation/transform matrix
     for (int i=0; i<16; i++)
         lastpor[i] = 0;
@@ -407,38 +425,66 @@ Cube::update( Uint32 dt )
 
 
 void 
-Cube::draw_mess()
+Cube::draw_mess( int alpha )
 {
-    //spTranslate( lastpos.x, lastpos.y, lastpos.z );
-    spMulMatrix( lastpor );
-	//spSetAlphaPattern4x4(200,8);
-	spSetAlphaPattern4x4(255,8);  // max is 255.  not sure what the second arg does.  seems to help with texture.
-    if (texture)
-        draw_textured_cube( texture, SP_ONE, color );
-    else
-        draw_box( SP_ONE, SP_ONE, SP_ONE, color );
-    //spTranslate( -lastpos.x, -lastpos.y, -lastpos.z );
+    if ( alpha > 0 )
+    {
+        spMulMatrix( lastpor );
+        spSetAlphaPattern4x4(alpha,8);
+        //spSetAlphaPattern4x4(255,8);  // max is 255.  not sure what the second arg does.  seems to help with texture.
+        if (texture)
+            draw_textured_cube( texture, SP_ONE, color );
+        else
+            draw_box( SP_ONE, SP_ONE, SP_ONE, color );
+    }
 }
 
-//void
-//Cube::remove()
-//{
-//    remove_physics();
-//    texture = NULL;
-//}
-// need to duplicate the remove() for the destructor
 Cube::~Cube()
 {
-    //remove_physics();
-    std::cout << " removing cube " << std::endl;
+    //remove_physics(); // DO NOT UNCOMMENT.
     texture = NULL;
-    std::cout << " finishing removing cube " << std::endl;
+    std::cout << " finishing removing cube " << id << std::endl;
+}
+
+Cube::Cube( const Cube& other ) // copy constructor
+{
+    //std::cout << " calling cube copy constructor from " << other.id << " to " << id << std::endl;
+    id = other.id + 100;
+    texture = other.texture;
+    m_dworld = other.m_dworld;
+    m_rb = other.m_rb;
+    color = other.color;
+    lastvelocity = other.lastvelocity;
+    iamdone = 0;
+    for ( int i=0; i<16; i++ )
+    {
+        lastpor[i] = other.lastpor[i];
+    }
+}
+
+Cube& 
+Cube::operator = ( Cube other ) // Copy Assignment Operator
+{
+    //std::cout << " calling cube copy assignment from " << other.id << " to " << id << std::endl;
+    id = other.id + 100;
+    texture = other.texture;
+    m_dworld = other.m_dworld;
+    m_rb = other.m_rb;
+    color = other.color;
+    lastvelocity = other.lastvelocity;
+    iamdone = 0;
+    for ( int i=0; i<16; i++ )
+    {
+        lastpor[i] = other.lastpor[i];
+    }
+    return *this;
 }
 
 Box::Box( sbVector size_, 
           sbVector pos, 
           Uint16 color_ )
 {
+    id = 0;
     for (int i=0; i<16; i++)
         lastpor[i] = 0;
     for (int i=0; i<4; i++)
@@ -478,30 +524,65 @@ Box::update( Uint32 dt )
 }
 
 void
-Box::draw_mess()
+Box::draw_mess( int alpha )
 {
     //spTranslate( lastpos.x, lastpos.y, lastpos.z );
-    spMulMatrix( lastpor );
-    draw_box( size.x, size.y, size.z, color );
+    if ( alpha > 0 )
+    {
+        spMulMatrix( lastpor );
+        spSetAlphaPattern4x4(alpha,8);
+        draw_box( size.x, size.y, size.z, color );
+    }
 }
 
-//void
-//Box::remove()
-//{
-//    remove_physics();
-//}
-// need to duplicate the remove() for the destructor
 Box::~Box()
 {
-    std::cout << " removing box " << std::endl;
-    //remove_physics();
+    //std::cout << " removing box " << std::endl;
+    //remove_physics(); // DO NOT UNCOMMENT.
 }
+
+Box::Box( const Box& other ) // copy constructor
+{
+    //std::cout << " calling box copy constructor " << std::endl;
+    id = other.id;
+    m_dworld = other.m_dworld;
+    m_rb = other.m_rb;
+    size = other.size;
+    color = other.color;
+    lastvelocity = other.lastvelocity;
+    iamdone = 0;
+    for ( int i=0; i<16; i++ )
+    {
+        lastpor[i] = other.lastpor[i];
+    }
+}
+
+Box& 
+Box::operator = ( Box other ) // Copy Assignment Operator
+{
+    //std::cout << " calling box copy assignment " << std::endl;
+    std::swap( m_dworld, other.m_dworld );
+    std::swap( m_rb, other.m_rb );
+    id = other.id;
+    size = other.size;
+    color = other.color;
+    lastvelocity = other.lastvelocity;
+    iamdone = 0;
+    for ( int i=0; i<16; i++ )
+    {
+        lastpor[i] = other.lastpor[i];
+    }
+    return *this;
+}
+
+
 
 
 Ramp::Ramp( sbVector size_, 
           sbVector pos, 
           Uint16 color_ )
 {
+    id = 0;
     for (int i=0; i<16; i++)
         lastpor[i] = 0;
     for (int i=0; i<4; i++)
@@ -514,7 +595,6 @@ Ramp::Ramp( sbVector size_,
     color = color_;
     m_dworld = NULL;
 }
-
 
 void
 Ramp::add_physics( Physics& physics )
@@ -532,7 +612,6 @@ Ramp::add_physics( Physics& physics )
     }
 }
 
-
 void
 Ramp::update( Uint32 dt )
 {
@@ -541,21 +620,52 @@ Ramp::update( Uint32 dt )
 }
 
 void
-Ramp::draw_mess()
+Ramp::draw_mess( int alpha )
 {
-    //spTranslate( lastpos.x, lastpos.y, lastpos.z );
-    spMulMatrix( lastpor );
-    draw_ramp( size.x, size.y, size.z, color );
+    if ( alpha > 0 )
+    {
+        spSetAlphaPattern4x4(alpha,8);
+        spMulMatrix( lastpor );
+        draw_ramp( size.x, size.y, size.z, color );
+    }
 }
 
-//void
-//Ramp::remove()
-//{
-//    remove_physics();
-//}
-// need to duplicate the remove() for the destructor
 Ramp::~Ramp()
 {
-    //remove_physics();
+    //remove_physics(); // DO NOT UNCOMMENT.
     std::cout << " removing ramps " << std::endl;
+}
+
+Ramp::Ramp( const Ramp& other ) // copy constructor
+{
+    //std::cout << " calling ramp copy constructor " << std::endl;
+    m_dworld = other.m_dworld;
+    id = other.id;
+    m_rb = other.m_rb;
+    size = other.size;
+    color = other.color;
+    lastvelocity = other.lastvelocity;
+    iamdone = 0;
+    for ( int i=0; i<16; i++ )
+    {
+        lastpor[i] = other.lastpor[i];
+    }
+}
+
+Ramp& 
+Ramp::operator = ( Ramp other ) // Copy Assignment Operator
+{
+    //std::cout << " calling ramp copy assignment " << std::endl;
+    std::swap( m_dworld, other.m_dworld );
+    std::swap( m_rb, other.m_rb );
+    id = other.id;
+    size = other.size;
+    color = other.color;
+    lastvelocity = other.lastvelocity;
+    iamdone = 0;
+    for ( int i=0; i<16; i++ )
+    {
+        lastpor[i] = other.lastpor[i];
+    }
+    return *this;
 }

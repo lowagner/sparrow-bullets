@@ -31,6 +31,8 @@ protected:
     btTransform my_transform();
 
 public:
+    int id;
+
     BaseObject();
 
     virtual void update( Uint32 dt );
@@ -57,9 +59,15 @@ public:
     //virtual void remove();
 
     // translate/rotate the model-view matrix and then draw:
-    virtual void draw_mess(); 
+    virtual void draw_mess( int alpha=255 ); 
 
+    // rule of three, define all these or none at all.
     virtual ~BaseObject();
+    //BaseObject( const BaseObject& other ); // copy constructor
+    //virtual BaseObject& operator = ( BaseObject other ); // Copy Assignment Operator
+    // except we don't here, because we don't want our children to inherit
+    // anything here.
+
 };
 
 
@@ -76,11 +84,13 @@ public:
     void add_physics( Physics& physics );
 
     // translate/rotate the model-view matrix and then draw:
-    void draw_mess(); 
+    void draw_mess( int alpha=255 ); 
 
     //void remove();
 
     ~Cube();
+    Cube( const Cube& other ); // copy constructor
+    Cube& operator = ( Cube other ); // Copy Assignment Operator
 };
 
 
@@ -96,11 +106,13 @@ public:
     void add_physics( Physics& physics );
 
     // translate/rotate the model-view matrix and then draw:
-    void draw_mess(); 
+    void draw_mess( int alpha=255 ); 
 
     //void remove();
 
     ~Box();
+    Box( const Box& other ); // copy constructor
+    Box& operator = ( Box other ); // Copy Assignment Operator
 };
 
 class Ramp : public BaseObject
@@ -115,11 +127,13 @@ public:
     void add_physics( Physics& physics );
 
     // translate/rotate the model-view matrix and then draw:
-    void draw_mess(); 
+    void draw_mess( int alpha=255 ); 
 
     //void remove();
 
     ~Ramp();
+    Ramp( const Ramp& other ); // copy constructor
+    Ramp& operator = ( Ramp other ); // Copy Assignment Operator
 };
 
 #endif

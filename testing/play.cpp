@@ -80,10 +80,18 @@ Play::reset()
 
     //world.add_box( 10,10,2, sbVector(0,0,-1) ); // add the floor
     hero = Cube( sbVector(0,0,10), 0xF00F, checkertexture );
-    
+   
+    std::cout << std::endl;
+    std::cout << " creating new blocks " << std::endl;
+    std::cout << std::endl;
     // add some blocks pieces
     for ( int i=0; i<5; i++ )
+    {
         blocks.push_back(  Cube( sbVector(2*i-3,0,10+2*i), 0x0F0F )  );
+    }
+    std::cout << std::endl;
+    std::cout << " end creating new blocks " << std::endl;
+    std::cout << std::endl;
 
     // now add physics to everybody 
     physics.init();
@@ -93,7 +101,12 @@ Play::reset()
         boxes[i].add_physics( physics );
     
     for ( int i=0; i<blocks.size(); i++ )
+    {
         blocks[i].add_physics( physics );
+        std::cout << " naming new block " << i << std::endl;
+        std::cout << std::endl;
+        blocks[i].id = i;
+    }
     
     for ( int i=0; i<ramps.size(); i++ )
         ramps[i].add_physics( physics );
@@ -161,7 +174,7 @@ void Play::draw( SDL_Surface* screen )
 
     for (int i=0; i<boxes.size(); i++)
     {
-        boxes[i].draw_mess(); // remember to reload camera matrix after this.
+        boxes[i].draw_mess(); // remember to reload camera matrix after this.  
         memcpy(spGetMatrix(),matrix,16*sizeof(Sint32)); //reload camera matrix after every draw
     }
     
@@ -173,7 +186,8 @@ void Play::draw( SDL_Surface* screen )
 
     for (int i=0; i<blocks.size(); i++)
     {
-        blocks[i].draw_mess(); // remember to reload camera matrix after this.
+        blocks[i].draw_mess( 200 ); // remember to reload camera matrix after this.
+        // draw at partial transparency.  max alpha = 255 (fully opaque), 0 = fully transparent
         memcpy(spGetMatrix(),matrix,16*sizeof(Sint32)); //reload camera matrix after every draw
     }
 
@@ -254,20 +268,23 @@ int Play::update( Uint32 dt )
         int blocksize = blocks.size();
         while ( i < blocksize )
         {
-            std::cout << i << " ";
+            //std::cout << i << "; id " << blocks[i].id << " ";
             blocks[i].update( dt );
+
             if (  blocks[i].out_of_bounds( outofbounds )   )
             {
-                //blocks.erase(blocks.begin() + i);
-                //blocksize --;
-                i++;
+                //std::cout << "\n WARNING!  block " << i << " out of bounds!\n";
+                blocks[i].remove_physics();  // remove this guy from physics world
+                blocks.erase(blocks.begin() + i);
+                blocksize --;
+                //std::cout << "\n deleted  block " << i << " since it was out of bounds.\n";
             }
             else
             {
                 i++;
             }
         }
-        std::cout << std::endl;
+        //std::cout << std::endl;
     }
 
     // return a value

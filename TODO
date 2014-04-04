@@ -1,14 +1,8 @@
 PRIORITY
 
 BUG
-Kill boxes that fly off screen
-SEGFAULT - need to figure out move-assignment operator.
-    operator = for the Cube class.
-
-(this should get rid of flashy green bug)
-
-BUG
 after reseting the game, the font no longer appears
+
 
 BaseObject:
 methods to figure out:
@@ -25,7 +19,7 @@ mesh and texture.  inherits from Cube.
 
 
 
-BUGS
+POSSIBLY FIXED BUGS
 
 time update.  slower when program is full screen, but the physics
 should happen about the same rate (even if the physics changes a bit)
@@ -35,7 +29,7 @@ SEGFAULT after exiting program.
     related to not freeing the surface texture?
   doesn't seem to be the problem.
   see if it's not removing the colshape of the box from that physics part.
-
+ -- FIXED??
 
 
 LESS IMPORTANT STUFF.  REALLY BORING, ACTUALLY
