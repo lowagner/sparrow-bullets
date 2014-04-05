@@ -82,6 +82,7 @@ Play::reset()
 
     //world.add_box( 10,10,2, sbVector(0,0,-1) ); // add the floor
     hero = Cube( sbVector(0,0,10), 0xF00F, checkertexture );
+    hero.debug = true;
    
 //    std::cout << std::endl;
 //    std::cout << " creating new blocks " << std::endl;

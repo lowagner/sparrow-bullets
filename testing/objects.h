@@ -33,6 +33,7 @@ protected:
 
 public:
     int id;
+    bool debug;
 
     BaseObject();
 

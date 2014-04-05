@@ -101,6 +101,7 @@ draw_ramp( Sint32 sizex, Sint32 sizey, Sint32 sizez,  Uint16 color )
 BaseObject::BaseObject()
 {
     std::cout << " calling base object constructor " << id << std::endl;
+    debug = false;
     m_dworld = NULL;
     m_rb = NULL;
 }
@@ -390,6 +391,7 @@ BaseObject::draw( Sint32* original_camera_matrix, int alpha )
 Cube::Cube( sbVector pos, Uint16 color_, SDL_Surface* texture_ )
 {
     id = 0;
+    debug = false;
     // setup GL orientation/transform matrix
     for (int i=0; i<16; i++)
         lastpor[i] = 0;
@@ -443,6 +445,13 @@ Cube::draw( Sint32* matrix, int alpha )
         else
             draw_box( SP_ONE, SP_ONE, SP_ONE, color );
 
+        if ( debug )
+        {
+            spLine3D(0,0,0, 2*SP_ONE,0,0, 0xF00F);
+            spLine3D(0,0,0, 0,2*SP_ONE,0, 0x0F0F);
+            spLine3D(0,0,0, 0,0,2*SP_ONE, 0x00FF);
+        }
+
         reset_camera( matrix );
     }
 }
@@ -458,6 +467,7 @@ Cube::Cube( const Cube& other ) // copy constructor
 {
     //std::cout << " calling cube copy constructor from " << other.id << " to " << id << std::endl;
     id = other.id + 100;
+    debug = other.debug;
     texture = other.texture;
     m_dworld = other.m_dworld;
     m_rb = other.m_rb;
@@ -475,6 +485,7 @@ Cube::operator = ( Cube other ) // Copy Assignment Operator
 {
     //std::cout << " calling cube copy assignment from " << other.id << " to " << id << std::endl;
     id = other.id + 100;
+    debug = other.debug;
     texture = other.texture;
     m_dworld = other.m_dworld;
     m_rb = other.m_rb;
@@ -493,6 +504,7 @@ Box::Box( sbVector size_,
           Uint16 color_ )
 {
     id = 0;
+    debug = false;
     for (int i=0; i<16; i++)
         lastpor[i] = 0;
     for (int i=0; i<4; i++)
@@ -554,6 +566,7 @@ Box::Box( const Box& other ) // copy constructor
 {
     //std::cout << " calling box copy constructor " << std::endl;
     id = other.id;
+    debug = other.debug;
     m_dworld = other.m_dworld;
     m_rb = other.m_rb;
     size = other.size;
@@ -570,8 +583,9 @@ Box&
 Box::operator = ( Box other ) // Copy Assignment Operator
 {
     //std::cout << " calling box copy assignment " << std::endl;
-    std::swap( m_dworld, other.m_dworld );
-    std::swap( m_rb, other.m_rb );
+    m_dworld = other.m_dworld;
+    m_rb = other.m_rb;
+    debug = other.debug;
     id = other.id;
     size = other.size;
     color = other.color;
@@ -592,6 +606,7 @@ Ramp::Ramp( sbVector size_,
           Uint16 color_ )
 {
     id = 0;
+    debug = false;
     for (int i=0; i<16; i++)
         lastpor[i] = 0;
     for (int i=0; i<4; i++)
@@ -649,8 +664,9 @@ Ramp::~Ramp()
 Ramp::Ramp( const Ramp& other ) // copy constructor
 {
     //std::cout << " calling ramp copy constructor " << std::endl;
-    m_dworld = other.m_dworld;
     id = other.id;
+    debug = other.debug;
+    m_dworld = other.m_dworld;
     m_rb = other.m_rb;
     size = other.size;
     color = other.color;
@@ -666,9 +682,10 @@ Ramp&
 Ramp::operator = ( Ramp other ) // Copy Assignment Operator
 {
     //std::cout << " calling ramp copy assignment " << std::endl;
-    std::swap( m_dworld, other.m_dworld );
-    std::swap( m_rb, other.m_rb );
+    m_dworld = other.m_dworld;
+    m_rb = other.m_rb;
     id = other.id;
+    debug = other.debug;
     size = other.size;
     color = other.color;
     lastvelocity = other.lastvelocity;
