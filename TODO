@@ -1,9 +1,21 @@
 PRIORITY
 
+Draw lines, dots, for debugging and what not.
+
+Draw x,y,z axis out of hero.
+
+Elevator
+(moving Box class)
+    give it a vector of positions to maneuver around.
+    also give it a vector of times to get to the next position.
+
+    Figure out Kinematics.
+
 
 BaseObject:
 methods to figure out:
     hit fraction with other objects.
+    check out bullet2/Demos/CollisionInterfaceDemo
     
     need an "explode" method.
         sets a timer, sends out sparks (spLine)
@@ -14,6 +26,15 @@ methods to figure out:
 write a CubeModel class.  initialized with 
 mesh and texture.  inherits from Cube.
 
+
+Kinematic vs. static vs. dynamic bodies.
+Kinematic Bodies
+If you plan to animate or move static objects, you should flag them as kinematic. Also disable the
+sleeping/deactivation for them during the animation. This means Bullet dynamics world will get the
+new worldtransform from the btMotionState every simulation frame.
+body->setCollisionFlags( body->getCollisionFlags() |
+btCollisionObject::CF_KINEMATIC_OBJECT);
+body->setActivationState(DISABLE_DEACTIVATION);
 
 
 POSSIBLY FIXED BUGS
@@ -110,6 +131,49 @@ btVector3 origin = transform.getOrigin();
 btQuaternion rot = transform.getRotation();
 
 
+
+// contact points:  DemoCollision...
+
+//another way is to directly query the dispatcher for both objects. The objects don't need to be inserted into the world
+
+btCollisionAlgorithm* algo = collisionWorld->getDispatcher()->findAlgorithm(&objects[0],&objects[1]);
+btManifoldResult contactPointResult(&objects[0],&objects[1]);
+algo->processCollision(&objects[0],&objects[1],collisionWorld->getDispatchInfo(),&contactPointResult);
+
+btManifoldArray manifoldArray;
+algo->getAllContactManifolds(manifoldArray);
+
+int numManifolds = manifoldArray.size();
+for (i=0;i<numManifolds;i++)
+{
+    btPersistentManifold* contactManifold = manifoldArray[i];
+    btCollisionObject* obA = static_cast<btCollisionObject*>(contactManifold->getBody0());
+    //  btCollisionObject* obB = static_cast<btCollisionObject*>(contactManifold->getBody1());
+
+    glDisable(GL_DEPTH_TEST);
+    int numContacts = contactManifold->getNumContacts();
+    bool swap = obA == &objects[0];
+
+    for (int j=0;j<numContacts;j++)
+    {
+        btManifoldPoint& pt = contactManifold->getContactPoint(j);
+
+        glBegin(GL_LINES);
+        glColor3f(0, 0, 0);
+
+        btVector3 ptA = swap ?pt.getPositionWorldOnA():pt.getPositionWorldOnB();
+        btVector3 ptB = swap ? pt.getPositionWorldOnB():pt.getPositionWorldOnA();
+
+        glVertex3d(ptA.x(),ptA.y(),ptA.z());
+        glVertex3d(ptB.x(),ptB.y(),ptB.z());
+        glEnd();
+    }
+
+    //you can un-comment out this line, and then all points are removed
+    //contactManifold->clearManifold(); 
+
+
+}
 
 
 // some guy's commentary on how to get collisions

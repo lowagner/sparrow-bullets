@@ -83,17 +83,17 @@ Play::reset()
     //world.add_box( 10,10,2, sbVector(0,0,-1) ); // add the floor
     hero = Cube( sbVector(0,0,10), 0xF00F, checkertexture );
    
-    std::cout << std::endl;
-    std::cout << " creating new blocks " << std::endl;
-    std::cout << std::endl;
+//    std::cout << std::endl;
+//    std::cout << " creating new blocks " << std::endl;
+//    std::cout << std::endl;
     // add some blocks pieces
     for ( int i=0; i<5; i++ )
     {
         blocks.push_back(  Cube( sbVector(2*i-3,0,10+2*i), 0x0F0F )  );
     }
-    std::cout << std::endl;
-    std::cout << " end creating new blocks " << std::endl;
-    std::cout << std::endl;
+//    std::cout << std::endl;
+//    std::cout << " end creating new blocks " << std::endl;
+//    std::cout << std::endl;
 
     // now add physics to everybody 
     physics.init();
@@ -105,8 +105,8 @@ Play::reset()
     for ( int i=0; i<blocks.size(); i++ )
     {
         blocks[i].add_physics( physics );
-        std::cout << " naming new block " << i << std::endl;
-        std::cout << std::endl;
+//        std::cout << " naming new block " << i << std::endl;
+//        std::cout << std::endl;
         blocks[i].id = i;
     }
     
@@ -176,26 +176,21 @@ void Play::draw( SDL_Surface* screen )
 
     for (int i=0; i<boxes.size(); i++)
     {
-        boxes[i].draw_mess(); // remember to reload camera matrix after this.  
-        memcpy(spGetMatrix(),matrix,16*sizeof(Sint32)); //reload camera matrix after every draw
+        boxes[i].draw( matrix );  // this draws and resets the model view to matrix
     }
     
     for (int i=0; i<ramps.size(); i++)
     {
-        ramps[i].draw_mess(); // remember to reload camera matrix after this.
-        memcpy(spGetMatrix(),matrix,16*sizeof(Sint32)); //reload camera matrix after every draw
+        ramps[i].draw( matrix ); 
     }
 
     for (int i=0; i<blocks.size(); i++)
     {
-        blocks[i].draw_mess( 200 ); // remember to reload camera matrix after this.
+        blocks[i].draw( matrix, 200 ); 
         // draw at partial transparency.  max alpha = 255 (fully opaque), 0 = fully transparent
-        memcpy(spGetMatrix(),matrix,16*sizeof(Sint32)); //reload camera matrix after every draw
     }
 
-    hero.draw_mess(); // remember to reload camera matrix after this.
-    memcpy(spGetMatrix(),matrix,16*sizeof(Sint32)); //reload camera matrix after every draw 
-    // need to reload camera matrix at the end or lights will go crazy.
+    hero.draw( matrix );
 
 	//spDeactivatePattern();
 	spSetPerspectiveTextureMapping(0);

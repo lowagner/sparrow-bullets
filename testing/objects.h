@@ -29,6 +29,7 @@ protected:
 
     void locate();
     btTransform my_transform();
+    void reset_camera( Sint32* matrix );
 
 public:
     int id;
@@ -58,8 +59,8 @@ public:
 
     //virtual void remove();
 
-    // translate/rotate the model-view matrix and then draw:
-    virtual void draw_mess( int alpha=255 ); 
+    // translate/rotate the model-view matrix, draws, then resets the model-view to "matrix"
+    virtual void draw( Sint32* matrix, int alpha=255 ); 
 
     // rule of three, define all these or none at all.
     virtual ~BaseObject();
@@ -84,7 +85,7 @@ public:
     void add_physics( Physics& physics );
 
     // translate/rotate the model-view matrix and then draw:
-    void draw_mess( int alpha=255 ); 
+    void draw( Sint32* matrix, int alpha=255 ); 
 
     //void remove();
 
@@ -106,7 +107,7 @@ public:
     void add_physics( Physics& physics );
 
     // translate/rotate the model-view matrix and then draw:
-    void draw_mess( int alpha=255 ); 
+    void draw( Sint32* matrix, int alpha=255 ); 
 
     //void remove();
 
@@ -127,7 +128,7 @@ public:
     void add_physics( Physics& physics );
 
     // translate/rotate the model-view matrix and then draw:
-    void draw_mess( int alpha=255 ); 
+    void draw( Sint32* matrix, int alpha=255 ); 
 
     //void remove();
 

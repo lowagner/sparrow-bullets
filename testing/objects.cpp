@@ -377,7 +377,13 @@ BaseObject::update( Uint32 dt )
 {}
 
 void
-BaseObject::draw_mess( int alpha )
+BaseObject::reset_camera( Sint32* matrix )
+{
+    memcpy(spGetMatrix(),matrix,16*sizeof(Sint32)); //reload camera matrix after every draw
+}
+
+void
+BaseObject::draw( Sint32* original_camera_matrix, int alpha )
 {}
 
 
@@ -425,7 +431,7 @@ Cube::update( Uint32 dt )
 
 
 void 
-Cube::draw_mess( int alpha )
+Cube::draw( Sint32* matrix, int alpha )
 {
     if ( alpha > 0 )
     {
@@ -436,6 +442,8 @@ Cube::draw_mess( int alpha )
             draw_textured_cube( texture, SP_ONE, color );
         else
             draw_box( SP_ONE, SP_ONE, SP_ONE, color );
+
+        reset_camera( matrix );
     }
 }
 
@@ -524,7 +532,7 @@ Box::update( Uint32 dt )
 }
 
 void
-Box::draw_mess( int alpha )
+Box::draw( Sint32* matrix, int alpha )
 {
     //spTranslate( lastpos.x, lastpos.y, lastpos.z );
     if ( alpha > 0 )
@@ -532,6 +540,7 @@ Box::draw_mess( int alpha )
         spMulMatrix( lastpor );
         spSetAlphaPattern4x4(alpha,8);
         draw_box( size.x, size.y, size.z, color );
+        reset_camera( matrix );
     }
 }
 
@@ -620,20 +629,21 @@ Ramp::update( Uint32 dt )
 }
 
 void
-Ramp::draw_mess( int alpha )
+Ramp::draw( Sint32* matrix, int alpha )
 {
     if ( alpha > 0 )
     {
         spSetAlphaPattern4x4(alpha,8);
         spMulMatrix( lastpor );
         draw_ramp( size.x, size.y, size.z, color );
+        reset_camera( matrix );
     }
 }
 
 Ramp::~Ramp()
 {
     //remove_physics(); // DO NOT UNCOMMENT.
-    std::cout << " removing ramps " << std::endl;
+    //std::cout << " removing ramp " << std::endl;
 }
 
 Ramp::Ramp( const Ramp& other ) // copy constructor
