@@ -1,8 +1,21 @@
-PRIORITY
+Draw dots for contact points, for debugging and what not.
 
-Draw lines, dots, for debugging and what not.
+check for ground:
+You could do a ray test straight down from the rigid body and test the distance of the ray hit.
 
-Draw x,y,z axis out of hero.
+One way is to simply use the rigid body position and subtract 10,000 or some arbitrary number to get a destination for the ray test.
+
+btVector3 btFrom(pos.x, pos.y, pos.z);
+btVector3 btTo(pos.x, -10000.0, pos.z);
+btCollisionWorld::ClosestRayResultCallback res(btFrom, btTo);
+
+btWorld->rayTest(btFrom, btTo, res); // m_btWorld is btDiscreteDynamicsWorld
+
+if(res.hasHit()){
+    /* Use Ogre::Vector3::squaredDistance() to find the difference from the rigid body to the ray hit */
+    }
+
+
 
 Elevator
 (moving Box class)
