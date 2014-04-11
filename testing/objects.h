@@ -24,7 +24,7 @@ protected:
     Sint32 lastpor[16]; // last position and orientation (rotation).  stored as openGL matrix.
     sbVector lastvelocity;
 
-    btDynamicsWorld* m_dworld;
+    Physics* m_physics;
     btRigidBody* m_rb;
 
     void locate();
@@ -37,7 +37,7 @@ public:
 
     BaseObject();
 
-    virtual void update( Uint32 dt );
+    virtual void update( float dt );
 
     sbVector last_position();
     
@@ -77,18 +77,26 @@ class Cube : public BaseObject
 { 
 protected:
     SDL_Surface* texture;
+    bool canjump, onground;
+    float speed, rotspeed;
 
 public:
     Cube( sbVector pos=sbVector(), Uint16 color_=0xFFFF, SDL_Surface* texture_ = NULL );
 
-    void update( Uint32 dt );
+    void update( float dt );
 
     void add_physics( Physics& physics );
 
     // translate/rotate the model-view matrix and then draw:
     void draw( Sint32* matrix, int alpha=255 ); 
 
-    //void remove();
+    bool feet_on_something(); // ray cast down in cube-coords
+    bool on_ground(); // ray cast downwards in world-coords
+
+    void jump();
+    void walk( float dt );
+    void turn( float dt, int dir );
+    void quick_turn();
 
     ~Cube();
     Cube( const Cube& other ); // copy constructor
@@ -103,7 +111,7 @@ protected:
 public:
     Box( sbVector size_=sbVector(1,1,1), sbVector pos=sbVector(), Uint16 color_=0xFFFF );
 
-    void update( Uint32 dt );
+    void update( float dt );
     
     void add_physics( Physics& physics );
 
@@ -124,7 +132,7 @@ protected:
 public:
     Ramp( sbVector size_=sbVector(1,1,1), sbVector pos=sbVector(), Uint16 color_=0xFFFF );
 
-    void update( Uint32 dt );
+    void update( float dt );
     
     void add_physics( Physics& physics );
 

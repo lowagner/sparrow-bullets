@@ -102,7 +102,7 @@ BaseObject::BaseObject()
 {
     std::cout << " calling base object constructor " << id << std::endl;
     debug = false;
-    m_dworld = NULL;
+    m_physics = NULL;
     m_rb = NULL;
 }
 
@@ -120,7 +120,7 @@ BaseObject::~BaseObject()
     // you have no way to check if c++ is deleting the physics of an object that should
     // still exist.
 
-    m_dworld = NULL;
+    m_physics = NULL;
     m_rb = NULL;
     // it's called after the inherited class' own destructor.
     // don't put any virtual methods in it.
@@ -146,7 +146,7 @@ BaseObject::last_velocity()
 void
 BaseObject::locate()
 {
-    if (m_dworld)
+    if (m_physics)
     {
         // get the openGL matrix from the object
         btScalar m[16];
@@ -186,7 +186,7 @@ BaseObject::rotate( sbVector axis, Sint32 angle )
         lastpor[i] = spFloatToFixed( btm[i] );
     }
 
-    if (m_dworld)
+    if (m_physics)
     {
         // get the openGL matrix from the object
         m_rb->getMotionState()->setWorldTransform( transform );
@@ -232,7 +232,7 @@ BaseObject::rotateZ( Sint32 rad )
 
     memcpy( lastpor, result, sizeof(Sint32)*8 );
 
-    if (m_dworld)
+    if (m_physics)
     {
         btScalar btm[16]; // transform matrix in btScalar form
         for (int i=0; i<16; i++)
@@ -256,7 +256,7 @@ BaseObject::translate( sbVector dist )
     lastpor[13] += dist.y;
     lastpor[14] += dist.z;
 
-    if (m_dworld)
+    if (m_physics)
     {
         btScalar btm[16]; // transform matrix in btScalar form
         for (int i=0; i<16; i++)
@@ -296,7 +296,7 @@ BaseObject::transform( Sint32* m )
         lastpor[i] = spFloatToFixed( obtm[i] );
     }
 
-    if (m_dworld)
+    if (m_physics)
     {
         // get the openGL matrix from the object
         m_rb->getMotionState()->setWorldTransform( transform );
@@ -307,7 +307,7 @@ BaseObject::transform( Sint32* m )
 void
 BaseObject::set_por( Sint32* m )
 {
-    if (m_dworld)
+    if (m_physics)
     {
         btScalar btm[16]; // transform matrix in btScalar form
         for (int i=0; i<16; i++)
@@ -363,18 +363,18 @@ BaseObject::out_of_bounds( sbVector outofbounds )
 void
 BaseObject::remove_physics()
 {
-    if (m_dworld)
+    if (m_physics)
     {
-        m_dworld->removeRigidBody(m_rb);
+        m_physics->m_dworld->removeRigidBody(m_rb);
         delete m_rb->getMotionState();
         delete m_rb;
-        m_dworld = NULL;
+        m_physics = NULL;
     }
 }
 
 
 void
-BaseObject::update( Uint32 dt )
+BaseObject::update( float dt )
 {}
 
 void
@@ -391,6 +391,10 @@ BaseObject::draw( Sint32* original_camera_matrix, int alpha )
 Cube::Cube( sbVector pos, Uint16 color_, SDL_Surface* texture_ )
 {
     id = 0;
+    speed = 2.8;
+    rotspeed = 0.5;
+    canjump = false;
+    onground = false;
     debug = false;
     // setup GL orientation/transform matrix
     for (int i=0; i<16; i++)
@@ -403,32 +407,156 @@ Cube::Cube( sbVector pos, Uint16 color_, SDL_Surface* texture_ )
 
     color = color_;
     texture = texture_;
-    m_dworld = NULL;
+    m_physics = NULL;
 }
 
 
 void
 Cube::add_physics( Physics& physics )
 {	
-    if (m_dworld)
+    if (m_physics)
     {
         // do we want to readd it by destroying it first?
         // just ignore for now.
     }
     else
     {
-        m_dworld = physics.m_dworld;
+        m_physics = &physics;
         m_rb = physics.add_cube( my_transform() );
         //init_physics_por();
     }
 }
 
 
+bool 
+Cube::feet_on_something() // ray cast down in cube-coords
+{
+    btVector3 rayfrom( spFixedToFloat(lastpor[12]), 
+                       spFixedToFloat(lastpor[13]), 
+                       spFixedToFloat(lastpor[14]) );
+    // get the cube-z direction in world coordinates
+    //btVector3 cubeup = m_rb->getWorldTransform().getBasis()[2];
+    //cubeup.normalize(); // this shouldn't be necessary
+    //btVector3 rayto = rayfrom - cubeup;
+
+	btTransform cubeform;
+	m_rb->getMotionState()->getWorldTransform( cubeform );
+	btVector3 down = -cubeform.getBasis()[2];
+	//btVector3 forward = cubeform.getBasis()[0];
+
+    btVector3 rayto = rayfrom + down;
+
+
+    ClosestNotMe ray(m_rb);
+
+    m_physics->m_dworld->rayTest( rayfrom, rayto, ray ); 
+
+    if ( ray.hasHit() )
+        return true;
+    else
+        return false;
+}
+
+bool 
+Cube::on_ground() // ray cast downwards in world-coords
+{
+    btVector3 rayfrom( spFixedToFloat(lastpor[12]), 
+                       spFixedToFloat(lastpor[13]), 
+                       spFixedToFloat(lastpor[14]) );
+    btVector3 rayto = rayfrom - btVector3(0,0,1);
+    
+    ClosestNotMe ray(m_rb);
+
+    m_physics->m_dworld->rayTest( rayfrom, rayto, ray ); 
+
+    if ( ray.hasHit() )
+        return true;
+    else
+        return false;
+}
+
 void
-Cube::update( Uint32 dt )
+Cube::jump()
+{
+//
+    if ( canjump )
+    {
+        canjump = false;
+
+        // get the cube-z direction in world coordinates
+        btVector3 cubeup = m_rb->getWorldTransform().getBasis()[2];
+//        cubeup.setX( 1.0* int( cubeup.x()*100 ) / 100 );
+//        cubeup.setY( 1.0* int( cubeup.y()*100 ) / 100 );
+//        cubeup.setZ( 1.0* int( cubeup.z()*100 ) / 100 );
+//        cubeup.normalize(); // this shouldn't be necessary
+        // add worldup to cubeup to get a jump vector
+        btVector3 jumpvec = (btVector3(0,0,1) + cubeup);
+        
+        m_rb->applyCentralImpulse( jumpvec );
+    }
+}
+
+
+void
+Cube::walk( float dt )
+{
+    if (canjump && onground)
+    {
+        // get the cube-x direction in world coordinates
+        btVector3 forward = m_rb->getWorldTransform().getBasis()[0];
+        forward.normalize();
+        std::cout << " forward = " << forward.x() << ", "
+                                   << forward.y() << ", "
+                                   << forward.z() << "\n";
+
+//        btTransform cubeform;
+//        m_rb->getMotionState()->getWorldTransform( cubeform );
+//        //btVector3 down = -cubeform.getBasis()[2];
+//        btVector3 forward = cubeform.getBasis()[0];
+
+        m_rb->applyCentralImpulse( speed*forward*dt );
+    }
+}
+
+void
+Cube::turn( float dt, int dir )
+{
+//    if (canjump && onground)
+    {
+        // get the cube-z direction in world coordinates
+        btVector3 up = m_rb->getWorldTransform().getBasis()[2];
+
+        //btTransform cubeform;
+        //m_rb->getMotionState()->getWorldTransform( cubeform );
+        //btVector3 up = cubeform.getBasis()[2];
+
+//        btVector3 up = m_rb->getInvInertiaTensorWorld().inverse()*
+//                                ( m_rb->getWorldTransform().getBasis()*btVector3(0,0,1) );
+
+        //m_rb->applyTorque( rotspeed*up*dir ); 
+//        m_rb->applyTorqueImpulse( rotspeed*up*dt*dir ); 
+        Physics* standin = m_physics;
+        remove_physics();
+        rotateZ( spFloatToFixed(rotspeed*dt*dir) ); 
+        add_physics(*standin);
+
+    }
+}
+
+void
+Cube::quick_turn()
+{
+
+}
+
+void
+Cube::update( float dt )
 {
     // find where cube is now.
     locate();
+
+    canjump = feet_on_something();
+    onground = on_ground();
 }
 
 
@@ -467,9 +595,11 @@ Cube::Cube( const Cube& other ) // copy constructor
 {
     //std::cout << " calling cube copy constructor from " << other.id << " to " << id << std::endl;
     id = other.id + 100;
+    speed = other.speed;
+    rotspeed = other.rotspeed;
     debug = other.debug;
     texture = other.texture;
-    m_dworld = other.m_dworld;
+    m_physics = other.m_physics;
     m_rb = other.m_rb;
     color = other.color;
     lastvelocity = other.lastvelocity;
@@ -485,9 +615,11 @@ Cube::operator = ( Cube other ) // Copy Assignment Operator
 {
     //std::cout << " calling cube copy assignment from " << other.id << " to " << id << std::endl;
     id = other.id + 100;
+    speed = other.speed;
+    rotspeed = other.rotspeed;
     debug = other.debug;
     texture = other.texture;
-    m_dworld = other.m_dworld;
+    m_physics = other.m_physics;
     m_rb = other.m_rb;
     color = other.color;
     lastvelocity = other.lastvelocity;
@@ -515,21 +647,21 @@ Box::Box( sbVector size_,
 
     size = size_;
     color = color_;
-    m_dworld = NULL;
+    m_physics = NULL;
 }
 
 
 void
 Box::add_physics( Physics& physics )
 {	
-    if (m_dworld)
+    if (m_physics)
     {
         // do we want to readd it by destroying it first?
         // just ignore for now.
     }
     else
     {
-        m_dworld = physics.m_dworld;
+        m_physics = &physics;
         m_rb = physics.add_box( my_transform(), size );
         //init_physics_por();
     }
@@ -537,7 +669,7 @@ Box::add_physics( Physics& physics )
 
 
 void
-Box::update( Uint32 dt )
+Box::update( float dt )
 {
     // find where box is now.
     locate();
@@ -567,7 +699,7 @@ Box::Box( const Box& other ) // copy constructor
     //std::cout << " calling box copy constructor " << std::endl;
     id = other.id;
     debug = other.debug;
-    m_dworld = other.m_dworld;
+    m_physics = other.m_physics;
     m_rb = other.m_rb;
     size = other.size;
     color = other.color;
@@ -583,7 +715,7 @@ Box&
 Box::operator = ( Box other ) // Copy Assignment Operator
 {
     //std::cout << " calling box copy assignment " << std::endl;
-    m_dworld = other.m_dworld;
+    m_physics = other.m_physics;
     m_rb = other.m_rb;
     debug = other.debug;
     id = other.id;
@@ -617,27 +749,27 @@ Ramp::Ramp( sbVector size_,
 
     size = size_;
     color = color_;
-    m_dworld = NULL;
+    m_physics = NULL;
 }
 
 void
 Ramp::add_physics( Physics& physics )
 {	
-    if (m_dworld)
+    if (m_physics)
     {
         // do we want to readd it by destroying it first?
         // just ignore for now.
     }
     else
     {
-        m_dworld = physics.m_dworld;
+        m_physics = &physics;
         m_rb = physics.add_ramp( my_transform(), size );
         //init_physics_por();
     }
 }
 
 void
-Ramp::update( Uint32 dt )
+Ramp::update( float dt )
 {
     // find where box is now.
     locate();
@@ -666,7 +798,7 @@ Ramp::Ramp( const Ramp& other ) // copy constructor
     //std::cout << " calling ramp copy constructor " << std::endl;
     id = other.id;
     debug = other.debug;
-    m_dworld = other.m_dworld;
+    m_physics = other.m_physics;
     m_rb = other.m_rb;
     size = other.size;
     color = other.color;
@@ -682,7 +814,7 @@ Ramp&
 Ramp::operator = ( Ramp other ) // Copy Assignment Operator
 {
     //std::cout << " calling ramp copy assignment " << std::endl;
-    m_dworld = other.m_dworld;
+    m_physics = other.m_physics;
     m_rb = other.m_rb;
     id = other.id;
     debug = other.debug;

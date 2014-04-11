@@ -81,7 +81,7 @@ Play::reset()
     ramps[1].rotateZ( SP_PI*0.1 );
 
     //world.add_box( 10,10,2, sbVector(0,0,-1) ); // add the floor
-    hero = Cube( sbVector(0,0,10), 0xF00F, checkertexture );
+    hero = Cube( sbVector(0,8,5), 0xF00F, checkertexture );
     hero.debug = true;
    
 //    std::cout << std::endl;
@@ -259,15 +259,21 @@ int Play::update( Uint32 dt )
 
     if (!(pause))
     {
-        physics.update( dt*1.0/100 );
+        float fdt = 1.0*dt/100;
+        physics.update( fdt );
+        // update hero stuff
+        hero.update( fdt );
+        // this function will check to see if the hero can actually walk.
+        hero.turn( fdt, 1 );
+        hero.walk( fdt );
 
-        hero.update( dt );
+        // update blocks
         int i=0;
         int blocksize = blocks.size();
         while ( i < blocksize )
         {
             //std::cout << i << "; id " << blocks[i].id << " ";
-            blocks[i].update( dt );
+            blocks[i].update( fdt );
 
             if (  blocks[i].out_of_bounds( outofbounds )   )
             {

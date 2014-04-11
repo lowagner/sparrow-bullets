@@ -1,6 +1,7 @@
 #include "physics.h"
 #include <iostream>
 
+
 void
 Physics::init()
 {
@@ -21,8 +22,8 @@ Physics::init()
                                             m_colconfig );
 	//m_dworld->setDebugDrawer(&gDebugDraw);
 	
-	m_dworld->setGravity( btVector3(0,0,-2.5) ); // -2 to -3 is pretty good.
-    // gravity should be greater (in magnitude) than about 0.4
+	m_dworld->setGravity( btVector3(0,0,-9) ); 
+    // gravity should be greater (in magnitude) than about 1
 
 
     // standard box shape

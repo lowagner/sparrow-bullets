@@ -3,6 +3,32 @@
 
 #include "basic.h"
 
+
+// borrowing a strange class from bullet2/Demos/CharacterDemo/DynamicCharacterController.cpp
+class ClosestNotMe : public btCollisionWorld::ClosestRayResultCallback
+{
+protected:
+    btRigidBody* m_me;
+
+public:
+    ClosestNotMe(btRigidBody* me)
+    :
+        btCollisionWorld::ClosestRayResultCallback(btVector3(0.0, 0.0, 0.0), btVector3(0.0, 0.0, 0.0))
+    {
+        m_me = me;
+    }
+
+    virtual btScalar addSingleResult(btCollisionWorld::LocalRayResult& rayResult,bool normalInWorldSpace)
+    {
+        if (rayResult.m_collisionObject == m_me)
+            return 1.0;
+
+        return ClosestRayResultCallback::addSingleResult( rayResult, normalInWorldSpace );
+    }
+};
+
+
+
 class Physics
 {
 
