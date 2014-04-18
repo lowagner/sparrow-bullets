@@ -18,9 +18,9 @@ I have compiled this on a Linux distribution, and good luck
 trying to do it on something else.  If you are on Linux, first
 download sparrow3d from https://github.com/theZiz/sparrow3d.
 
-Then compile sparrow3d.  You may need to install extra libraries such as
+Then compile sparrow3d.  You will need to install extra libraries such as
 `libsdl-ttf2.0-dev`, `libsdl-mixer1.2-dev`, `libsdl-net1.2-dev`,
-`libsdl-gfx1.2-dev`, and what not.  For sparrow-bullets, you'll 
+`libsdl-gfx1.2-dev`, and `libsdl-image1.2-dev`.  For sparrow-bullets, you'll 
 also need to install `libbullet-dev` so grab that while you're at it.
 
 After compiling the sparrow3d library, head back to sparrow-bullets,
