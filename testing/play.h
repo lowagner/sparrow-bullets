@@ -25,7 +25,7 @@ private:
     Sint32 axis;
     Sint32 rotation;
     Sint32 distance;
-    sbVector outofbounds;
+    btVector3 outofbounds;
 
     spFontPointer font;
 

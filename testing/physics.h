@@ -1,8 +1,8 @@
 #ifndef __PHYSICS__
 #define __PHYSICS__
 
-#include "basic.h"
-
+#include "btBulletDynamicsCommon.h"
+#include <iostream>
 
 // borrowing a strange class from bullet2/Demos/CharacterDemo/DynamicCharacterController.cpp
 class ClosestNotMe : public btCollisionWorld::ClosestRayResultCallback
@@ -35,7 +35,7 @@ class Physics
 public:
     // biggest PHYSICS class
     // the general world which calculates everything, does dynamics, etc.
-	btDynamicsWorld*		m_dworld;
+    btDynamicsWorld* m_dworld;
 
 private:
     // more physics classes
@@ -43,25 +43,25 @@ private:
     // this collision shapes holds all the unique collision shapes.
     // so don't add to it unless you have a different shape to collide.
     // (it's probably ok, it's just less efficient.)
-	btAlignedObjectArray<btCollisionShape*>	m_colshapes;
+    btAlignedObjectArray<btCollisionShape*>	m_colshapes;
 
     // methods to calculate things...
-	btBroadphaseInterface*	m_broadphase;
+    btBroadphaseInterface*	m_broadphase;
 
     // something to dispatch... collision events?
-	btCollisionDispatcher*	m_dispatcher;
+    btCollisionDispatcher*	m_dispatcher;
 
     // methods to calculate constraints
-	btSequentialImpulseConstraintSolver*	m_solver;
+    btSequentialImpulseConstraintSolver*	m_solver;
 
     // not sure what this is
-	btDefaultCollisionConfiguration* m_colconfig;
-   
+    btDefaultCollisionConfiguration* m_colconfig;
+
     // standard box shape
-	btBoxShape* cubeshape;
+    btBoxShape* cubeshape;
     // standard box inertia -- or moment of inertia off-diagonals, not exactly sure!
     btVector3 cubeinertia;
-	
+
 public:
 
     Physics();
@@ -72,16 +72,23 @@ public:
     void
     update( float dt );
 
-    btRigidBody*
-    add_cube( btTransform transform );
+    int 
+    set_object_dynamics( btRigidBody* body, btVector3 velocity, btVector3 omega = btVector3() );
 
     btRigidBody*
-    add_box( btTransform transform, sbVector size, 
-             Uint32 mass_=0 );
+    add_cube( btTransform transform, 
+              btVector3 velocity = btVector3(), 
+              btVector3 omega = btVector3(), btScalar mass_=1 );
+
+    btRigidBody*
+    add_box( btVector3 size, btTransform transform, 
+             btVector3 velocity = btVector3(), btVector3 omega = btVector3(),
+             btScalar mass_=0 );
     
     btRigidBody*
-    add_ramp( btTransform transform, sbVector size, 
-              Uint32 mass_=0 );
+    add_ramp( btVector3 size, btTransform transform, 
+              btVector3 velocity = btVector3(), btVector3 omega = btVector3(),
+              btScalar mass_=0 );
 
     void remove_body( btRigidBody* rb );
 

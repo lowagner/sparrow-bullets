@@ -6,32 +6,32 @@ void
 Physics::init()
 {
     //initialization
-	///use the default collision dispatcher. For parallel processing you can use a diffent dispatcher (see Extras/BulletMultiThreaded)
+    ///use the default collision dispatcher. For parallel processing you can use a diffent dispatcher (see Extras/BulletMultiThreaded)
     m_colconfig = new btDefaultCollisionConfiguration();
 
-	m_dispatcher = new	btCollisionDispatcher(m_colconfig);
+    m_dispatcher = new btCollisionDispatcher(m_colconfig);
 
-	m_broadphase = new btDbvtBroadphase();
+    m_broadphase = new btDbvtBroadphase();
 
-	///the default constraint solver. For parallel processing you can use a different solver (see Extras/BulletMultiThreaded)
+    ///the default constraint solver. For parallel processing you can use a different solver (see Extras/BulletMultiThreaded)
     m_solver = new btSequentialImpulseConstraintSolver;
 
-	m_dworld = new btDiscreteDynamicsWorld( m_dispatcher,
+    m_dworld = new btDiscreteDynamicsWorld( m_dispatcher,
                                             m_broadphase,
                                             m_solver,
                                             m_colconfig );
-	//m_dworld->setDebugDrawer(&gDebugDraw);
-	
-	m_dworld->setGravity( btVector3(0,0,-9) ); 
+    //m_dworld->setDebugDrawer(&gDebugDraw);
+
+    m_dworld->setGravity( btVector3(0,0,-9) ); 
     // gravity should be greater (in magnitude) than about 1
 
 
     // standard box shape
     cubeshape = new btBoxShape( btVector3(1,1,1) );
-    
-    // put it in the collision shapes list	
-	m_colshapes.push_back( cubeshape );
-   
+
+    // put it in the collision shapes list
+    m_colshapes.push_back( cubeshape );
+
     // standard box inertia, initialize to zero.
     cubeinertia = btVector3(0,0,0);
     // give the shape a mass and inertia
@@ -43,20 +43,35 @@ Physics::init()
 Physics::Physics() 
 {
     m_colconfig = NULL;
-	m_dispatcher = NULL;
-	m_broadphase = NULL;
+    m_dispatcher = NULL;
+    m_broadphase = NULL;
     m_solver = NULL;
-	m_dworld =  NULL;
+    m_dworld =  NULL;
+}
+
+int
+Physics::set_object_dynamics( btRigidBody* body, btVector3 velocity, btVector3 omega )
+{
+    body->setLinearVelocity( velocity );
+    body->setAngularVelocity( omega );
+
+    if ( velocity.length2() > 0 || omega.length2() > 0 )
+        return 1;
+    else
+        return 0;
 }
 
 
 btRigidBody*
-Physics::add_cube( btTransform transform )
+Physics::add_cube( btTransform transform, btVector3 velocity, btVector3 omega, btScalar _mass )
 {
     //using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
     btDefaultMotionState* myMotionState = new btDefaultMotionState( transform );
-    btRigidBody::btRigidBodyConstructionInfo rbInfo(btScalar(1),myMotionState,cubeshape,cubeinertia);
+    btRigidBody::btRigidBodyConstructionInfo rbInfo(_mass,myMotionState,cubeshape,cubeinertia);
     btRigidBody* body = new btRigidBody(rbInfo);
+
+    
+    set_object_dynamics( body, velocity, omega );
 
     //add the body to the dynamics world
     m_dworld->addRigidBody(body);
@@ -65,31 +80,35 @@ Physics::add_cube( btTransform transform )
 }
 
 btRigidBody*
-Physics::add_box( btTransform transform, sbVector size, 
-                  Uint32 mass_ )
+Physics::add_box( btVector3 size, btTransform transform, 
+                  btVector3 velocity, btVector3 omega,
+                  btScalar mass )
 {
-	btBoxShape* newbox = new btBoxShape(   btVector3( spFixedToFloat(size.x), 
-                                                      spFixedToFloat(size.y), 
-                                                      spFixedToFloat(size.z) )   );
-	
-	m_colshapes.push_back( newbox );
+    btBoxShape* newbox = new btBoxShape( size );
 
-	//btTransform transform;
-	//transform.setIdentity();
-	//transform.setOrigin(   btVector3()   );
+    m_colshapes.push_back( newbox );
 
+    //btTransform transform;
+    //transform.setIdentity();
+    //transform.setOrigin(   btVector3()   );
 
-    btScalar mass( spFixedToFloat(mass_) );
 
     //rigidbody is dynamic if and only if mass is non zero, otherwise static
-    btVector3 localInertia(0,0,0);
+    btVector3 linertia(0,0,0);
     if (mass != 0.f)
-        newbox->calculateLocalInertia(mass,localInertia);
+        newbox->calculateLocalInertia(mass,linertia);
 
     //using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
     btDefaultMotionState* myMotionState = new btDefaultMotionState( transform );
-    btRigidBody::btRigidBodyConstructionInfo rbInfo(mass,myMotionState,newbox,localInertia);
+    btRigidBody::btRigidBodyConstructionInfo rbInfo(mass,myMotionState,newbox,linertia);
     btRigidBody* body = new btRigidBody(rbInfo);
+
+    int dynamic = set_object_dynamics( body, velocity, omega );
+    if ( dynamic and mass == 0 )
+    {
+        body->setCollisionFlags( body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT );
+        body->setActivationState( DISABLE_DEACTIVATION );
+    }
 
     //add the body to the dynamics world
     m_dworld->addRigidBody(body);
@@ -98,35 +117,37 @@ Physics::add_box( btTransform transform, sbVector size,
 }
 
 btRigidBody*
-Physics::add_ramp( btTransform transform, sbVector size, 
-                   Uint32 mass_ )
+Physics::add_ramp( btVector3 size, btTransform transform, 
+                   btVector3 velocity, btVector3 omega,
+                   btScalar mass )
 {
-	btConvexHullShape* newbox = new btConvexHullShape();
+    btConvexHullShape* newbox = new btConvexHullShape();
     newbox->addPoint( btVector3(0,0,0) );
-    newbox->addPoint( btVector3(spFixedToFloat(size.x),0,0) );
-    newbox->addPoint( btVector3(spFixedToFloat(size.x),spFixedToFloat(size.y),0) );
-    newbox->addPoint( btVector3(0,spFixedToFloat(size.y),0) );
-    newbox->addPoint( btVector3(spFixedToFloat(size.x),0,spFixedToFloat(size.z)) );
-    newbox->addPoint( btVector3(spFixedToFloat(size.x),spFixedToFloat(size.y),spFixedToFloat(size.z)) );
-	
-	m_colshapes.push_back( newbox );
+    newbox->addPoint( btVector3(size.x(),0,0) );
+    newbox->addPoint( btVector3(size.x(),size.y(),0) );
+    newbox->addPoint( btVector3(0,size.y(),0) );
+    newbox->addPoint( btVector3(size.x(),0,size.z()) );
+    newbox->addPoint( btVector3(size.x(),size.y(),size.z()) );
+    
+    m_colshapes.push_back( newbox );
 
-	//btTransform transform;
-	//transform.setIdentity();
-	//transform.setOrigin(   btVector3()   );
+    //btTransform transform;
+    //transform.setIdentity();
+    //transform.setOrigin(   btVector3()   );
 
-
-    btScalar mass( spFixedToFloat(mass_) );
 
     //rigidbody is dynamic if and only if mass is non zero, otherwise static
-    btVector3 localInertia(0,0,0);
+    btVector3 linertia(0,0,0); // not sure what this guy is, but everyone's doing it so let's go for it!
     if (mass != 0.f)
-        newbox->calculateLocalInertia(mass,localInertia);
+        newbox->calculateLocalInertia(mass,linertia);
+        // is it a moment of inertia?  is it an inertia tensor?  is it local in Er Tia?  we'll never know.
 
     //using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
     btDefaultMotionState* myMotionState = new btDefaultMotionState( transform );
-    btRigidBody::btRigidBodyConstructionInfo rbInfo(mass,myMotionState,newbox,localInertia);
+    btRigidBody::btRigidBodyConstructionInfo rbInfo(mass,myMotionState,newbox,linertia);
     btRigidBody* body = new btRigidBody(rbInfo);
+
+    set_object_dynamics( body, velocity, omega );
 
     //add the body to the dynamics world
     m_dworld->addRigidBody(body);
@@ -179,9 +200,9 @@ Physics::update( float dt )
 //		//rigidbody is dynamic if and only if mass is non zero, otherwise static
 //		bool isDynamic = (mass != 0.f);
 //
-//		btVector3 localInertia(0,0,0);
+//		btVector3 linertia(0,0,0);
 //		if (isDynamic)
-//			colShape->calculateLocalInertia(mass,localInertia);
+//			colShape->calculateLocalInertia(mass,linertia);
 //
 //		float start_x = START_POS_X - ARRAY_SIZE_X/2;
 //		float start_y = START_POS_Y;
@@ -201,7 +222,7 @@ Physics::update( float dt )
 //			
 //					//using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
 //					btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
-//					btRigidBody::btRigidBodyConstructionInfo rbInfo(mass,myMotionState,colShape,localInertia);
+//					btRigidBody::btRigidBodyConstructionInfo rbInfo(mass,myMotionState,colShape,linertia);
 //					btRigidBody* body = new btRigidBody(rbInfo);
 //					
 //
@@ -245,22 +266,22 @@ Physics::deinit()
     }
 
     if ( m_solver )
-	    delete m_solver;
+        delete m_solver;
 
     if ( m_broadphase )
-	    delete m_broadphase;
+        delete m_broadphase;
 
     if ( m_dispatcher )
-	    delete m_dispatcher;
+        delete m_dispatcher;
 
     if ( m_colconfig )
-	    delete m_colconfig;
+        delete m_colconfig;
     
     m_colconfig = NULL;
-	m_dispatcher = NULL;
-	m_broadphase = NULL;
+    m_dispatcher = NULL;
+    m_broadphase = NULL;
     m_solver = NULL;
-	m_dworld =  NULL;
+    m_dworld =  NULL;
 }
 
 

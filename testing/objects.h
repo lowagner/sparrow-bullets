@@ -18,18 +18,30 @@ void draw_ramp( Sint32 sizex = SP_ONE,
 class BaseObject
 {
 protected:
-    int iamdone;
     Uint16 color;
+    Sint32 lastpor[16]; // last position and orientation (rotation), for display.  stored as openGL matrix.
+   
+    // INTERFACING TO PHYSICS ENGINE
+    bool kinematic; // whether or not the object is moved by fiat.
 
-    Sint32 lastpor[16]; // last position and orientation (rotation).  stored as openGL matrix.
-    sbVector lastvelocity;
+    btScalar mass;
+    btTransform transform; // the position and orientation to interface with Bullet 
+    btVector3 lastposition; // position
+    btVector3 lastvelocity; // linear velocity
+    btVector3 lastomega; //angular velocity
 
     Physics* m_physics;
     btRigidBody* m_rb;
 
-    void locate();
-    btTransform my_transform();
+    void update_por( btScalar dt ); // updates por for non-kinematic/dynamic objects
+    void fix_transform(); // essentially sets transform from the lastpor guy.
+    void fix_por(); // essentially sets lastpor from the transform guy.
+
+    void update_transform( btScalar dt ); // updates por/transform for kinematic objects
+
+    void locate_and_move( btScalar dt );
     void reset_camera( Sint32* matrix );
+    
 
 public:
     int id;
@@ -39,22 +51,25 @@ public:
 
     virtual void update( float dt );
 
-    sbVector last_position();
+    btVector3 last_position();
     
-    sbVector last_velocity();
+    btVector3 last_velocity();
+    
+    btVector3 last_omega();
 
     virtual void add_physics( Physics& physics );
 
-    bool out_of_bounds( sbVector outofbounds );
+    bool out_of_bounds( btVector3 outofbounds );
 
-    void translate( sbVector dist );
+    void translate( btVector3 dist );
 
-    void rotateZ( Sint32 angle );
-    void rotate( sbVector axis, Sint32 angle );
+    void rotateZ( btScalar angle );
+    void rotate( btVector3 axis, btScalar angle );
 
-    void transform( Sint32* m );
+    //void transform( Sint32* m );
+
     
-    void set_por( Sint32* m );
+    //void set_por( Sint32* m );
 
     void remove_physics();
 
@@ -81,7 +96,7 @@ protected:
     float speed, rotspeed;
 
 public:
-    Cube( sbVector pos=sbVector(), Uint16 color_=0xFFFF, SDL_Surface* texture_ = NULL );
+    Cube( btVector3 pos=btVector3(), Uint16 color_=0xFFFF, SDL_Surface* texture_ = NULL, btScalar mass_=1 );
 
     void update( float dt );
 
@@ -107,9 +122,13 @@ public:
 class Box : public BaseObject
 {
 protected:
-    sbVector size;
+    btVector3 size;
+    Sint32 sizex;
+    Sint32 sizey;
+    Sint32 sizez;
+
 public:
-    Box( sbVector size_=sbVector(1,1,1), sbVector pos=sbVector(), Uint16 color_=0xFFFF );
+    Box( btVector3 size_=btVector3(1,1,1), btVector3 pos=btVector3(), Uint16 color_=0xFFFF, btScalar mass_=0 );
 
     void update( float dt );
     
@@ -128,9 +147,13 @@ public:
 class Ramp : public BaseObject
 {
 protected:
-    sbVector size;
+    btVector3 size;
+    Sint32 sizex;
+    Sint32 sizey;
+    Sint32 sizez;
+
 public:
-    Ramp( sbVector size_=sbVector(1,1,1), sbVector pos=sbVector(), Uint16 color_=0xFFFF );
+    Ramp( btVector3 size_=btVector3(1,1,1), btVector3 pos=btVector3(), Uint16 color_=0xFFFF, btScalar mass_=0 );
 
     void update( float dt );
     
