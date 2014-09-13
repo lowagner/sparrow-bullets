@@ -13,6 +13,8 @@
 #include "objects.h"
 #include "meta.h"
 #include <vector>
+//#include <time.h>  // for timer functionality
+//#include <unistd.h> // for sleep function
 //#include <string>
 //using std::string;
 
@@ -44,6 +46,9 @@ private:
     
     int iamdone;
     Physics physics;
+    
+//    time_t previous_t;
+//    time_t current_t;
     
     
 public:

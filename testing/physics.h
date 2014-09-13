@@ -8,19 +8,19 @@
 class ClosestNotMe : public btCollisionWorld::ClosestRayResultCallback
 {
 protected:
-    btRigidBody* m_me;
+    btCollisionObject* me;
 
 public:
-    ClosestNotMe(btRigidBody* me)
+    ClosestNotMe(btCollisionObject* me)
     :
         btCollisionWorld::ClosestRayResultCallback(btVector3(0.0, 0.0, 0.0), btVector3(0.0, 0.0, 0.0))
     {
-        m_me = me;
+        me = me;
     }
 
     virtual btScalar addSingleResult(btCollisionWorld::LocalRayResult& rayResult,bool normalInWorldSpace)
     {
-        if (rayResult.m_collisionObject == m_me)
+        if (rayResult.m_collisionObject == me)
             return 1.0;
 
         return ClosestRayResultCallback::addSingleResult( rayResult, normalInWorldSpace );
@@ -35,7 +35,7 @@ class Physics
 public:
     // biggest PHYSICS class
     // the general world which calculates everything, does dynamics, etc.
-    btDynamicsWorld* m_dworld;
+    btDynamicsWorld* dworld;
 
 private:
     // more physics classes
@@ -43,19 +43,19 @@ private:
     // this collision shapes holds all the unique collision shapes.
     // so don't add to it unless you have a different shape to collide.
     // (it's probably ok, it's just less efficient.)
-    btAlignedObjectArray<btCollisionShape*>	m_colshapes;
+    btAlignedObjectArray<btCollisionShape*> colshapes;
 
     // methods to calculate things...
-    btBroadphaseInterface*	m_broadphase;
+    btBroadphaseInterface* broadphase;
 
     // something to dispatch... collision events?
-    btCollisionDispatcher*	m_dispatcher;
+    btCollisionDispatcher* dispatcher;
 
     // methods to calculate constraints
-    btSequentialImpulseConstraintSolver*	m_solver;
+    btSequentialImpulseConstraintSolver* solver;
 
     // not sure what this is
-    btDefaultCollisionConfiguration* m_colconfig;
+    btDefaultCollisionConfiguration* colconfig;
 
     // standard box shape
     btBoxShape* cubeshape;
@@ -71,22 +71,29 @@ public:
 
     void
     update( float dt );
-
-    int 
-    set_object_dynamics( btRigidBody* body, btVector3 velocity, btVector3 omega = btVector3() );
+    
+    btRigidBody*
+    add_body( short int& dynamics,
+              btCollisionShape* newbox, 
+              btTransform transform, 
+              btVector3 velocity, btVector3 omega,
+              btScalar mass );
 
     btRigidBody*
-    add_cube( btTransform transform, 
+    add_cube( short int& dynamics,
+              btTransform transform, 
               btVector3 velocity = btVector3(), 
               btVector3 omega = btVector3(), btScalar mass_=1 );
 
     btRigidBody*
-    add_box( btVector3 size, btTransform transform, 
+    add_box( short int& dynamics,
+             btVector3 size, btTransform transform, 
              btVector3 velocity = btVector3(), btVector3 omega = btVector3(),
              btScalar mass_=0 );
     
     btRigidBody*
-    add_ramp( btVector3 size, btTransform transform, 
+    add_ramp( short int& dynamics,
+              btVector3 size, btTransform transform, 
               btVector3 velocity = btVector3(), btVector3 omega = btVector3(),
               btScalar mass_=0 );
 

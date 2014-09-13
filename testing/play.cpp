@@ -8,7 +8,7 @@
  added to by Lucas Wagner (lowagner), low agner _at_ gmail.com
  mostly for the bullets.
 */
-
+//#include <cmath>
 #include "play.h"
 //#include <strings.h>
 #include <string>
@@ -64,6 +64,8 @@ void
 Play::reset()
 {
     deinit(); // kill everything first
+//    previous_t = time(0);
+//    current_t = time(0);
 
     // then rebirth it all...
     pause = 1;
@@ -77,20 +79,21 @@ Play::reset()
     ramps.push_back( Ramp( btVector3(10,2,4), btVector3(-3,0,-3), 0xF0FF ) ); // sizes, pos, color
     //ramps[0].rotate( btVector3(0,0,1), SP_PI*0.5 );
     ramps.push_back( Ramp( btVector3(5,2.5,3), btVector3(-1,0,-4), 0xFFFF ) ); // sizes, pos, color
-    ramps[0].rotateZ( SP_PI*0.5 );
-    ramps[1].rotateZ( SP_PI*0.1 );
+    ramps[0].rotateZ( M_PI/2 );
+    ramps[1].rotateZ( 2*M_PI );
 
     //world.add_box( 10,10,2, btVector3(0,0,-1) ); // add the floor
     hero = Cube( btVector3(0,8,5), 0xF00F, checkertexture );
     hero.debug = true;
    
-//    std::cout << std::endl;
-//    std::cout << " creating new blocks " << std::endl;
-//    std::cout << std::endl;
+    std::cout << std::endl;
+    std::cout << " creating new blocks " << std::endl;
+    std::cout << std::endl;
     // add some blocks pieces
     for ( int i=0; i<5; i++ )
     {
         blocks.push_back(  Cube( btVector3(2*i-3,0,10+2*i), 0x0F0F )  );
+//        std::cout << " mass = " << blocks[i].mass << std::endl;
     }
 //    std::cout << std::endl;
 //    std::cout << " end creating new blocks " << std::endl;
@@ -99,18 +102,28 @@ Play::reset()
     // now add physics to everybody 
     physics.init();
     hero.add_physics( physics );
-
-    for ( int i=0; i<boxes.size(); i++ )
-        boxes[i].add_physics( physics );
     
+//    std::cout << std::endl;
+//    std::cout << " start adding block physics " << std::endl;
+//    std::cout << std::endl;
+
     for ( int i=0; i<blocks.size(); i++ )
     {
+//        std::cout << " mass = " << blocks[i].mass << std::endl;
         blocks[i].add_physics( physics );
 //        std::cout << " naming new block " << i << std::endl;
 //        std::cout << std::endl;
         blocks[i].id = i;
     }
     
+    std::cout << std::endl;
+    std::cout << " end adding block physics " << std::endl;
+    std::cout << std::endl;
+    
+    
+    for ( int i=0; i<boxes.size(); i++ )
+        boxes[i].add_physics( physics );
+
     for ( int i=0; i<ramps.size(); i++ )
         ramps[i].add_physics( physics );
     
@@ -256,10 +269,17 @@ int Play::update( Uint32 dt )
         reset();
     }
 
-
     if (!(pause))
     {
-        btScalar fdt = 1.0*spFixedToFloat(dt)/1000;
+        btScalar fdt = dt*1.0/1000;
+
+//        current_t = time(0);
+//        double time = difftime(current_t, previous_t);
+//        sleep(3);
+//        std::cerr << " sparrow dt = " << fdt << ", c++ sec = " << time << ";  ";
+//        previous_t = current_t;
+
+
         physics.update( fdt );
         // update hero stuff
         hero.update( fdt );

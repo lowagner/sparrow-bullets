@@ -22,16 +22,22 @@ protected:
     Sint32 lastpor[16]; // last position and orientation (rotation), for display.  stored as openGL matrix.
    
     // INTERFACING TO PHYSICS ENGINE
-    bool kinematic; // whether or not the object is moved by fiat.
+    //bool kinematic; // whether or not the object is moved by fiat.
+    short int dynamics;  //  0 is not in the physics world
+                         //  1 is in the physics world, but not moving
+                         //  2 is in the physics world, moving, but with mass=0 and not affected by physics
+                         //  3 is fully in the physics world, dynamics fully described by the world
+                         // -1 is a ghost in the physics world, not moving
+                         // -2 is a ghost in the physics world, moving
 
-    btScalar mass;
     btTransform transform; // the position and orientation to interface with Bullet 
     btVector3 lastposition; // position
     btVector3 lastvelocity; // linear velocity
     btVector3 lastomega; //angular velocity
 
-    Physics* m_physics;
-    btRigidBody* m_rb;
+    Physics* physics;
+    btRigidBody* body;
+    btScalar mass;
 
     void update_por( btScalar dt ); // updates por for non-kinematic/dynamic objects
     void fix_transform(); // essentially sets transform from the lastpor guy.
@@ -57,7 +63,7 @@ public:
     
     btVector3 last_omega();
 
-    virtual void add_physics( Physics& physics );
+    virtual void add_physics( Physics& new_physics, short int dynamics_=1 );
 
     bool out_of_bounds( btVector3 outofbounds );
 
@@ -96,11 +102,12 @@ protected:
     float speed, rotspeed;
 
 public:
-    Cube( btVector3 pos=btVector3(), Uint16 color_=0xFFFF, SDL_Surface* texture_ = NULL, btScalar mass_=1 );
+    Cube( btVector3 pos=btVector3(), Uint16 color_=0xFFFF, 
+          SDL_Surface* texture_ = NULL, btScalar mass_ = btScalar(1) );
 
     void update( float dt );
 
-    void add_physics( Physics& physics );
+    void add_physics( Physics& new_physics, short int dynamics_=3 );
 
     // translate/rotate the model-view matrix and then draw:
     void draw( Sint32* matrix, int alpha=255 ); 
@@ -128,11 +135,12 @@ protected:
     Sint32 sizez;
 
 public:
-    Box( btVector3 size_=btVector3(1,1,1), btVector3 pos=btVector3(), Uint16 color_=0xFFFF, btScalar mass_=0 );
+    Box( btVector3 size_=btVector3(1,1,1), 
+         btVector3 pos=btVector3(), Uint16 color_=0xFFFF, btScalar mass_=0 );
 
     void update( float dt );
     
-    void add_physics( Physics& physics );
+    void add_physics( Physics& new_physics, short int dynamics_=1 );
 
     // translate/rotate the model-view matrix and then draw:
     void draw( Sint32* matrix, int alpha=255 ); 
@@ -153,11 +161,12 @@ protected:
     Sint32 sizez;
 
 public:
-    Ramp( btVector3 size_=btVector3(1,1,1), btVector3 pos=btVector3(), Uint16 color_=0xFFFF, btScalar mass_=0 );
+    Ramp( btVector3 size_=btVector3(1,1,1), 
+          btVector3 pos=btVector3(), Uint16 color_=0xFFFF, btScalar mass_=0 );
 
     void update( float dt );
     
-    void add_physics( Physics& physics );
+    void add_physics( Physics& new_physics, short int dynamics_=1 );
 
     // translate/rotate the model-view matrix and then draw:
     void draw( Sint32* matrix, int alpha=255 ); 
