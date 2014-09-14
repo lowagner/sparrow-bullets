@@ -83,8 +83,8 @@ Play::reset()
     ramps[1].rotateZ( 2*M_PI );
 
     //world.add_box( 10,10,2, btVector3(0,0,-1) ); // add the floor
-    hero = Cube( btVector3(0,8,5), 0xF00F, checkertexture );
-    hero.debug = true;
+    hero = Player( btVector3(0,8,5), 0xF00F, checkertexture );
+    hero.object->debug = true;
    
     std::cout << std::endl;
     std::cout << " creating new blocks " << std::endl;
@@ -101,7 +101,7 @@ Play::reset()
 
     // now add physics to everybody 
     physics.init();
-    hero.add_physics( physics );
+    hero.object->add_physics( physics );
     
 //    std::cout << std::endl;
 //    std::cout << " start adding block physics " << std::endl;
@@ -204,7 +204,7 @@ void Play::draw( SDL_Surface* screen )
         // draw at partial transparency.  max alpha = 255 (fully opaque), 0 = fully transparent
     }
 
-    hero.draw( matrix );
+    hero.object->draw( matrix );
 
     //spDeactivatePattern();
     spSetPerspectiveTextureMapping(0);

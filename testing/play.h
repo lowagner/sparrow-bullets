@@ -11,6 +11,7 @@
 
 #include "physics.h"
 #include "objects.h"
+#include "shapes.h"
 #include "meta.h"
 #include <vector>
 //#include <time.h>  // for timer functionality
@@ -31,7 +32,7 @@ private:
 
     spFontPointer font;
 
-    Cube hero;
+    Player hero;
     std::vector<Cube> blocks; // dynamic blocks
     std::vector<Box> boxes; // static boxes
     std::vector<Ramp> ramps; // static ramps

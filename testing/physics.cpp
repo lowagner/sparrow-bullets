@@ -22,7 +22,7 @@ Physics::init()
                                           colconfig );
     //dworld->setDebugDrawer(&gDebugDraw);
 
-    dworld->setGravity( btVector3(0,0,-70) ); 
+    dworld->setGravity( btVector3(0,0,-150) ); 
     // gravity should be greater (in magnitude) than about 50
 
 
