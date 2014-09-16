@@ -29,6 +29,7 @@ private:
     Sint32 rotation;
     Sint32 distance;
     btVector3 outofbounds;
+    btScalar clock;
 
     spFontPointer font;
 

@@ -26,8 +26,10 @@ protected:
     btVector3 lastomega; //angular velocity
 
     Physics* physics;
+
     btRigidBody* body;
     btScalar mass;
+    btVector3 size;
 
     void update_por( btScalar dt ); // updates por for non-kinematic/dynamic objects
     void fix_transform(); // essentially sets transform from the lastpor guy.
@@ -47,12 +49,6 @@ public:
 
     virtual void update( float dt );
 
-    btVector3 last_position();
-    
-    btVector3 last_velocity();
-    
-    btVector3 last_omega();
-
     virtual void add_physics( Physics& new_physics, short int dynamics_=1 );
 
     bool out_of_bounds( btVector3 outofbounds );
@@ -61,6 +57,7 @@ public:
 
     void rotateZ( btScalar angle );
     void rotate( btVector3 axis, btScalar angle );
+    void impulse( btVector3 forcedt );
 
     //void transform( Sint32* m );
 
@@ -89,7 +86,8 @@ class Player
 protected:
     bool canjump, onground;
     float maxwalkspeed2, walkacceleration;
-    float rotspeed;
+    float maxrotspeed2, rotacceleration;
+    float jumpimpulse;
 
 public:
     BaseObject* object;
@@ -106,7 +104,7 @@ public:
     bool on_ground(); // ray cast downwards in world-coords
 
     void jump();
-    void walk( float dt );
+    void walk( float dt, int dir=1 );
     void turn( float dt, int dir );
     void quick_turn();
    

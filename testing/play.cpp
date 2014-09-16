@@ -69,57 +69,39 @@ Play::reset()
 
     // then rebirth it all...
     pause = 1;
+    clock = 0;
     checkertexture = spLoadSurface("../data/check.png");
 
     outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
 
     // this guy includes the floor.  all static rectangular prisms.
     boxes.push_back( Box( btVector3(10,10,1), btVector3(0,0,-5), 0x05FF ) ); // half-sizes, pos, color
+    boxes.push_back( Box( btVector3(4,4,1), btVector3(7,7,-3), 0x055F ) ); // half-sizes, pos, color
 
-    ramps.push_back( Ramp( btVector3(10,2,4), btVector3(-3,0,-3), 0xF0FF ) ); // sizes, pos, color
-    //ramps[0].rotate( btVector3(0,0,1), SP_PI*0.5 );
-    ramps.push_back( Ramp( btVector3(5,2.5,3), btVector3(-1,0,-4), 0xFFFF ) ); // sizes, pos, color
+    ramps.push_back( Ramp( btVector3(10,2,4), btVector3(-4,0,-3), 0xF0FF ) ); // sizes, pos, color
+    ramps.push_back( Ramp( btVector3(5,2.5,0.5), btVector3(-1,0,-4), 0xFFFF ) ); // sizes, pos, color
     ramps[0].rotateZ( M_PI/2 );
     ramps[1].rotateZ( 2*M_PI );
 
-    //world.add_box( 10,10,2, btVector3(0,0,-1) ); // add the floor
     hero = Player( btVector3(0,8,5), 0xF00F, checkertexture );
     hero.object->debug = true;
    
-    std::cout << std::endl;
-    std::cout << " creating new blocks " << std::endl;
-    std::cout << std::endl;
     // add some blocks pieces
     for ( int i=0; i<5; i++ )
     {
         blocks.push_back(  Cube( btVector3(2*i-3,0,10+2*i), 0x0F0F )  );
-//        std::cout << " mass = " << blocks[i].mass << std::endl;
     }
-//    std::cout << std::endl;
-//    std::cout << " end creating new blocks " << std::endl;
-//    std::cout << std::endl;
-
+    blocks[4].impulse( btVector3(0,10,0) );
+    
     // now add physics to everybody 
     physics.init();
     hero.object->add_physics( physics );
     
-//    std::cout << std::endl;
-//    std::cout << " start adding block physics " << std::endl;
-//    std::cout << std::endl;
-
     for ( int i=0; i<blocks.size(); i++ )
     {
-//        std::cout << " mass = " << blocks[i].mass << std::endl;
         blocks[i].add_physics( physics );
-//        std::cout << " naming new block " << i << std::endl;
-//        std::cout << std::endl;
         blocks[i].id = i;
     }
-    
-    std::cout << std::endl;
-    std::cout << " end adding block physics " << std::endl;
-    std::cout << std::endl;
-    
     
     for ( int i=0; i<boxes.size(); i++ )
         boxes[i].add_physics( physics );
@@ -214,18 +196,14 @@ void Play::draw( SDL_Surface* screen )
 int Play::update( Uint32 dt )
 {
     // inputy type things
-    //if ( spGetInput()->button[SP_BUTTON_A] )
     if ( spGetInput()->axis[0]==-1 )
     {
-        spGetInput()->button[SP_BUTTON_A] = 0;
-        axis -= 150*dt;
+//        axis -= 150*dt;
         //std::cout << " axis = " << axis << std::endl;
     }
-    //if ( spGetInput()->button[SP_BUTTON_B] )
     else if ( spGetInput()->axis[0]==1 )
     {
-        spGetInput()->button[SP_BUTTON_B] = 0;
-        axis += 150*dt;
+//        axis += 150*dt;
         //std::cout << " axis = " << axis << std::endl;
     }
 
@@ -237,31 +215,44 @@ int Play::update( Uint32 dt )
         spGetInput()->button[SP_BUTTON_SELECT] = 0;
         pause = 1-pause;
     }
-
+    if ( spGetInput()->button[SP_BUTTON_A] )
+    {
+        // key A on a standard QWERTY keyboard
+        axis += 150*dt;
+    }
+    if ( spGetInput()->button[SP_BUTTON_B] )
+    {
+        // key D on a standard QWERTY keyboard
+        axis -= 150*dt;
+    }
     if ( spGetInput()->button[SP_BUTTON_X] )
     {
-        //spGetInput()->button[SP_BUTTON_X] = 0;
+        // key S on a QWERTY
+        //spGetInput()->button[SP_BUTTON_x] = 0; // can only allow input once if desired
         distance -= 1000*dt;
+        rotation += 100*dt;
     }
     else if ( spGetInput()->button[SP_BUTTON_Y] )
     {
+        // key W on a QWERTY
         //spGetInput()->button[SP_BUTTON_Y] = 0;
         distance += 1000*dt;
+        rotation -= 100*dt;
     }
 
     if ( spGetInput()->axis[1] == 1 )
     {
-        rotation += 100*dt;
+        //rotation += 100*dt;
     }
     else if ( spGetInput()->axis[1] == -1 )
     {
-        rotation -= 100*dt;
+        //rotation -= 100*dt;
     }
 
     if ( spGetInput()->button[SP_BUTTON_R] )
     {
         // randomize
-        spGetInput()->button[SP_BUTTON_R] = 0;
+        //spGetInput()->button[SP_BUTTON_R] = 0;
     }
     if ( spGetInput()->button[SP_BUTTON_L] )
     {
@@ -272,7 +263,8 @@ int Play::update( Uint32 dt )
     if (!(pause))
     {
         btScalar fdt = dt*1.0/1000;
-
+        clock += fdt;
+        
 //        current_t = time(0);
 //        double time = difftime(current_t, previous_t);
 //        sleep(3);
@@ -283,9 +275,22 @@ int Play::update( Uint32 dt )
         physics.update( fdt );
         // update hero stuff
         hero.update( fdt );
+        
+        if ( spGetInput()->axis[0] )
+        {
+            hero.turn( fdt, -spGetInput()->axis[0] );
+            //std::cout << " turning hero " << (spGetInput()->axis[0]) << std::endl;
+        }
         // this function will check to see if the hero can actually walk.
-        //hero.turn( fdt, 1 );
-        hero.walk( fdt );
+        if ( spGetInput()->axis[1] )
+            hero.walk( fdt, -spGetInput()->axis[1] );
+
+        if ( spGetInput()->button[SP_BUTTON_R] )
+        {
+            spGetInput()->button[SP_BUTTON_R] = 0;
+            hero.jump();
+        }
+
 
         // update blocks
         int i=0;

@@ -41,7 +41,6 @@ class Box : public BaseObject
 {
     friend class Player;
 protected:
-    btVector3 size;
     Sint32 sizex;
     Sint32 sizey;
     Sint32 sizez;

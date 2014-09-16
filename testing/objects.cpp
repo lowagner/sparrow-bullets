@@ -4,12 +4,16 @@
 
 BaseObject::BaseObject()
 {
-    std::cout << " calling base object constructor " << id << std::endl;
+//    std::cout << " calling base object constructor " << id << std::endl;
     debug = false;
     physics = NULL;
     body = NULL;
     mass = 0;
     dynamics = 0;
+    lastposition = btVector3(); // position
+    lastvelocity = btVector3(); // linear velocity
+    lastomega = btVector3(); //angular velocity
+    size = btVector3(1,1,1); // size
 }
 
 BaseObject::~BaseObject()
@@ -30,24 +34,9 @@ BaseObject::~BaseObject()
     body = NULL;
     // it's called after the inherited class' own destructor.
     // don't put any virtual methods in it.
-    std::cout << " finished calling base object " << id << " destructor " << std::endl;
+//    std::cout << " finished calling base object " << id << " destructor " << std::endl;
 }
 
-btVector3 
-BaseObject::last_position()
-{
-    btVector3 pos;
-    pos.setX( spFixedToFloat( lastpor[12] ) );
-    pos.setY( spFixedToFloat( lastpor[13] ) );
-    pos.setZ( spFixedToFloat( lastpor[14] ) );
-    return pos;
-}
-
-btVector3 
-BaseObject::last_velocity()
-{
-    return lastvelocity;
-}
 
 void
 BaseObject::update_por( btScalar dt )
@@ -217,6 +206,24 @@ BaseObject::locate_and_move( btScalar dt )
         // but let it continue off into space with a constant velocity.
         update_por( dt ); 
     }
+}
+
+void 
+BaseObject::impulse( btVector3 forcedt )
+{
+  if (mass != 0.f)
+  {
+    btVector3 dv = forcedt / mass;
+    lastvelocity += dv;
+    if ( physics )
+    {
+        if ( dynamics == 3 )
+        {
+            body->forceActivationState(1);
+            body->applyCentralImpulse( forcedt );
+        }
+    }
+  }
 }
 
 void 
@@ -457,7 +464,7 @@ BaseObject::translate( btVector3 dist )
 void
 BaseObject::add_physics( Physics& new_physics, short int dynamics_ )
 { 
-std::cerr << " base object add_physics " << std::endl;
+//std::cerr << " base object add_physics " << std::endl;
 }
 
 
@@ -517,12 +524,13 @@ Player::Player( BaseObject object_ )
 void
 Player::init()
 {
-    maxwalkspeed2 = 100;
-    walkacceleration = 1;
-    rotspeed = 0.5;
+    maxwalkspeed2 = 43;
+    walkacceleration = 2.5;
+    maxrotspeed2 = 12;
+    rotacceleration = 10;
     canjump = false;
     onground = false;
-
+    jumpimpulse = 15;
 }
 
 void
@@ -535,7 +543,7 @@ Player::update( float dt )
 }
 
 void
-Player::walk( float dt )
+Player::walk( float dt, int dir )
 {
     if ( canjump && onground)
     if (object->dynamics == 3)
@@ -543,6 +551,7 @@ Player::walk( float dt )
         // get the cube-x direction in world coordinates
         btVector3 forward = object->body->getWorldTransform().getBasis()[0];
         forward.normalize();
+        forward.setY( -forward.y() ); // for some reason the world transform has an inverted y...
 //        std::cout << " forward = " << forward.x() << ", "
 //                                   << forward.y() << ", "
 //                                   << forward.z() << "\n";
@@ -551,9 +560,12 @@ Player::walk( float dt )
 //        std::cerr << " last velocity = " << (object->lastvelocity.length2()) << std::endl;
 //        std::cerr << " max walk speed = " << (maxwalkspeed2) << std::endl;
         if ( veldiff2 > 0 )
-            object->body->applyCentralImpulse( walkacceleration*veldiff2*forward*dt );
+        {
+            object->body->forceActivationState(1);
+            object->body->applyCentralImpulse( walkacceleration*veldiff2*forward*dt*dir );
+        }
 //        else
-//            std::cerr << "walking too fast " << std::endl;
+//            std::cerr << "moving too fast, can't walk properly" << std::endl;
     }
 }
 
@@ -564,28 +576,32 @@ Player::turn( float dt, int dir )
     {
         // get the cube-z direction in world coordinates
         btVector3 up = object->body->getWorldTransform().getBasis()[2];
-
-        //btTransform cubeform;
-        //body->getMotionState()->getWorldTransform( cubeform );
-        //btVector3 up = cubeform.getBasis()[2];
+        up.normalize();
 
 //        btVector3 up = body->getInvInertiaTensorWorld().inverse()*
 //                                ( body->getWorldTransform().getBasis()*btVector3(0,0,1) );
 
         //body->applyTorque( rotspeed*up*dir ); 
-//        body->applyTorqueImpulse( rotspeed*up*dt*dir ); 
-        Physics* standin = object->physics;
-        object->remove_physics();
-        object->rotateZ( rotspeed*dt*dir ); 
-        object->add_physics(*standin);
-
+        float omegadiff2 = maxrotspeed2- (object->lastomega.length2());
+        if ( omegadiff2 > 0 )
+        {
+            object->body->forceActivationState(1);
+            object->body->applyTorqueImpulse( rotacceleration*(omegadiff2)*up*dt*dir ); 
+        }
+        // else
+        // std::cerr << " player is spinning out of control " << std::endl;
     }
 }
 
 void
 Player::quick_turn()
 {
-
+//        btVector3 up = object->body->getWorldTransform().getBasis()[2];
+//        Physics* standin = object->physics;
+//        object->remove_physics();
+//        object->rotateZ( rotspeed*dt*dir ); 
+//        object->fix_transform(); // need to fix transform since there was no dynamics
+//        object->add_physics(*standin);
 }
 
 
@@ -599,8 +615,9 @@ Player::feet_on_something() // ray cast down in cube-coords
     //btVector3 rayto = rayfrom - cubeup;
 
     btTransform cubeform;
-    object->body->getMotionState()->getWorldTransform( cubeform );
-    btVector3 down = -cubeform.getBasis()[2];
+    btVector3 down = -(object->body->getWorldTransform().getBasis()[2]);
+    down.normalize();
+    down *= object->size.z()*1.05;
     //btVector3 forward = cubeform.getBasis()[0];
 
     btVector3 rayto = rayfrom + down;
@@ -620,7 +637,7 @@ bool
 Player::on_ground() // ray cast downwards in world-coords
 {
     btVector3 rayfrom( object->lastposition );
-    btVector3 rayto = rayfrom - btVector3(0,0,1);
+    btVector3 rayto = rayfrom - btVector3(0,0,object->size.z());
     
     ClosestNotMe ray(object->body);
 
@@ -639,13 +656,14 @@ Player::jump()
     if ( canjump && (object->dynamics == 3) )
     {
         canjump = false;
+        object->body->forceActivationState(1);
 
         // get the cube-z direction in world coordinates
         btVector3 cubeup = object->body->getWorldTransform().getBasis()[2];
         // add worldup to cubeup to get a jump vector
         btVector3 jumpvec = (btVector3(0,0,1) /* it'd be nice to multiply by friction of object at feet here */+ cubeup);
         
-        object->body->applyCentralImpulse( jumpvec );
+        object->body->applyCentralImpulse( jumpvec*jumpimpulse );
 //        btRigidBody* rbody = dynamic_cast<btRigidBody*> body;
 //        if ( rbody )
 //        {
@@ -676,7 +694,9 @@ Player::Player( const Player& other ) // copy constructor
     object = other.object;
     maxwalkspeed2 = other.maxwalkspeed2;
     walkacceleration = other.walkacceleration;
-    rotspeed = other.rotspeed;
+    maxrotspeed2 = other.maxrotspeed2;
+    rotacceleration = other.rotacceleration;
+    jumpimpulse = other.jumpimpulse;
 }
 
 Player& 
@@ -685,6 +705,8 @@ Player::operator = ( Player other ) // Copy Assignment Operator
     object = other.object;
     maxwalkspeed2 = other.maxwalkspeed2;
     walkacceleration = other.walkacceleration;
-    rotspeed = other.rotspeed;
+    maxrotspeed2 = other.maxrotspeed2;
+    rotacceleration = other.rotacceleration;
+    jumpimpulse = other.jumpimpulse;
     return *this;
 }

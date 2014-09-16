@@ -140,7 +140,7 @@ Cube::add_physics( Physics& new_physics, short int dynamics_ )
     // add physics
     body = physics->add_cube( dynamics, transform, lastvelocity, lastomega, mass );
     //init_physics_por();
-    std::cerr << " dynamics Cube is " << dynamics << std::endl;
+    //std::cerr << " dynamics Cube is " << dynamics << std::endl;
 }
 
 
@@ -270,7 +270,7 @@ Box::add_physics( Physics& new_physics, short int dynamics_ )
     fix_transform();
     // add physics
     body = physics->add_box( dynamics, size, transform, lastvelocity, lastomega, mass );
-    std::cerr << " dynamics Box is " << dynamics << std::endl;
+    //std::cerr << " dynamics Box is " << dynamics << std::endl;
 }
 
 
@@ -397,7 +397,7 @@ Ramp::add_physics( Physics& new_physics, short int dynamics_ )
     fix_transform();
     // add physics
     body = physics->add_ramp( dynamics, size, transform, lastvelocity, lastomega, mass );
-    std::cerr << " dynamics Ramp is " << dynamics << std::endl;
+    //std::cerr << " dynamics Ramp is " << dynamics << std::endl;
 }
 
 void
