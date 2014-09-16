@@ -123,8 +123,8 @@ void Play::draw( SDL_Surface* screen )
     spSetZSet( 0 );
     spSetZTest( 0 );
     spSetAlphaTest( 1 );
-    spFontDraw( 2, font-> maxheight+2, 0, "[L] reset", font );
-    spFontDrawRight( screen->w - 2 , font-> maxheight+2, 0, "[R] N/A", font );
+    spFontDraw( 2, font-> maxheight+2, 0, "[L] Reset", font );
+    spFontDrawRight( screen->w - 2 , font-> maxheight+2, 0, "[R] Jump", font );
     spFontDrawRight( screen->w - 2 , 2, 0, "[S] Exit", font );
     spFontDrawRight( screen->w - 2, screen->h - 2*font-> maxheight, 0, "[Y] Zoom in", font ); 
     spFontDrawRight( screen->w - 2, screen->h - 1*font-> maxheight, 0, "[X] Zoom out", font );
