@@ -79,7 +79,7 @@ Play::reset()
     boxes.push_back( Box( btVector3(4,4,1), btVector3(7,7,-3), 0x055F ) ); // half-sizes, pos, color
 
     ramps.push_back( Ramp( btVector3(10,2,4), btVector3(-4,0,-3), 0xF0FF ) ); // sizes, pos, color
-    ramps.push_back( Ramp( btVector3(5,2.5,0.5), btVector3(-1,0,-4), 0xFFFF ) ); // sizes, pos, color
+    ramps.push_back( Ramp( btVector3(10,2.5,1), btVector3(-1,0,-4), 0xFFFF ) ); // sizes, pos, color
     ramps[0].rotateZ( M_PI/2 );
     ramps[1].rotateZ( 2*M_PI );
 
@@ -136,8 +136,8 @@ void Play::draw( SDL_Surface* screen )
     }
     //spFontDrawMiddle( screen->w /2, screen->h - 2*font-> maxheight, 0, input, font );
 
-    spFontDrawMiddle( screen->w / 2, font->maxheight + 2, 0, "Falling Cube", font );	
-    spFontDraw( 2, screen->h - 1*font->maxheight,0, "D-pad rotate view", font); 
+    spFontDrawMiddle( screen->w / 2, font->maxheight + 2, 0, "Cube Drop", font );	
+    spFontDraw( 2, screen->h - 1*font->maxheight,0, "D-pad Move Player", font); 
     //spFontDraw( 2, screen->h - 2*font->maxheight,0, "[B] rotate right", font);
 
     char buffer[64];

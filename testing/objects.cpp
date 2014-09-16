@@ -617,7 +617,7 @@ Player::feet_on_something() // ray cast down in cube-coords
     btTransform cubeform;
     btVector3 down = -(object->body->getWorldTransform().getBasis()[2]);
     down.normalize();
-    down *= object->size.z()*1.05;
+    down *= object->size.z()*1.1;
     //btVector3 forward = cubeform.getBasis()[0];
 
     btVector3 rayto = rayfrom + down;
@@ -637,7 +637,7 @@ bool
 Player::on_ground() // ray cast downwards in world-coords
 {
     btVector3 rayfrom( object->lastposition );
-    btVector3 rayto = rayfrom - btVector3(0,0,object->size.z());
+    btVector3 rayto = rayfrom - 1.2*btVector3(0,0,object->size.z());
     
     ClosestNotMe ray(object->body);
 
