@@ -235,14 +235,14 @@ int Play::update( Uint32 dt )
         // key S on a QWERTY
         //spGetInput()->button[SP_BUTTON_x] = 0; // can only allow input once if desired
         distance -= 1000*dt;
-        rotation += 100*dt;
+        rotation += 50*dt;
     }
     else if ( spGetInput()->button[SP_BUTTON_Y] )
     {
         // key W on a QWERTY
         //spGetInput()->button[SP_BUTTON_Y] = 0;
         distance += 1000*dt;
-        rotation -= 100*dt;
+        rotation -= 50*dt;
     }
 
     if ( spGetInput()->axis[1] == 1 )
@@ -283,17 +283,16 @@ int Play::update( Uint32 dt )
         
         if ( spGetInput()->axis[0] )
         {
-            hero.turn( fdt, -spGetInput()->axis[0] );
+            spGetInput()->axis[0] = hero.turn( fdt, spGetInput()->axis[0] );
             //std::cout << " turning hero " << (spGetInput()->axis[0]) << std::endl;
         }
         // this function will check to see if the hero can actually walk.
         if ( spGetInput()->axis[1] )
-            hero.walk( fdt, -spGetInput()->axis[1] );
+            spGetInput()->axis[1] = hero.walk( fdt, spGetInput()->axis[1] );
 
         if ( spGetInput()->button[SP_BUTTON_R] )
         {
-            spGetInput()->button[SP_BUTTON_R] = 0;
-            hero.jump();
+            spGetInput()->button[SP_BUTTON_R] = hero.jump();
         }
 
 

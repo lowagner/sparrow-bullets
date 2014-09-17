@@ -529,7 +529,10 @@ Player::init()
     maxrotspeed2 = 12;
     rotacceleration = 10;
     flyingrotacceleration = 5;
-    kickimpulse = 100;
+    siderotacceleration = 0.1;
+    sidewalkacceleration = 1.8;
+    kickrotimpulse = 20;
+    kickupimpulse = 0.5;
     canjump = false;
     onground = false;
     jumpimpulse = 15;
@@ -601,7 +604,7 @@ Player::draw_debug()
              z+spFloatToFixed(up.z()), 0x00FF);
 }
 
-void
+int
 Player::walk( float dt, int dir )
 {
     if ( onground )
@@ -614,12 +617,10 @@ Player::walk( float dt, int dir )
                 btVector3 forward = get_forward();
 
                 float veldiff2 = maxwalkspeed2- (object->lastvelocity.length2());
-        //        std::cerr << " last velocity = " << (object->lastvelocity.length2()) << std::endl;
-        //        std::cerr << " max walk speed = " << (maxwalkspeed2) << std::endl;
                 if ( veldiff2 > 0 )
                 {
                     object->body->forceActivationState(1);
-                    object->body->applyCentralImpulse( walkacceleration*veldiff2*forward*dt*dir );
+                    object->body->applyCentralImpulse( -walkacceleration*veldiff2*forward*dt*dir );
                 }
         //        else
         //            std::cerr << "moving too fast, can't walk properly" << std::endl;
@@ -628,8 +629,48 @@ Player::walk( float dt, int dir )
         else 
         {
         // on ground, but in a bad spot
-            std::cerr << " player landed badly, can't walk " << std::endl;
+            //std::cerr << " player landed badly, can't walk " << std::endl;
+            if ( facesideup==0 && topsideup == 0 )
+            {
+                //  trouble maker.  one of your sides is pointing up
+                btVector3 forward = get_forward();
+                
+                // do the "woobwoobwoobwoob" move, move forward ...
+                float veldiff2 = 0.5*maxwalkspeed2- (object->lastvelocity.length2());
+                if ( veldiff2 > 0 )
+                {
+                    object->body->forceActivationState(1);
+                    object->body->applyCentralImpulse( -sidewalkacceleration*veldiff2*forward*dt*dir );
+                }
 
+                // do the "woobwoobwoobwoob" move, ... and spin around
+                float omegadiff2 = 0.5*maxrotspeed2- (object->lastomega.length2()); 
+                if ( omegadiff2 > 0 )
+                {
+                    float multiplier = get_side().z();
+                    if ( multiplier > 0 )
+                        multiplier = 1;
+                    else
+                        multiplier = -1;
+
+                    object->body->applyTorqueImpulse( multiplier*siderotacceleration*omegadiff2*btVector3(0,0,1)*dir ); 
+                }
+            }
+            else
+            {
+                // either you're on your head or you're on your face or you're on your back
+                btVector3 axis = get_side();
+                float omegadiff2 = maxrotspeed2- (object->lastomega.length2());
+                if ( omegadiff2 > 0 )
+                {
+                    object->body->forceActivationState(1);
+                    object->body->applyTorqueImpulse( -kickrotimpulse*axis*dir ); 
+                    object->body->applyCentralImpulse( btVector3(0,0,kickupimpulse) );
+                    onground = false;
+                    return 0; // return if we should stop input from the button
+                }
+
+            }
         }
     }
     else
@@ -642,28 +683,45 @@ Player::walk( float dt, int dir )
         if ( omegadiff2 > 0 )
         {
             object->body->forceActivationState(1);
-            object->body->applyTorqueImpulse( flyingrotacceleration*sideaxis*dt*dir ); 
+            object->body->applyTorqueImpulse( -flyingrotacceleration*sideaxis*dt*dir ); 
         }
 
     }
+    return dir; // +-1 if continuous motion is ok to continue.  0 if not.
 }
 
-void
+int
 Player::turn( float dt, int dir )
 {
-    if ( onground && ( (!canjump) || (topsideup ==0) ) )
+    if ( onground && ( (topsideup == 0 ) || ( facesideup ) ) )
     {   // very bad landing.  player's head isn't up (or down), or he can't jump
         //std::cerr << " player landed badly, can't turn " << std::endl;
         if ( facesideup == 0 )
         {   // we are on our side somewhere
-            std::cerr << " player landed on side, can't turn " << std::endl;
-
-
+            //std::cerr << " player landed on side, can't turn " << std::endl; 
+            btVector3 axis = get_forward();
+            float omegadiff2 = maxrotspeed2- (object->lastomega.length2());
+            if ( omegadiff2 > 0 )
+            {
+                object->body->forceActivationState(1);
+                object->body->applyTorqueImpulse( kickrotimpulse*axis*dir ); 
+                object->body->applyCentralImpulse( btVector3(0,0,kickupimpulse) );
+                onground = false;
+                return 0; // return if we should stop input from the button
+            }
         }
         else
         {   // either facing the sky or the ground
-            std::cerr << " player on face/back, " << facesideup << "; can't turn " << std::endl;
+            //std::cerr << " player on face/back, " << facesideup << "; can't turn " << std::endl;
+            // turn cube in face direction
+            btVector3 axis = get_forward();
 
+            float omegadiff2 = maxrotspeed2- (object->lastomega.length2());
+            if ( omegadiff2 > 0 )
+            {
+                object->body->forceActivationState(1);
+                object->body->applyTorqueImpulse( -rotacceleration*(omegadiff2)*axis*dt*dir ); 
+            }
 
         }
     }
@@ -676,14 +734,15 @@ Player::turn( float dt, int dir )
         if ( omegadiff2 > 0 )
         {
             object->body->forceActivationState(1);
-            object->body->applyTorqueImpulse( rotacceleration*(omegadiff2)*up*dt*dir ); 
+            object->body->applyTorqueImpulse( -rotacceleration*(omegadiff2)*up*dt*dir ); 
         }
         // else
         // std::cerr << " player is spinning out of control " << std::endl;
     }
+    return dir; // +-1 if continuous motion is ok to continue.  0 if not.
 }
 
-void
+int
 Player::quick_turn()
 {
 //        btVector3 up = object->body->getWorldTransform().getBasis()[2];
@@ -692,6 +751,7 @@ Player::quick_turn()
 //        object->rotateZ( rotspeed*dt*dir ); 
 //        object->fix_transform(); // need to fix transform since there was no dynamics
 //        object->add_physics(*standin);
+    return 1; // 1 if continuous motion is ok to continue.  0 if not.
 }
 
 
@@ -760,13 +820,15 @@ Player::check_surroundings()
     onground = ( ray.hasHit() );
 }
 
-void
+int
 Player::jump()
 {
 //
     if ( canjump && (object->dynamics == 3) )
     {
         canjump = false;
+        onground = false;
+
         object->body->forceActivationState(1);
 
         // get the cube-z direction in world coordinates
@@ -775,7 +837,9 @@ Player::jump()
         btVector3 jumpvec = (btVector3(0,0,1) /* it'd be nice to multiply by friction of object at feet here */+ cubeup);
         
         object->body->applyCentralImpulse( jumpvec*jumpimpulse );
+        return 0; // stop holding down jump button
     }
+    return 1; // if it's ok to keep holding down jump button
 }
 
 Player::~Player()
@@ -793,7 +857,10 @@ Player::Player( const Player& other ) // copy constructor
     rotacceleration = other.rotacceleration;
     jumpimpulse = other.jumpimpulse;
     flyingrotacceleration = other.flyingrotacceleration;
-    kickimpulse = other.kickimpulse;
+    kickupimpulse = other.kickupimpulse;
+    kickrotimpulse = other.kickrotimpulse;
+    siderotacceleration = other.siderotacceleration;
+    sidewalkacceleration = other.sidewalkacceleration;
 }
 
 Player& 
@@ -806,6 +873,9 @@ Player::operator = ( Player other ) // Copy Assignment Operator
     rotacceleration = other.rotacceleration;
     jumpimpulse = other.jumpimpulse;
     flyingrotacceleration = other.flyingrotacceleration;
-    kickimpulse = other.kickimpulse;
+    kickupimpulse = other.kickupimpulse;
+    kickrotimpulse = other.kickrotimpulse;
+    siderotacceleration = other.siderotacceleration;
+    sidewalkacceleration = other.sidewalkacceleration;
     return *this;
 }

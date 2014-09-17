@@ -89,7 +89,10 @@ protected:
 
     float maxwalkspeed2, walkacceleration;
     float maxrotspeed2, rotacceleration, flyingrotacceleration;
-    float kickimpulse;
+    float siderotacceleration;
+    float sidewalkacceleration;
+    float kickrotimpulse, kickupimpulse;
+
     float jumpimpulse;
 
     void check_surroundings();
@@ -105,10 +108,10 @@ public:
     
     virtual void update( float dt );
 
-    void jump();
-    void walk( float dt, int dir=1 );
-    void turn( float dt, int dir );
-    void quick_turn();
+    int jump();
+    int walk( float dt, int dir=1 );
+    int turn( float dt, int dir );
+    int quick_turn();
     void draw_debug();
 
     btVector3 get_forward();
