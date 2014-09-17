@@ -110,11 +110,11 @@ Play::reset()
         outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
 
         // this guy includes the floor.  all static rectangular prisms.
-        boxes.push_back( Box( btVector3(7,7,1), btVector3(0,0,-5), 0x05FF ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(7,7,-3), 0x055F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(3,7,-1), 0x055F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(3,3,1), 0x055F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(7,3,3), 0x055F ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(7,7,1), btVector3(0,0,-5), 0xF00F ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(4,4,1), btVector3(7,7,-3), 0xF50F ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(4,4,1), btVector3(3,7,-1), 0x0F0F ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(4,4,1), btVector3(3,3,1), 0x03FF ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(4,4,1), btVector3(7,3,3), 0x00FF ) ); // half-sizes, pos, color
 
         hero = Player( btVector3(0,4,5), 0xF00F, checkertexture );
         hero.object->rotateZ( -M_PI/2 );
