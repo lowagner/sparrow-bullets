@@ -35,18 +35,8 @@ Play::Play() // init play class
 void
 Play::deinit()
 {
-    //delete hero;
-
-//    for ( int i=0; i<blocks.size(); i++ )
-//        blocks[i]
     blocks.clear();
-    
-//    for ( int i=0; i<boxes.size(); i++ )
-//        boxes[i].remove();
     boxes.clear();
-    
-//    for ( int i=0; i<ramps.size(); i++ )
-//        ramps[i].remove();
     ramps.clear();
    
     if ( font )
