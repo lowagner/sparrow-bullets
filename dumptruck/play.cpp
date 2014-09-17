@@ -65,10 +65,10 @@ Play::reset()
         boxes.push_back( Box( btVector3(10,10,1), btVector3(0,0,-5), 0x05FF ) ); // half-sizes, pos, color
         boxes.push_back( Box( btVector3(4,4,1), btVector3(7,7,-3), 0x055F ) ); // half-sizes, pos, color
 
-//        ramps.push_back( Ramp( btVector3(10,2,4), btVector3(-4,0,-3), 0xF0FF ) ); // sizes, pos, color
-//        ramps.push_back( Ramp( btVector3(10,2.5,1), btVector3(-1,0,-4), 0xFFFF ) ); // sizes, pos, color
-//        ramps[0].rotateZ( M_PI/2 );
-//        ramps[1].rotateZ( 2*M_PI );
+        ramps.push_back( Ramp( btVector3(10,2,4), btVector3(-8,0,-4), 0xF0FF ) ); // sizes, pos, color
+        ramps.push_back( Ramp( btVector3(10,2.5,1), btVector3(0,-10,-4), 0xFFFF ) ); // sizes, pos, color
+        ramps[0].rotateZ( M_PI/2 );
+        ramps[1].rotateZ( 2*M_PI );
 
         hero = Player( btVector3(0,8,5), 0xF00F, checkertexture );
         hero.object->debug = true;
@@ -101,7 +101,7 @@ Play::reset()
         // add some blocks pieces
         for ( int i=0; i<6; i++ )
         {
-            blocks.push_back(  Cube( btVector3(2*i-4,2*i-4,10+2*i), 0x0F0F )  );
+            blocks.push_back(  Cube( btVector3(2*i-4,2*i-4,10+2*i), 0xFF0F )  );
         }
         blocks[4].impulse( btVector3(0,10,0) );
     }
@@ -123,7 +123,7 @@ Play::reset()
         // add some blocks pieces
         for ( int i=0; i<6; i++ )
         {
-            blocks.push_back(  Cube( btVector3(2*i-4,2*i-4,10+2*i), 0x0F0F )  );
+            blocks.push_back(  Cube( btVector3(2*i-4,2*i-4,10+2*i), 0xFFFF )  );
         }
         blocks[4].impulse( btVector3(0,10,0) );
     }
@@ -142,17 +142,18 @@ Play::reset()
         hero.object->rotateZ( -M_PI/2 );
         hero.object->debug = true;
       
-        blocks.push_back( Cube( btVector3(-15,-3,19), 0x0F0F ) );
-        blocks.push_back( Cube( btVector3(-4,7,3), 0x0F0F ) );
-        blocks.push_back( Cube( btVector3(13,7,3), 0x0F0F ) );
-        blocks.push_back( Cube( btVector3(6,-6,3), 0x0F0F ) );
-        blocks.push_back( Cube( btVector3(-14,2,0), 0x0F0F ) );
+        blocks.push_back( Cube( btVector3(-15,-3,19), 0xF00F ) );
+        blocks.push_back( Cube( btVector3(-4,7,3), 0xF00F ) );
+        blocks.push_back( Cube( btVector3(13,7,3), 0xF00F ) );
+        blocks.push_back( Cube( btVector3(6,-6,3), 0xF00F ) );
+        blocks.push_back( Cube( btVector3(-14,2,0), 0xF00F ) );
 
         // add some blocks pieces
         blocks[4].impulse( btVector3(23,0,40) );
     }
     else
     {
+        std::cout << " you beated all levels! " << std::endl;
         return GAMESTATEquit;
     }
     

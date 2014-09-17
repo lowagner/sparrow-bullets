@@ -56,7 +56,7 @@ private:
     
 public:
 
-    Play( int level_ = 1 );
+    Play( int level_ = 2 );
     int reset();
     void draw( SDL_Surface* screen );
     void load_font();
