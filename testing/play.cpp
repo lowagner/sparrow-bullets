@@ -161,6 +161,11 @@ void Play::draw( SDL_Surface* screen )
 
     // set the camera matrix
     spIdentity();
+    // draw debuggy type things
+//    if (pause)
+//        hero.draw_debug();
+
+    // continue with camera matrix
     spTranslate( 0, 0, distance );
     spRotateX( rotation );
     spRotateZ( axis );

@@ -1324,3 +1324,24 @@ int main(int argc, char* argv[]) {
    return 0;
 }
 //---------------------------------------------------------------------------------------
+
+
+
+
+upcasting or dynamic casting
+//        btRigidBody* rbody = dynamic_cast<btRigidBody*> body;
+//        if ( rbody )
+//        {
+//            canjump = false;
+//
+//            // get the cube-z direction in world coordinates
+//            btVector3 cubeup = rbody->getWorldTransform().getBasis()[2];
+//            // add worldup to cubeup to get a jump vector
+//            btVector3 jumpvec = (btVector3(0,0,1) + cubeup);
+//            
+//            rbody->applyCentralImpulse( jumpvec );
+//        }
+//        else
+//        {
+//            std::cerr << " dynamics3 object is not a rigid body, WARNING! " << std::endl;
+//        }

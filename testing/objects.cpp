@@ -528,6 +528,8 @@ Player::init()
     walkacceleration = 2.5;
     maxrotspeed2 = 12;
     rotacceleration = 10;
+    flyingrotacceleration = 5;
+    kickimpulse = 100;
     canjump = false;
     onground = false;
     jumpimpulse = 15;
@@ -538,50 +540,138 @@ Player::update( float dt )
 {
     object->update( dt );
 
-    canjump = feet_on_something();
-    onground = on_ground();
+    check_surroundings();
+}
+
+btVector3
+Player::get_forward()
+{
+    btVector3 forward = object->body->getWorldTransform().getBasis() * btVector3(1,0,0);
+    forward.normalize();
+    return forward;
+}
+
+btVector3
+Player::get_side()
+{
+    btVector3 side = object->body->getInvInertiaTensorWorld().inverse()*
+                       ( object->body->getWorldTransform().getBasis()* btVector3(0,1,0) );
+    side.normalize();
+    return side;
+}
+
+btVector3
+Player::get_up()
+{
+    btVector3 up = object->body->getWorldTransform().getBasis() * btVector3(0,0,1);
+    up.normalize();
+    return up;
+}
+
+void
+Player::draw_debug()
+{
+    btVector3 forward = get_forward();
+    btVector3 side = get_side();
+    btVector3 up = get_up();
+    forward *= 2;
+    side *= 2;
+    up *= 2;
+    
+    Sint32 x = spFloatToFixed( object->lastposition.x() );
+    Sint32 y = spFloatToFixed( object->lastposition.y() );
+    Sint32 z = spFloatToFixed( object->lastposition.z() );
+    std::cerr << "x,y,z = " << x << ", " << y << ", " << z << "; " << std::endl;
+    std::cerr << " forward = " << forward.x() << ", " << forward.y() << ", " << forward.z() << "; " << std::endl;
+    std::cerr << " side = " << side.x() << ", " << side.y() << ", " << side.z() << "; " << std::endl;
+    std::cerr << " up = " << up.x() << ", " << up.y() << ", " << up.z() << "; " << std::endl;
+
+
+    spLine3D(x,y,z, 
+             x+spFloatToFixed(forward.x()),
+             y+spFloatToFixed(forward.y()),
+             z+spFloatToFixed(forward.z()), 0xF00F);
+    spLine3D(x,y,z, 
+             x+spFloatToFixed(side.x()),
+             y+spFloatToFixed(side.y()),
+             z+spFloatToFixed(side.z()), 0x0F0F);
+    spLine3D(x,y,z, 
+             x+spFloatToFixed(up.x()),
+             y+spFloatToFixed(up.y()),
+             z+spFloatToFixed(up.z()), 0x00FF);
 }
 
 void
 Player::walk( float dt, int dir )
 {
-    if ( canjump && onground)
-    if (object->dynamics == 3)
-    {
-        // get the cube-x direction in world coordinates
-        btVector3 forward = object->body->getWorldTransform().getBasis()[0];
-        forward.normalize();
-        forward.setY( -forward.y() ); // for some reason the world transform has an inverted y...
-//        std::cout << " forward = " << forward.x() << ", "
-//                                   << forward.y() << ", "
-//                                   << forward.z() << "\n";
+    if ( onground )
+    {  
+        if (canjump && (topsideup==1))
+        {
+            if (object->dynamics == 3)
+            {
+                // get the cube-x direction in world coordinates
+                btVector3 forward = get_forward();
 
-        float veldiff2 = maxwalkspeed2- (object->lastvelocity.length2());
-//        std::cerr << " last velocity = " << (object->lastvelocity.length2()) << std::endl;
-//        std::cerr << " max walk speed = " << (maxwalkspeed2) << std::endl;
-        if ( veldiff2 > 0 )
+                float veldiff2 = maxwalkspeed2- (object->lastvelocity.length2());
+        //        std::cerr << " last velocity = " << (object->lastvelocity.length2()) << std::endl;
+        //        std::cerr << " max walk speed = " << (maxwalkspeed2) << std::endl;
+                if ( veldiff2 > 0 )
+                {
+                    object->body->forceActivationState(1);
+                    object->body->applyCentralImpulse( walkacceleration*veldiff2*forward*dt*dir );
+                }
+        //        else
+        //            std::cerr << "moving too fast, can't walk properly" << std::endl;
+            }
+        }
+        else 
+        {
+        // on ground, but in a bad spot
+            std::cerr << " player landed badly, can't walk " << std::endl;
+
+        }
+    }
+    else
+    {
+    // in the air
+        //std::cerr << " player in the air, can't walk " << std::endl;
+        btVector3 sideaxis = get_side();
+        
+        float omegadiff2 = maxrotspeed2- (object->lastomega.length2());
+        if ( omegadiff2 > 0 )
         {
             object->body->forceActivationState(1);
-            object->body->applyCentralImpulse( walkacceleration*veldiff2*forward*dt*dir );
+            object->body->applyTorqueImpulse( flyingrotacceleration*sideaxis*dt*dir ); 
         }
-//        else
-//            std::cerr << "moving too fast, can't walk properly" << std::endl;
+
     }
 }
 
 void
 Player::turn( float dt, int dir )
 {
-//    if (canjump && onground)
-    {
+    if ( onground && ( (!canjump) || (topsideup ==0) ) )
+    {   // very bad landing.  player's head isn't up (or down), or he can't jump
+        //std::cerr << " player landed badly, can't turn " << std::endl;
+        if ( facesideup == 0 )
+        {   // we are on our side somewhere
+            std::cerr << " player landed on side, can't turn " << std::endl;
+
+
+        }
+        else
+        {   // either facing the sky or the ground
+            std::cerr << " player on face/back, " << facesideup << "; can't turn " << std::endl;
+
+
+        }
+    }
+    else
+    {   // player is fine, on the ground or in the air, but able to turn freely.
         // get the cube-z direction in world coordinates
-        btVector3 up = object->body->getWorldTransform().getBasis()[2];
-        up.normalize();
+        btVector3 up = get_up();
 
-//        btVector3 up = body->getInvInertiaTensorWorld().inverse()*
-//                                ( body->getWorldTransform().getBasis()*btVector3(0,0,1) );
-
-        //body->applyTorque( rotspeed*up*dir ); 
         float omegadiff2 = maxrotspeed2- (object->lastomega.length2());
         if ( omegadiff2 > 0 )
         {
@@ -605,9 +695,13 @@ Player::quick_turn()
 }
 
 
-bool 
-Player::feet_on_something() // ray cast down in cube-coords
+void 
+Player::check_surroundings() 
 {
+    // FIRST
+    // check if our feet are on something...    
+    // ray cast down in cube-coords
+
     btVector3 rayfrom( object->lastposition );
     // get the cube-z direction in world coordinates
     //btVector3 cubeup = body->getWorldTransform().getBasis()[2];
@@ -615,38 +709,55 @@ Player::feet_on_something() // ray cast down in cube-coords
     //btVector3 rayto = rayfrom - cubeup;
 
     btTransform cubeform;
-    btVector3 down = -(object->body->getWorldTransform().getBasis()[2]);
-    down.normalize();
+    btVector3 down = -get_up();
     down *= object->size.z()*1.1;
-    //btVector3 forward = cubeform.getBasis()[0];
+   
+    // in the meantime, check if our head is rightside up
+    float result = -down.z(); //dot( btVector3(0,0,-1) );
+    if ( result > 0.1f )
+        topsideup = 1; // standing on our feet
+    else if ( result < -0.1f )
+        topsideup = -1; // standing on our head
+    else
+        topsideup = 0;
+
+    if (topsideup == 0)
+    {
+        btVector3 forward = get_forward();
+        
+        result = forward.z(); //dot( btVector3(0,0,1) );
+        //std::cerr << " face dotted into up is " << result << std::endl;
+        if ( result > 0.1f )
+            facesideup = 1;
+        else if ( result < -0.1f )
+            facesideup = -1;
+        else
+            facesideup = 0;
+    }
+    else
+    {
+        // topside is either up or down, in either case the face can't be.
+        facesideup = 0;
+    }
 
     btVector3 rayto = rayfrom + down;
-
-
     ClosestNotMe ray(object->body);
 
     object->physics->dworld->rayTest( rayfrom, rayto, ray ); 
 
-    if ( ray.hasHit() )
-        return true;
-    else
-        return false;
-}
-
-bool 
-Player::on_ground() // ray cast downwards in world-coords
-{
-    btVector3 rayfrom( object->lastposition );
-    btVector3 rayto = rayfrom - 1.2*btVector3(0,0,object->size.z());
+    canjump = ( ray.hasHit() );
     
-    ClosestNotMe ray(object->body);
+    
+
+    // SECOND
+    // check if we're on the ground.
+    // ray cast downwards in world-coords
+
+    rayto = rayfrom - 1.2*btVector3(0,0,object->size.z());
 
     object->physics->dworld->rayTest( rayfrom, rayto, ray ); 
 
-    if ( ray.hasHit() )
-        return true;
-    else
-        return false;
+    onground = ( ray.hasHit() );
 }
 
 void
@@ -659,27 +770,11 @@ Player::jump()
         object->body->forceActivationState(1);
 
         // get the cube-z direction in world coordinates
-        btVector3 cubeup = object->body->getWorldTransform().getBasis()[2];
+        btVector3 cubeup = get_up();
         // add worldup to cubeup to get a jump vector
         btVector3 jumpvec = (btVector3(0,0,1) /* it'd be nice to multiply by friction of object at feet here */+ cubeup);
         
         object->body->applyCentralImpulse( jumpvec*jumpimpulse );
-//        btRigidBody* rbody = dynamic_cast<btRigidBody*> body;
-//        if ( rbody )
-//        {
-//            canjump = false;
-//
-//            // get the cube-z direction in world coordinates
-//            btVector3 cubeup = rbody->getWorldTransform().getBasis()[2];
-//            // add worldup to cubeup to get a jump vector
-//            btVector3 jumpvec = (btVector3(0,0,1) + cubeup);
-//            
-//            rbody->applyCentralImpulse( jumpvec );
-//        }
-//        else
-//        {
-//            std::cerr << " dynamics3 object is not a rigid body, WARNING! " << std::endl;
-//        }
     }
 }
 
@@ -697,6 +792,8 @@ Player::Player( const Player& other ) // copy constructor
     maxrotspeed2 = other.maxrotspeed2;
     rotacceleration = other.rotacceleration;
     jumpimpulse = other.jumpimpulse;
+    flyingrotacceleration = other.flyingrotacceleration;
+    kickimpulse = other.kickimpulse;
 }
 
 Player& 
@@ -708,5 +805,7 @@ Player::operator = ( Player other ) // Copy Assignment Operator
     maxrotspeed2 = other.maxrotspeed2;
     rotacceleration = other.rotacceleration;
     jumpimpulse = other.jumpimpulse;
+    flyingrotacceleration = other.flyingrotacceleration;
+    kickimpulse = other.kickimpulse;
     return *this;
 }

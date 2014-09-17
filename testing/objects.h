@@ -85,9 +85,14 @@ class Player
 { 
 protected:
     bool canjump, onground;
+    short int topsideup, facesideup;
+
     float maxwalkspeed2, walkacceleration;
-    float maxrotspeed2, rotacceleration;
+    float maxrotspeed2, rotacceleration, flyingrotacceleration;
+    float kickimpulse;
     float jumpimpulse;
+
+    void check_surroundings();
 
 public:
     BaseObject* object;
@@ -100,13 +105,15 @@ public:
     
     virtual void update( float dt );
 
-    bool feet_on_something(); // ray cast down in cube-coords
-    bool on_ground(); // ray cast downwards in world-coords
-
     void jump();
     void walk( float dt, int dir=1 );
     void turn( float dt, int dir );
     void quick_turn();
+    void draw_debug();
+
+    btVector3 get_forward();
+    btVector3 get_side();
+    btVector3 get_up();
    
     ~Player();
     Player( const Player& other ); // copy constructor
