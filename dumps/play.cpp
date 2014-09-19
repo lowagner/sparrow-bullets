@@ -164,7 +164,7 @@ Play::reset()
 
         // this guy includes the floor.  all static rectangular prisms.
         boxes.push_back( Box( btVector3(5,1,1), btVector3(5,2,-3), 0x1100 ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(5,1,1), btVector3(8,-2,-3), 0x1100 ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(5,1,1), btVector3(8,-2,0), 0x1100 ) ); // half-sizes, pos, color
         
         boxes.push_back( Box( btVector3(5,0.15,1), btVector3(-5,0.9,-3.5), 0xA030 ) ); // half-sizes, pos, color
         boxes.push_back( Box( btVector3(5,0.15,1), btVector3(-5,-0.9,-3.5), 0xA030 ) ); // half-sizes, pos, color
