@@ -40,17 +40,17 @@ cubey messes!  Compile with `make` and run with `./dump`.
 
 Keyboard controls:
 
-    - WASD control the camera
+- WASD control the camera
 
-    - E jumps
+- E jumps
 
-    - Q resets play
+- Q resets play
 
-    - [Enter] quits the game
+- [Enter] quits the game
 
-    - [Backspace] pauses/unpauses
+- [Backspace] pauses/unpauses
 
-    - Arrow keys move the checkered dumptruck
+- Arrow keys move the checkered dumptruck
 
 If you fall on your face or side, the arrow keys may do something which is
 unexpected (for you), but I contend that it makes sense,
