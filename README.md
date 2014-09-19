@@ -44,17 +44,17 @@ Keyboard controls:
 - Q resets play
 - [Enter] quits the game
 - [Backspace] pauses/unpauses
-- Arrow keys move the checkered dumptruck
+- Arrow keys move the checkered dumptruck, RELATIVE motion!
 
 If you fall on your face or side, the arrow keys may do something which is
-unexpected (for you), but I contend that it makes sense,
+unexpected (for you), but I contend that it makes sense (in a relative way),
 if you know exactly how you landed.  Also you have control
 of your orientation midair, but not your velocity.  This is important
 for certain levels.  For instance, if you hold forward while jumping, you will probably
 land on your face, whereas if you jump and then press backwards you may have a little
 more control.
 
-Note, all levels are beatable, try to figure them out.
+Note:  All levels are beatable, try to figure them out.
 
 
 Roadmap
