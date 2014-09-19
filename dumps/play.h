@@ -34,6 +34,9 @@ private:
     spFontPointer font;
 
     Player hero;
+    float winlevel; // 0 until we won the level, then jumps to some preset time
+    int lives; // number of lives left
+
     std::vector<Cube> blocks; // dynamic blocks
     std::vector<Box> boxes; // static boxes
     std::vector<Ramp> ramps; // static ramps

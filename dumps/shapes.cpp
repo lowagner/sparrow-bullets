@@ -105,7 +105,7 @@ Cube::Cube( btVector3 pos, Uint16 color_, SDL_Surface* texture_,
             btScalar mass_ )
 {    
     mass = mass_;
-    std::cout << " Cube mass = " << mass << std::endl;
+    //std::cout << " Cube mass = " << mass << std::endl;
     id = 0;
     debug = false;
     // setup GL orientation/transform matrix
@@ -183,7 +183,7 @@ Cube::~Cube()
 {
     //remove_physics(); // DO NOT UNCOMMENT.
     texture = NULL;
-    std::cout << " finishing removing cube " << id << std::endl;
+    //std::cout << " finishing removing cube " << id << std::endl;
 }
 
 Cube::Cube( const Cube& other ) // copy constructor

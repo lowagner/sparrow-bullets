@@ -11,6 +11,7 @@ Check the LICENSE file included for copyright information.
 Play::Play( int level_ ) // init play class
 {
     spFontShadeButtons(1);
+    lives = 12;
 
     distance = spFloatToFixed( -25.0f );
     axis = SP_PI * 0.1;
@@ -52,7 +53,9 @@ Play::reset()
 //    previous_t = time(0);
 //    current_t = time(0);
 
+
     // then rebirth it all...
+    winlevel = 0.f; // you haven't won yet!
     pause = 0; // default to no pause
     clock = 0;
     checkertexture = spLoadSurface("../data/check.png");
@@ -181,7 +184,8 @@ Play::reset()
     }
     else
     {
-        std::cout << " you beated all levels! " << std::endl;
+        std::cout << " congratulations, you beated all levels! " << std::endl;
+        std::cout << " hopefully they will get around to creating level " << level << std::endl;
         return GAMESTATEquit;
     }
     
@@ -229,13 +233,23 @@ void Play::draw( SDL_Surface* screen )
     }
     //spFontDrawMiddle( screen->w /2, screen->h - 2*font-> maxheight, 0, input, font );
 
-    spFontDrawMiddle( screen->w / 2, font->maxheight + 2, 0, "Cube Drop", font );	
+    spFontDrawMiddle( screen->w / 2, font->maxheight + 2, 0, "Cube Dump", font );
     spFontDraw( 2, screen->h - 1*font->maxheight,0, "D-pad Move Player", font); 
     //spFontDraw( 2, screen->h - 2*font->maxheight,0, "[B] rotate right", font);
 
     char buffer[64];
     sprintf( buffer, "fps: %i", spGetFPS() );
     spFontDrawMiddle( screen->w/2, 1, 0, buffer, font );
+    
+    sprintf( buffer, "time: %.2f", clock );
+    spFontDrawMiddle( screen->w / 2, 2*(font->maxheight) + 4 , 0, buffer, font );
+   
+    if ( lives == 1 )
+        sprintf( buffer, "life: %d", lives );
+    else
+        sprintf( buffer, "lives: %d", lives );
+    spFontDrawMiddle( screen->w / 2, screen->h  - (font->maxheight), 0, buffer, font );
+
     // this displays everything. (??)
     spFlip(); 
 
@@ -281,7 +295,7 @@ void Play::draw( SDL_Surface* screen )
     for (int i=0; i<blocks.size(); i++)
     {
         blocks[i].draw( matrix, 200 ); 
-        // draw at partial transparency.  max alpha = 255 (fully opaque), 0 = fully transparent
+        // draw blocks at partial transparency.  max alpha = 255 (fully opaque), 0 = fully transparent
     }
 
     hero.object->draw( matrix );
@@ -355,13 +369,13 @@ int Play::update( Uint32 dt )
     if ( spGetInput()->button[SP_BUTTON_L] )
     {
         spGetInput()->button[SP_BUTTON_L] = 0;
+        lives -= 1;
         reset();
     }
 
     if (!(pause))
     {
         btScalar fdt = dt*1.0/1000;
-        clock += fdt;
         
 //        current_t = time(0);
 //        double time = difftime(current_t, previous_t);
@@ -373,6 +387,11 @@ int Play::update( Uint32 dt )
         physics.update( fdt );
         // update hero stuff
         hero.update( fdt );
+        if ( hero.object->out_of_bounds( outofbounds ) )
+        {
+            lives -= 1;
+            reset();
+        }
         
         if ( spGetInput()->axis[0] )
         {
@@ -388,32 +407,48 @@ int Play::update( Uint32 dt )
             spGetInput()->button[SP_BUTTON_R] = hero.jump();
         }
 
-
-        // update blocks
-        int i=0;
-        int blocksize = blocks.size();
-        while ( i < blocksize )
+        
+        if ( winlevel == 0.f )
         {
-            //std::cout << i << "; id " << blocks[i].id << " ";
-            blocks[i].update( fdt );
+            // if we have not won the level yet...
+            // update level time
+            clock += fdt;
 
-            if (  blocks[i].out_of_bounds( outofbounds )   )
+            // update blocks
+            int i=0;
+            int blocksize = blocks.size();
+            while ( i < blocksize )
             {
-                //std::cout << "\n WARNING!  block " << i << " out of bounds!\n";
-                blocks[i].remove_physics();  // remove this guy from physics world
-                blocks.erase(blocks.begin() + i);
-                blocksize --;
-                //std::cout << "\n deleted  block " << i << " since it was out of bounds.\n";
+                //std::cout << i << "; id " << blocks[i].id << " ";
+                blocks[i].update( fdt );
+
+                if (  blocks[i].out_of_bounds( outofbounds )   )
+                {
+                    //std::cout << "\n WARNING!  block " << i << " out of bounds!\n";
+                    blocks[i].remove_physics();  // remove this guy from physics world
+                    blocks.erase(blocks.begin() + i);
+                    blocksize --;
+                    //std::cout << "\n deleted  block " << i << " since it was out of bounds.\n";
+                }
+                else
+                {
+                    i++;
+                }
             }
-            else
+            if (blocksize == 0)
             {
-                i++;
+                winlevel = 3;
             }
-        }
-        if (blocksize == 0)
-        {
-            level += 1;
-            return reset();
+        } 
+        else
+        { // we have won and are waiting to start next level
+            winlevel -= fdt;
+            if ( winlevel <= 0.f )
+            {
+                level += 1;
+                return reset();
+            }
+
         }
         //std::cout << std::endl;
     }
@@ -468,8 +503,8 @@ void Play::handle( SDL_Event* event )
     if (event->type == SDL_KEYDOWN)
     {
         int lastKey = event->key.keysym.unicode;
-        char buffer[5];
-        printf("keydown event 0x%x = \"%s\" keysym=%i\n",lastKey,spFontGetUTF8FromUnicode(lastKey,buffer,5),event->key.keysym.sym);
+//        char buffer[5];
+//        printf("keydown event 0x%x = \"%s\" keysym=%i\n",lastKey,spFontGetUTF8FromUnicode(lastKey,buffer,5),event->key.keysym.sym);
     }
 }
 
