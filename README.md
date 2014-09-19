@@ -38,12 +38,18 @@ respective directories.  The first contender is `dumps`, in which you play
 as a red-checkered cube dumptruck trying to clean the world of all its
 cubey messes!  Compile with `make` and run with `./dump`.
 
-Controls:  on a keyboard,
+Keyboard controls:
+
     - WASD control the camera
+
     - E jumps
+
     - Q resets play
+
     - [Enter] quits the game
+
     - [Backspace] pauses/unpauses
+
     - Arrow keys move the checkered dumptruck
 
 If you fall on your face or side, the arrow keys may do something which is
