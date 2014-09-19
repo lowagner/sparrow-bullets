@@ -182,6 +182,33 @@ Play::reset()
         
         blocks.push_back( Cube( btVector3(15,-2,2), 0xF000 ) );
     }
+    else if ( level == 6 )
+    {
+        outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
+
+        // this guy includes the floor.  all static rectangular prisms.
+        boxes.push_back( Box( btVector3(10,10,1), btVector3(0,0,-5), 0x05FF ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(4,4,1), btVector3(7,7,-3), 0x055F ) ); // half-sizes, pos, color 
+        boxes.push_back( Box( btVector3(6,1,2), btVector3(3,-1,-2), 0xF50F ) ); // half-sizes, pos, color
+
+        ramps.push_back( Ramp( btVector3(10,2,4), btVector3(-8,0,-4), 0xF0FF ) ); // sizes, pos, color
+        ramps.push_back( Ramp( btVector3(10,2.5,1), btVector3(0,-10,-4), 0xFFFF ) ); // sizes, pos, color
+        ramps[0].rotateZ( M_PI/2 );
+        ramps[1].rotateZ( 2*M_PI );
+
+        hero = Player( btVector3(0,8,5), 0xF00F, checkertexture );
+        hero.object->debug = true;
+       
+        // add some blocks pieces
+        for ( int i=0; i<5; i++ )
+        {
+            blocks.push_back(  Cube( btVector3(2*i-3.5,-1,10+2*i), 0x0F0F )  );
+        }
+        blocks[4].impulse( btVector3(0,10,0) );
+        blocks[3].impulse( btVector3(10,15,0) );
+        blocks[2].impulse( btVector3(0,-10,0) );
+        blocks[0].impulse( btVector3(-10,10,0) );
+    }
     else
     {
         std::cout << " congratulations, you beated all levels! " << std::endl;
@@ -243,6 +270,12 @@ void Play::draw( SDL_Surface* screen )
     
     sprintf( buffer, "time: %.2f", clock );
     spFontDrawMiddle( screen->w / 2, 2*(font->maxheight) + 4 , 0, buffer, font );
+
+    if ( winlevel > 0.f )
+    {
+        sprintf( buffer, "win in %d", int(ceil(winlevel)) );
+        spFontDrawMiddle( screen->w / 2, screen->h / 2, 0, buffer, font );
+    }
    
     if ( lives == 1 )
         sprintf( buffer, "life: %d", lives );
