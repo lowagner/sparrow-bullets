@@ -191,7 +191,7 @@ Cube::Cube( const Cube& other ) // copy constructor
     //std::cout << " calling cube copy constructor from " << other.id << " to " << id << std::endl;
     dynamics = other.dynamics;
     mass = other.mass;
-    id = other.id + 100;
+    id = other.id;
     debug = other.debug;
     texture = other.texture;
     physics = other.physics;
@@ -212,7 +212,7 @@ Cube::operator = ( Cube other ) // Copy Assignment Operator
 {
     dynamics = other.dynamics;
     mass = other.mass;
-    id = other.id + 100;
+    id = other.id;
     debug = other.debug;
     texture = other.texture;
     physics = other.physics;

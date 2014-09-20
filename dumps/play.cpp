@@ -53,6 +53,8 @@ Play::reset()
 //    previous_t = time(0);
 //    current_t = time(0);
 
+    killboxfromblockid = false;
+
 
     // then rebirth it all...
     winlevel = 0.f; // you haven't won yet!
@@ -212,6 +214,39 @@ Play::reset()
         blocks[2].impulse( btVector3(10,-7,0) );
         blocks[0].impulse( btVector3(-10,10,0) );
     }
+    else if ( level == 7 )
+    {
+        // fun level, where boxes will die if cubes do
+        killboxfromblockid = true;
+
+        outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
+
+        // this guy includes the floor.  all static rectangular prisms.
+        boxes.push_back( Box( btVector3(4,4,1), btVector3(4,4,-3), 0x500F ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(4,4,1), btVector3(-4,4,-3), 0x505F ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(4,4,1), btVector3(4,-4,-3), 0x055F ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(4,4,1), btVector3(-4,-4,-3), 0x0F5F ) ); // half-sizes, pos, color
+
+        blocks.push_back(  Cube( btVector3(4,4,1), 0x500F )  );
+        blocks.push_back(  Cube( btVector3(-4,4,1), 0x505F )  );
+        blocks.push_back(  Cube( btVector3(4,-4,1), 0x055F )  );
+        blocks.push_back(  Cube( btVector3(-4,-4,1), 0x0F5F )  );
+        
+        boxes.push_back( Box( btVector3(1,4,1), btVector3(9,4,-1), 0xFFFF ) ); // half-sizes, pos, color
+
+
+        hero = Player( btVector3(4,4,5), 0xF00F, checkertexture );
+        hero.object->rotateZ( M_PI/2 );
+        hero.object->debug = true;
+       
+        // add some blocks pieces
+        for ( int i=0; i<5; i++ )
+        {
+            blocks[i].id = i;
+            boxes[i].id = i;
+        }
+    }
+
     else
     {
         std::cout << " congratulations, you beated all levels! " << std::endl;
@@ -464,6 +499,30 @@ int Play::update( Uint32 dt )
                 {
                     //std::cout << "\n WARNING!  block " << i << " out of bounds!\n";
                     blocks[i].remove_physics();  // remove this guy from physics world
+                    if ( killboxfromblockid )
+                    { // here we kill any boxes which have the same id as block j
+
+                        int blockid = blocks[i].id;
+                        int j=0;
+                        int boxsize = boxes.size();
+//                        std::cout << "\n deleting  block " << blockid << "; ";
+                        while ( j < boxsize )
+                        {
+//                            std::cout << "checking  box " << boxes[j].id << "; "; 
+                            if ( boxes[j].id == blockid )
+                            {
+//                                std::cout << "deleting  box " << boxes[j].id << "; "; 
+                                boxes[j].remove_physics();  // remove this guy from physics world
+                                boxes.erase(boxes.begin() + j);
+                                boxsize --;
+                            }
+                            else
+                            {
+//                                std::cout << "skipping  box " << boxes[j].id << "; "; 
+                                j++;
+                            }
+                        }
+                    }
                     blocks.erase(blocks.begin() + i);
                     blocksize --;
                     //std::cout << "\n deleted  block " << i << " since it was out of bounds.\n";

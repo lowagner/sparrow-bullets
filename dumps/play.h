@@ -39,6 +39,7 @@ private:
 
     std::vector<Cube> blocks; // dynamic blocks
     std::vector<Box> boxes; // static boxes
+    bool killboxfromblockid;
     std::vector<Ramp> ramps; // static ramps
 
     int pause;
@@ -59,7 +60,7 @@ private:
     
 public:
 
-    Play( int level_ = 6 );
+    Play( int level_ = 7 );
     int reset();
     void draw( SDL_Surface* screen );
     void load_font();
