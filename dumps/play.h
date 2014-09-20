@@ -30,6 +30,7 @@ private:
     Sint32 distance;
     btVector3 outofbounds;
     btScalar clock;
+    btScalar totalclock;
 
     spFontPointer font;
 

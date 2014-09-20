@@ -12,6 +12,8 @@ Play::Play( int level_ ) // init play class
 {
     spFontShadeButtons(1);
     lives = 12;
+    totalclock = 0;
+    clock = 0;
 
     distance = spFloatToFixed( -25.0f );
     axis = SP_PI * 0.1;
@@ -49,6 +51,8 @@ Play::deinit()
 int
 Play::reset()
 {
+    totalclock += clock;
+
     deinit(); // kill everything first
 //    previous_t = time(0);
 //    current_t = time(0);
@@ -250,6 +254,7 @@ Play::reset()
     else
     {
         std::cout << " congratulations, you beated all levels! " << std::endl;
+        std::cout << " total accumulated time: " << totalclock << std::endl;
         std::cout << " hopefully they will get around to creating level " << level << std::endl;
         return GAMESTATEquit;
     }
@@ -285,18 +290,19 @@ void Play::draw( SDL_Surface* screen )
     spSetZSet( 0 );
     spSetZTest( 0 );
     spSetAlphaTest( 1 );
-    spFontDraw( 2, font-> maxheight+2, 0, "[L] Reset", font );
-    spFontDrawRight( screen->w - 2 , font-> maxheight+2, 0, "[R] Jump", font );
-    spFontDrawRight( screen->w - 2 , 2, 0, "[S] Exit", font );
+    spFontDraw( 2, 2, 0, "[L] Reset", font ); 
+    spFontDrawRight( screen->w - 2 , 2, 0, "[R] Jump", font );
+
+    spFontDrawRight( screen->w - 2 , font-> maxheight+2, 0, "[S] Exit", font );
+    switch (pause)
+    {
+        case 0:  spFontDraw( 2, font-> maxheight+4, 0, "[E] Pause", font ); break;
+        case 1:  spFontDraw( 2, font-> maxheight+4, 0, "[E] Unpause", font ); break;
+    }
+    //spFontDrawMiddle( screen->w /2, screen->h - 2*font-> maxheight, 0, input, font );
     spFontDrawRight( screen->w - 2, screen->h - 2*font-> maxheight, 0, "[Y] Zoom in", font ); 
     spFontDrawRight( screen->w - 2, screen->h - 1*font-> maxheight, 0, "[X] Zoom out", font );
 
-    switch (pause)
-    {
-        case 0:  spFontDraw( 2, 2, 0, "[E] Pause", font ); break;
-        case 1:  spFontDraw( 2, 2, 0, "[E] Unpause", font ); break;
-    }
-    //spFontDrawMiddle( screen->w /2, screen->h - 2*font-> maxheight, 0, input, font );
 
     spFontDraw( 2, screen->h - 1*font->maxheight,0, "D-pad Move Player", font); 
     //spFontDraw( 2, screen->h - 2*font->maxheight,0, "[B] rotate right", font);
@@ -315,6 +321,9 @@ void Play::draw( SDL_Surface* screen )
     {
         sprintf( buffer, "win in %d", int(ceil(winlevel)) );
         spFontDrawMiddle( screen->w / 2, screen->h / 2, 0, buffer, font );
+
+        sprintf( buffer, "accumulated time: %.2f", (totalclock+clock) );
+        spFontDrawMiddle( screen->w / 2, screen->h / 2 + font->maxheight + 2, 0, buffer, font );
     }
    
     if ( lives == 1 )
@@ -443,6 +452,7 @@ int Play::update( Uint32 dt )
     {
         spGetInput()->button[SP_BUTTON_L] = 0;
         lives -= 1;
+        totalclock -= clock;
         reset();
     }
 
@@ -463,6 +473,7 @@ int Play::update( Uint32 dt )
         if ( hero.object->out_of_bounds( outofbounds ) )
         {
             lives -= 1;
+            totalclock -= clock;
             reset();
         }
         
