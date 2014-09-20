@@ -172,27 +172,6 @@ Play::reset()
         outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
 
         // this guy includes the floor.  all static rectangular prisms.
-        boxes.push_back( Box( btVector3(1,5,1), btVector3(5,2,4), 0x1100 ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(7,1,1), btVector3(10,-2,0), 0x1100 ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(5,1,1), btVector3(5,2,-3), 0x1100 ) ); // half-sizes, pos, color
-        
-        boxes.push_back( Box( btVector3(5,0.15,1), btVector3(-5,0.9,-3.5), 0xA030 ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(5,0.15,1), btVector3(-5,-0.9,-3.5), 0xA030 ) ); // half-sizes, pos, color
-
-        hero = Player( btVector3(5,6,7), 0xF00F, checkertexture );
-        hero.object->rotateZ( -M_PI/2 );
-        hero.object->debug = true;
-      
-        blocks.push_back( Cube( btVector3(-9,0,5), 0xF000 ) );
-        blocks[0].rotate( btVector3(1,0,0), M_PI/4 );
-        
-        blocks.push_back( Cube( btVector3(15,-2,2), 0xF000 ) );
-    }
-    else if ( level == 6 )
-    {
-        outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
-
-        // this guy includes the floor.  all static rectangular prisms.
         boxes.push_back( Box( btVector3(4,5,1), btVector3(2,5,-5), 0x05FF ) ); // half-sizes, pos, color
         boxes.push_back( Box( btVector3(2,2,1), btVector3(-5,0,-5), 0x05FF ) ); // half-sizes, pos, color
         boxes.push_back( Box( btVector3(10,1,1), btVector3(0,-5,-5), 0x05FF ) ); // half-sizes, pos, color
@@ -217,6 +196,27 @@ Play::reset()
         blocks[3].impulse( btVector3(10,15,0) );
         blocks[2].impulse( btVector3(10,-7,0) );
         blocks[0].impulse( btVector3(-10,10,0) );
+    }
+    else if ( level == 6 )
+    {
+        outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
+
+        // this guy includes the floor.  all static rectangular prisms.
+        boxes.push_back( Box( btVector3(1,5,1), btVector3(5,2,4), 0x1100 ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(7,1,1), btVector3(10,-2,0), 0x1100 ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(5,1,1), btVector3(5,2,-3), 0x1100 ) ); // half-sizes, pos, color
+        
+        boxes.push_back( Box( btVector3(5,0.15,1), btVector3(-5,0.9,-3.5), 0xA030 ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(5,0.15,1), btVector3(-5,-0.9,-3.5), 0xA030 ) ); // half-sizes, pos, color
+
+        hero = Player( btVector3(5,6,7), 0xF00F, checkertexture );
+        hero.object->rotateZ( -M_PI/2 );
+        hero.object->debug = true;
+      
+        blocks.push_back( Cube( btVector3(-9,0,5), 0xF000 ) );
+        blocks[0].rotate( btVector3(1,0,0), M_PI/4 );
+        
+        blocks.push_back( Cube( btVector3(15,-2,2), 0xF000 ) );
     }
     else if ( level == 7 )
     {
@@ -244,17 +244,55 @@ Play::reset()
         hero.object->debug = true;
        
         // add some blocks pieces
-        for ( int i=0; i<5; i++ )
+        for ( int i=0; i<4; i++ )
         {
             blocks[i].id = i;
             boxes[i].id = i;
         }
     }
+    else if ( level == 8 )
+    {
+        // fun level, where boxes will die if cubes do
+        killboxfromblockid = true;
 
+        outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
+
+        // this guy includes the floor.  all static rectangular prisms.
+        boxes.push_back( Box( btVector3(1,1,1), btVector3(-6,0,7), 0x109F ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(1,1,1), btVector3(-3,0,5), 0x307F ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(1,1,1), btVector3(0,0,3), 0x505F ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(1,1,1), btVector3(3,0,1), 0x703F ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(1,1,1), btVector3(6,0,-1), 0x901F ) ); // half-sizes, pos, color
+        
+        boxes.push_back( Box( btVector3(10,5,5), btVector3(0,-7,-7), 0x000F ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(10,5,5), btVector3(0,7,5), 0x000F ) ); // half-sizes, pos, color
+
+        blocks.push_back(  Cube( btVector3(4,4,12), 0xFFFF )  );
+        blocks.push_back(  Cube( btVector3(-4,4,12), 0xFFFF )  );
+        blocks.push_back(  Cube( btVector3(4,-4,12), 0xFFFF )  );
+        blocks.push_back(  Cube( btVector3(-4,-4,12), 0xFFFF )  );
+
+        hero = Player( btVector3(-9,-6,12), 0xF00F, checkertexture );
+        //hero.object->rotateZ( M_PI/2 );
+        hero.object->debug = true;
+       
+        // add some blocks pieces
+        for ( int i=0; i<4; i++ )
+        {
+            blocks[i].id = 0;
+            boxes[i].id = 0;
+        }
+        boxes[4].id = 0;
+        for ( int i=5; i<7; i++ )
+        {
+            boxes[i].id = 1234;
+        }
+    }
     else
     {
         std::cout << " congratulations, you beated all levels! " << std::endl;
         std::cout << " total accumulated time: " << totalclock << std::endl;
+        std::cout << " remaining lives: " << lives << std::endl;
         std::cout << " hopefully they will get around to creating level " << level << std::endl;
         return GAMESTATEquit;
     }
@@ -266,7 +304,6 @@ Play::reset()
     for ( int i=0; i<blocks.size(); i++ )
     {
         blocks[i].add_physics( physics );
-        blocks[i].id = i;
     }
     
     for ( int i=0; i<boxes.size(); i++ )
@@ -516,20 +553,20 @@ int Play::update( Uint32 dt )
                         int blockid = blocks[i].id;
                         int j=0;
                         int boxsize = boxes.size();
-//                        std::cout << "\n deleting  block " << blockid << "; ";
+                        //std::cout << "\n deleting  block " << blockid << "; ";
                         while ( j < boxsize )
                         {
-//                            std::cout << "checking  box " << boxes[j].id << "; "; 
+                            //std::cout << "checking  box " << boxes[j].id << "; "; 
                             if ( boxes[j].id == blockid )
                             {
-//                                std::cout << "deleting  box " << boxes[j].id << "; "; 
+                                //std::cout << "deleting  box " << boxes[j].id << "; "; 
                                 boxes[j].remove_physics();  // remove this guy from physics world
                                 boxes.erase(boxes.begin() + j);
                                 boxsize --;
                             }
                             else
                             {
-//                                std::cout << "skipping  box " << boxes[j].id << "; "; 
+                                //std::cout << "skipping  box " << boxes[j].id << "; "; 
                                 j++;
                             }
                         }
