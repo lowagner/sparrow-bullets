@@ -121,10 +121,10 @@ Play::reset()
 
         // this guy includes the floor.  all static rectangular prisms.
         boxes.push_back( Box( btVector3(7,7,1), btVector3(0,0,-5), 0xF00F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(7,7,-3), 0xF50F ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(4,4,1), btVector3(7,5,-3), 0xF50F ) ); // half-sizes, pos, color
         boxes.push_back( Box( btVector3(4,4,1), btVector3(3,7,-1), 0x0F0F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(3,3,1), 0x03FF ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(7,3,3), 0x00FF ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(4,4,1), btVector3(1,3,1), 0x03FF ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(4,4,1), btVector3(7,-1,3), 0x00FF ) ); // half-sizes, pos, color
 
         hero = Player( btVector3(0,4,5), 0xF00F, checkertexture );
         hero.object->rotateZ( -M_PI/2 );
@@ -133,9 +133,9 @@ Play::reset()
         // add some blocks pieces
         for ( int i=0; i<6; i++ )
         {
-            blocks.push_back(  Cube( btVector3(2*i-4,2*i-4,10+2*i), 0xFFFF )  );
+            blocks.push_back(  Cube( btVector3(2*i-4,2*i-6,10+2*i), 0xFFFF )  );
         }
-        blocks[4].impulse( btVector3(0,10,0) );
+        //blocks[4].impulse( btVector3(0,10,0) );
     }
     else if ( level == 4 )
     {
@@ -187,7 +187,10 @@ Play::reset()
         outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
 
         // this guy includes the floor.  all static rectangular prisms.
-        boxes.push_back( Box( btVector3(10,10,1), btVector3(0,0,-5), 0x05FF ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(4,5,1), btVector3(2,5,-5), 0x05FF ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(2,2,1), btVector3(-5,0,-5), 0x05FF ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(10,1,1), btVector3(0,-5,-5), 0x05FF ) ); // half-sizes, pos, color
+
         boxes.push_back( Box( btVector3(4,4,1), btVector3(7,7,-3), 0x055F ) ); // half-sizes, pos, color 
         boxes.push_back( Box( btVector3(6,1,2), btVector3(3,-1,-2), 0xF50F ) ); // half-sizes, pos, color
 
@@ -206,7 +209,7 @@ Play::reset()
         }
         blocks[4].impulse( btVector3(0,10,0) );
         blocks[3].impulse( btVector3(10,15,0) );
-        blocks[2].impulse( btVector3(0,-10,0) );
+        blocks[2].impulse( btVector3(10,-7,0) );
         blocks[0].impulse( btVector3(-10,10,0) );
     }
     else
@@ -260,11 +263,13 @@ void Play::draw( SDL_Surface* screen )
     }
     //spFontDrawMiddle( screen->w /2, screen->h - 2*font-> maxheight, 0, input, font );
 
-    spFontDrawMiddle( screen->w / 2, font->maxheight + 2, 0, "Cube Dump", font );
     spFontDraw( 2, screen->h - 1*font->maxheight,0, "D-pad Move Player", font); 
     //spFontDraw( 2, screen->h - 2*font->maxheight,0, "[B] rotate right", font);
 
-    char buffer[64];
+    char buffer[64]; 
+    sprintf( buffer, "cube dump lvl. %i", level );
+    spFontDrawMiddle( screen->w / 2, font->maxheight + 2, 0, buffer, font );
+
     sprintf( buffer, "fps: %i", spGetFPS() );
     spFontDrawMiddle( screen->w/2, 1, 0, buffer, font );
     
