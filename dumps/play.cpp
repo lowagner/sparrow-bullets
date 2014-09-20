@@ -249,6 +249,7 @@ Play::reset()
             blocks[i].id = i;
             boxes[i].id = i;
         }
+        blocks[4].id = 1234;
     }
     else if ( level == 8 )
     {
