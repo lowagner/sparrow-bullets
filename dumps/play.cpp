@@ -452,7 +452,7 @@ int Play::update( Uint32 dt )
     {
         spGetInput()->button[SP_BUTTON_L] = 0;
         lives -= 1;
-        totalclock -= clock;
+        clock = 0;
         reset();
     }
 
@@ -473,7 +473,7 @@ int Play::update( Uint32 dt )
         if ( hero.object->out_of_bounds( outofbounds ) )
         {
             lives -= 1;
-            totalclock -= clock;
+            clock = 0;
             reset();
         }
         
