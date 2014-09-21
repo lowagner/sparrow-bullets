@@ -54,6 +54,7 @@ public:
     bool out_of_bounds( btVector3 outofbounds );
 
     void translate( btVector3 dist );
+    void activate();
 
     void rotateZ( btScalar angle );
     void rotate( btVector3 axis, btScalar angle );

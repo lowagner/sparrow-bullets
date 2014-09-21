@@ -229,6 +229,12 @@ BaseObject::impulse( btVector3 forcedt )
   }
 }
 
+void
+BaseObject::activate()
+{
+    body->forceActivationState(1);
+}
+
 void 
 BaseObject::rotate( btVector3 axis, btScalar angle )
 {

@@ -539,6 +539,7 @@ int Play::update( Uint32 dt )
             // update blocks
             int i=0;
             int blocksize = blocks.size();
+            bool activate = false;
             while ( i < blocksize )
             {
                 //std::cout << i << "; id " << blocks[i].id << " ";
@@ -564,6 +565,7 @@ int Play::update( Uint32 dt )
                                 boxes[j].remove_physics();  // remove this guy from physics world
                                 boxes.erase(boxes.begin() + j);
                                 boxsize --;
+                                activate = true;
                             }
                             else
                             {
@@ -584,6 +586,15 @@ int Play::update( Uint32 dt )
             if (blocksize == 0)
             {
                 winlevel = 3;
+            }
+            else if ( activate )
+            {
+                // boxes disappeared or something, we should reactivate everything
+                for ( int i=0; i<blocks.size(); i++ )
+                {
+                    blocks[i].activate();
+                }
+                hero.object->activate();
             }
         } 
         else
