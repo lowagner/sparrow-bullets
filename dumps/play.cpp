@@ -303,9 +303,7 @@ Play::reset()
     hero.object->add_physics( physics );
     
     for ( int i=0; i<blocks.size(); i++ )
-    {
         blocks[i].add_physics( physics );
-    }
     
     for ( int i=0; i<boxes.size(); i++ )
         boxes[i].add_physics( physics );

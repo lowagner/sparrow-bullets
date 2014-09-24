@@ -1,5 +1,21 @@
-REACTIVATE hero when player is trying to move him
-    DONE deal.
+get some menu items going.
+    start menu:
+        play (level 1, 2, 3, .. by left/right arrows)
+        quit
+    play menu:
+        quit to main
+        skip level (lose 10 lives)
+        exit game
+
+could make the start menu a little world, where you pilot around to choose a level set or quit (fall off).
+
+get some statistics going, files saving:
+    level j:  best time         -- time, lives lost
+              fewest lives lost -- time, lives lost
+    whole level set, same idea
+    
+
+get two player action all up-ons
 
 
 
