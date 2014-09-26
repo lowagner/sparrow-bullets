@@ -533,10 +533,10 @@ Player::Player( BaseObject object_ )
 void
 Player::init()
 {
-    maxwalkspeed2 = 43;
-    walkacceleration = 2.5;
-    maxrotspeed2 = 12;
-    rotacceleration = 10;
+    maxwalkspeed2 = 50;
+    walkacceleration = 2.1;
+    maxrotspeed2 = 15;
+    rotacceleration = 7;
     flyingrotacceleration = 5;
     siderotacceleration = 0.1;
     sidewalkacceleration = 1.8;
