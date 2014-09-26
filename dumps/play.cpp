@@ -16,10 +16,13 @@ Play::Play( int level_ ) // init play class
     clock = 0;
 
     camerafollowhero = true;
+    camerafollowdelta = 0.4;
+    cameraalignhero = true;
+    cameraaligndelta = 0.4;
     cameracenter = btVector3();
     cameradistance = spFloatToFixed( -25.0f );
-    cameraincline = SP_PI * 0.1; // for incline
-    camerarotation = spFloatToFixed( -1.5f ); // closer to zero - more from top down.
+    cameraaxis = SP_PI * 0.1; // for rotation around the z axis
+    cameraincline = spFloatToFixed( -1.5f ); // closer to zero - more from top down.
 
     font=NULL;
     checkertexture=NULL;
@@ -333,33 +336,35 @@ void Play::draw( SDL_Surface* screen )
     spSetZSet( 0 );
     spSetZTest( 0 );
     spSetAlphaTest( 1 );
-    spFontDraw( 2, 2, 0, "[L] Reset", font ); 
-    spFontDrawRight( screen->w - 2 , 2, 0, "[R] Jump", font );
 
+    char buffer[64]; 
     if (menu)
     {
         spFontDrawRight( screen->w - 2 , font-> maxheight+2, 0, "[S] Select", font );
         spFontDraw( 2, font-> maxheight+4, 0, "[E] Select", font ); 
         int y = 2*screen->h/5 - ((menuitems.size()+1)/2)*(font->maxheight);
-        for ( int i=0; i<menuitems.size(); i++)
+
+        sprintf( buffer, "= %s =", menuitems[0] );
+        spFontDrawMiddle( screen->w / 2, y, 0, buffer, font );
+        y += font->maxheight*3/2;
+
+        for ( int i=1; i<menuitems.size(); i++)
         {
-            char buffer[64]; 
             if ( i == menu )
-                sprintf( buffer, "+%s+", menuitems[i] );
+                sprintf( buffer, "+ %s +", menuitems[i] );
             else
                 sprintf( buffer, "%s", menuitems[i] );
             spFontDrawMiddle( screen->w / 2, y, 0, buffer, font );
             y += font->maxheight + 4;
-            if ( i == 0 )
-            {   // give a little extra space for the title of menu
-                y += 6;
-            }
         } 
         
         spFontDraw( 2, screen->h - 1*font->maxheight,0, "D-pad Navigate Menu", font); 
     }
     else
-    {
+    {   // no menu
+        spFontDraw( 2, 2, 0, "[L] Reset", font ); 
+        spFontDrawRight( screen->w - 2 , 2, 0, "[R] Jump", font );
+
         spFontDrawRight( screen->w - 2 , font-> maxheight+2, 0, "[S] Menu", font );
         switch (pause)
         {
@@ -368,31 +373,31 @@ void Play::draw( SDL_Surface* screen )
         }
 
         spFontDraw( 2, screen->h - 1*font->maxheight,0, "D-pad Move Player", font); 
+
+        spFontDrawRight( screen->w - 2, screen->h - 2*font-> maxheight, 0, "[Y] Zoom in", font ); 
+        spFontDrawRight( screen->w - 2, screen->h - 1*font-> maxheight, 0, "[X] Zoom out", font );
+
+        if ( winlevel > 0.f )
+        {
+            sprintf( buffer, "win in %d", int(ceil(winlevel)) );
+            spFontDrawMiddle( screen->w / 2, screen->h / 2, 0, buffer, font );
+
+            sprintf( buffer, "accumulated time: %.2f", (totalclock+clock) );
+            spFontDrawMiddle( screen->w / 2, screen->h / 2 + font->maxheight + 2, 0, buffer, font );
+        }
     }
     //spFontDrawMiddle( screen->w /2, screen->h - 2*font-> maxheight, 0, input, font );
-    spFontDrawRight( screen->w - 2, screen->h - 2*font-> maxheight, 0, "[Y] Zoom in", font ); 
-    spFontDrawRight( screen->w - 2, screen->h - 1*font-> maxheight, 0, "[X] Zoom out", font );
 
 
 
-    char buffer[64]; 
     sprintf( buffer, "cube dump lvl. %i", level );
     spFontDrawMiddle( screen->w / 2, font->maxheight + 2, 0, buffer, font );
-
-    sprintf( buffer, "fps: %i", spGetFPS() );
-    spFontDrawMiddle( screen->w/2, 1, 0, buffer, font );
     
+    sprintf( buffer, "fps: %i", spGetFPS() );
+    spFontDrawMiddle( screen->w/2, 1, 0, buffer, font ); 
+
     sprintf( buffer, "time: %.2f", clock );
     spFontDrawMiddle( screen->w / 2, 2*(font->maxheight) + 4 , 0, buffer, font );
-
-    if ( winlevel > 0.f )
-    {
-        sprintf( buffer, "win in %d", int(ceil(winlevel)) );
-        spFontDrawMiddle( screen->w / 2, screen->h / 2, 0, buffer, font );
-
-        sprintf( buffer, "accumulated time: %.2f", (totalclock+clock) );
-        spFontDrawMiddle( screen->w / 2, screen->h / 2 + font->maxheight + 2, 0, buffer, font );
-    }
    
     if ( lives == 1 )
         sprintf( buffer, "life: %d", lives );
@@ -424,8 +429,8 @@ void Play::draw( SDL_Surface* screen )
 
     // continue with camera matrix
     spTranslate( 0, 0, cameradistance );
-    spRotateX( camerarotation );
-    spRotateZ( cameraincline );
+    spRotateX( cameraincline );
+    spRotateZ( cameraaxis );
     //spTranslate( 0, 0, spFloatToFixed( -1.0f ) ); // go a bit up from the player
 
     // also get to center of camera
@@ -533,26 +538,28 @@ int Play::update( Uint32 dt )
     if ( spGetInput()->button[SP_BUTTON_A] )
     {
         // key A on a standard QWERTY keyboard
-        cameraincline += 150*dt;
+        cameraaxis += std::max(int(80*dt),1);
+        cameracooldown = 2;
     }
     if ( spGetInput()->button[SP_BUTTON_B] )
     {
         // key D on a standard QWERTY keyboard
-        cameraincline -= 150*dt;
+        cameraaxis -= std::max(int(80*dt),1);
+        cameracooldown = 2;
     }
     if ( spGetInput()->button[SP_BUTTON_X] )
     {
         // key S on a QWERTY
         //spGetInput()->button[SP_BUTTON_x] = 0; // can only allow input once if desired
         cameradistance -= 1000*dt;
-        camerarotation += 50*dt;
+        cameraincline += 50*dt;
     }
     else if ( spGetInput()->button[SP_BUTTON_Y] )
     {
         // key W on a QWERTY
         //spGetInput()->button[SP_BUTTON_Y] = 0;
         cameradistance += 1000*dt;
-        camerarotation -= 50*dt;
+        cameraincline -= 50*dt;
     }
 
     if ( spGetInput()->axis[1] == 1 )
@@ -597,7 +604,66 @@ int Play::update( Uint32 dt )
             clock = 0;
             reset();
         }
-        cameracenter = ( cameracenter + fdt * hero.get_position() ) / (1 + fdt );
+
+        if ( camerafollowhero )
+            cameracenter = ( cameracenter + camerafollowdelta * fdt * hero.get_position() ) / ( 1 + camerafollowdelta * fdt );
+        if ( cameraalignhero )
+        { 
+            if ( cameracooldown == 0.f )
+            {
+                if ( hero.on_ground() )
+                {   
+                    btVector3 cameraforward = hero.get_forward();
+                    if ( fabs( cameraforward.z() ) > 0.91f )
+                    {   // if we are looking up or down...
+                        if ( cameraforward.z() < 0 )
+                            cameraforward = hero.get_up();
+                        else
+                            cameraforward = -hero.get_up();
+                    }
+                    else if ( hero.topside_up() == -1 )
+                    {   // if we're on our head...
+                        cameraforward *= -1;
+                    }
+                    Sint32 theta = spFloatToFixed( atan2( -cameraforward.x(), -cameraforward.y() ) + M_PI ) ;
+//                    std::cerr << " theta / (2 Pi ) = " << ( ( theta )*1.0/(2*SP_PI) ) << std::endl;
+
+                    if ( cameraaxis > 2*SP_PI )
+                        cameraaxis -= 2*SP_PI;
+                    else if (cameraaxis < 0 )
+                        cameraaxis += 2*SP_PI;
+                    //std::cerr << " camera / (2 Pi ) = " << ( ( cameraaxis )*1.0/(2*SP_PI) ) << std::endl;
+
+                    if ( abs( cameraaxis - theta ) > SP_PI )
+                    {
+                        // check if the distance between the two is very large...
+                        // because we want to go the quickest way around...
+                        if ( abs( cameraaxis - ( theta + 2*SP_PI ) ) < abs( cameraaxis - (theta - 2*SP_PI ) ) )
+                        {
+                            // here, it's best to add 2pi to theta...
+                            cameraaxis = ( cameraaxis + fdt * (theta+2*SP_PI) ) / ( 1 + fdt );
+                        }
+                        else
+                        {
+                            // here it's better to subtract 2pi from theta
+                            cameraaxis = ( cameraaxis + cameraaligndelta * fdt * (theta-2*SP_PI) ) / ( 1 +cameraaligndelta * fdt );
+                        }
+                    }
+                    else
+                        cameraaxis = ( cameraaxis + cameraaligndelta * fdt * theta ) / ( 1 + cameraaligndelta * fdt );
+                }
+                else
+                { // currently don't spin camera around, if hero is in the air
+
+                }
+            }
+            else
+            { // camera was moved recently, give a cool down
+                cameracooldown -= fdt;
+                if ( cameracooldown < 0.f )
+                    cameracooldown = 0.f;
+            }
+        }
         
         if ( spGetInput()->axis[0] )
         {

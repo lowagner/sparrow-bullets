@@ -86,7 +86,7 @@ class Player
 { 
 protected:
     bool canjump, onground;
-    short int topsideup, facesideup;
+    int topsideup, facesideup;
 
     float maxwalkspeed2, walkacceleration;
     float maxrotspeed2, rotacceleration, flyingrotacceleration;
@@ -114,6 +114,10 @@ public:
     int turn( float dt, int dir );
     int quick_turn();
     void draw_debug();
+
+    bool on_ground();
+    int topside_up();
+    int facing_up();
 
     btVector3 get_position();
 

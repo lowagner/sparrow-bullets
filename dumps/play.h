@@ -17,14 +17,15 @@ Check the LICENSE file included for copyright information.
 
 class Play : public GameChunk
 {
-private:
+protected:
     SDL_Surface* checkertexture;
 
     Sint32 cameraincline;
-    Sint32 camerarotation;
+    Sint32 cameraaxis;
     Sint32 cameradistance;
     btVector3 cameracenter;
-    bool camerafollowhero;
+    bool camerafollowhero, cameraalignhero;
+    float cameracooldown, cameraaligndelta, camerafollowdelta;
 
     btVector3 outofbounds;
     btScalar clock;

@@ -572,8 +572,7 @@ Player::get_forward()
 btVector3
 Player::get_side()
 {
-    btVector3 side = object->body->getInvInertiaTensorWorld().inverse()*
-                       ( object->body->getWorldTransform().getBasis()* btVector3(0,1,0) );
+    btVector3 side = ( object->body->getWorldTransform().getBasis()* btVector3(0,1,0) );
     side.normalize();
     return side;
 }
@@ -833,6 +832,24 @@ Player::check_surroundings()
     object->physics->dworld->rayTest( rayfrom, rayto, ray ); 
 
     onground = ( ray.hasHit() );
+}
+
+bool
+Player::on_ground()
+{
+    return onground;
+}
+
+int
+Player::topside_up()
+{
+    return topsideup;
+}
+
+int
+Player::facing_up()
+{
+    return facesideup;
 }
 
 int
