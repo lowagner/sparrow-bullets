@@ -15,6 +15,7 @@ Play::Play( int level_ ) // init play class
     totalclock = 0;
     clock = 0;
 
+    camerafollowhero = true;
     cameracenter = btVector3();
     cameradistance = spFloatToFixed( -25.0f );
     cameraincline = SP_PI * 0.1; // for incline
@@ -428,9 +429,10 @@ void Play::draw( SDL_Surface* screen )
     //spTranslate( 0, 0, spFloatToFixed( -1.0f ) ); // go a bit up from the player
 
     // also get to center of camera
-    spTranslate( spFloatToFixed( -cameracenter.x() ), 
-                 spFloatToFixed( -cameracenter.y() ), 
-                 spFloatToFixed( -cameracenter.z() ) - SP_ONE  );
+    if ( camerafollowhero )
+        spTranslate( spFloatToFixed( -cameracenter.x() ), 
+                     spFloatToFixed( -cameracenter.y() ), 
+                     spFloatToFixed( -cameracenter.z() ) - SP_ONE  );
    
     // grab the camera matrix for later usage.
     Sint32 matrix[16]; //pointer to array of 16 Sint32's.
