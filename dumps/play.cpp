@@ -15,9 +15,10 @@ Play::Play( int level_ ) // init play class
     totalclock = 0;
     clock = 0;
 
-    distance = spFloatToFixed( -25.0f );
-    axis = SP_PI * 0.1;
-    rotation = spFloatToFixed( -1.5f ); // closer to zero - more from top down.
+    cameracenter = btVector3();
+    cameradistance = spFloatToFixed( -25.0f );
+    cameraincline = SP_PI * 0.1; // for incline
+    camerarotation = spFloatToFixed( -1.5f ); // closer to zero - more from top down.
 
     font=NULL;
     checkertexture=NULL;
@@ -349,8 +350,8 @@ void Play::draw( SDL_Surface* screen )
             spFontDrawMiddle( screen->w / 2, y, 0, buffer, font );
             y += font->maxheight + 4;
             if ( i == 0 )
-            {
-                y += 4;
+            {   // give a little extra space for the title of menu
+                y += 6;
             }
         } 
         
@@ -421,10 +422,15 @@ void Play::draw( SDL_Surface* screen )
 //        hero.draw_debug();
 
     // continue with camera matrix
-    spTranslate( 0, 0, distance );
-    spRotateX( rotation );
-    spRotateZ( axis );
-    spTranslate( 0, 0, spFloatToFixed( -1.0f ) ); // go a bit up from the player
+    spTranslate( 0, 0, cameradistance );
+    spRotateX( camerarotation );
+    spRotateZ( cameraincline );
+    //spTranslate( 0, 0, spFloatToFixed( -1.0f ) ); // go a bit up from the player
+
+    // also get to center of camera
+    spTranslate( spFloatToFixed( -cameracenter.x() ), 
+                 spFloatToFixed( -cameracenter.y() ), 
+                 spFloatToFixed( -cameracenter.z() ) - SP_ONE  );
    
     // grab the camera matrix for later usage.
     Sint32 matrix[16]; //pointer to array of 16 Sint32's.
@@ -525,26 +531,26 @@ int Play::update( Uint32 dt )
     if ( spGetInput()->button[SP_BUTTON_A] )
     {
         // key A on a standard QWERTY keyboard
-        axis += 150*dt;
+        cameraincline += 150*dt;
     }
     if ( spGetInput()->button[SP_BUTTON_B] )
     {
         // key D on a standard QWERTY keyboard
-        axis -= 150*dt;
+        cameraincline -= 150*dt;
     }
     if ( spGetInput()->button[SP_BUTTON_X] )
     {
         // key S on a QWERTY
         //spGetInput()->button[SP_BUTTON_x] = 0; // can only allow input once if desired
-        distance -= 1000*dt;
-        rotation += 50*dt;
+        cameradistance -= 1000*dt;
+        camerarotation += 50*dt;
     }
     else if ( spGetInput()->button[SP_BUTTON_Y] )
     {
         // key W on a QWERTY
         //spGetInput()->button[SP_BUTTON_Y] = 0;
-        distance += 1000*dt;
-        rotation -= 50*dt;
+        cameradistance += 1000*dt;
+        camerarotation -= 50*dt;
     }
 
     if ( spGetInput()->axis[1] == 1 )
@@ -578,7 +584,7 @@ int Play::update( Uint32 dt )
 //        sleep(3);
 //        std::cerr << " sparrow dt = " << fdt << ", c++ sec = " << time << ";  ";
 //        previous_t = current_t;
-
+        
 
         physics.update( fdt );
         // update hero stuff
@@ -589,6 +595,7 @@ int Play::update( Uint32 dt )
             clock = 0;
             reset();
         }
+        cameracenter = ( cameracenter + fdt * hero.get_position() ) / (1 + fdt );
         
         if ( spGetInput()->axis[0] )
         {

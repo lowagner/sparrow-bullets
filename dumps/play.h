@@ -25,9 +25,11 @@ class Play : public GameChunk
 private:
     SDL_Surface* checkertexture;
 
-    Sint32 axis;
-    Sint32 rotation;
-    Sint32 distance;
+    Sint32 cameraincline;
+    Sint32 camerarotation;
+    Sint32 cameradistance;
+    btVector3 cameracenter;
+
     btVector3 outofbounds;
     btScalar clock;
     btScalar totalclock;

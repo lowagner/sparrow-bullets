@@ -115,6 +115,8 @@ public:
     int quick_turn();
     void draw_debug();
 
+    btVector3 get_position();
+
     btVector3 get_forward();
     btVector3 get_side();
     btVector3 get_up();

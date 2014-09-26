@@ -556,6 +556,12 @@ Player::update( float dt )
 }
 
 btVector3
+Player::get_position()
+{
+    return object->lastposition;
+}
+
+btVector3
 Player::get_forward()
 {
     btVector3 forward = object->body->getWorldTransform().getBasis() * btVector3(1,0,0);
