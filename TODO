@@ -1,12 +1,3 @@
-get some menu items going.
-    start menu:
-        play (level 1, 2, 3, .. by left/right arrows)
-        quit
-    play menu:
-        quit to main
-        skip level (lose 10 lives)
-        exit game
-
 could make the start menu a little world, where you pilot around to choose a level set or quit (fall off).
 
 get some statistics going, files saving:
@@ -14,6 +5,13 @@ get some statistics going, files saving:
               fewest lives lost -- time, lives lost
     whole level set, same idea
     
+
+get "addboxes" from blocks id also in there.  tossing off one box can make one box appear, etc.
+you can have both going at the same time.  
+
+make drawing boxes only give fully opaque if physics is on for them.
+
+
 
 get two player action all up-ons
 

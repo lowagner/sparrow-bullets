@@ -19,13 +19,17 @@ Play::Play( int level_ ) // init play class
     axis = SP_PI * 0.1;
     rotation = spFloatToFixed( -1.5f ); // closer to zero - more from top down.
 
-    //input.push_back("");
-    iamdone = 0;
-
     font=NULL;
     checkertexture=NULL;
 
     level = level_;
+
+    // also, menu is the index of the currently selected menu item. 
+    menuitems.push_back( "Game Menu" ); // not allowed to select this guy, menu > 0
+    menuitems.push_back( "Return to play" );
+    menuitems.push_back( "Next level (deduct 10 lives)" );
+    //menuitems.push_back( "Exit to main menu" );
+    menuitems.push_back( "Exit" );
 
     reset();
 }
@@ -63,6 +67,7 @@ Play::reset()
     // then rebirth it all...
     winlevel = 0.f; // you haven't won yet!
     pause = 0; // default to no pause
+    menu = 0;
     clock = 0;
     checkertexture = spLoadSurface("../data/check.png");
 
@@ -329,19 +334,44 @@ void Play::draw( SDL_Surface* screen )
     spFontDraw( 2, 2, 0, "[L] Reset", font ); 
     spFontDrawRight( screen->w - 2 , 2, 0, "[R] Jump", font );
 
-    spFontDrawRight( screen->w - 2 , font-> maxheight+2, 0, "[S] Exit", font );
-    switch (pause)
+    if (menu)
     {
-        case 0:  spFontDraw( 2, font-> maxheight+4, 0, "[E] Pause", font ); break;
-        case 1:  spFontDraw( 2, font-> maxheight+4, 0, "[E] Unpause", font ); break;
+        spFontDrawRight( screen->w - 2 , font-> maxheight+2, 0, "[S] Select", font );
+        spFontDraw( 2, font-> maxheight+4, 0, "[E] Select", font ); 
+        int y = 2*screen->h/5 - ((menuitems.size()+1)/2)*(font->maxheight);
+        for ( int i=0; i<menuitems.size(); i++)
+        {
+            char buffer[64]; 
+            if ( i == menu )
+                sprintf( buffer, "+%s+", menuitems[i] );
+            else
+                sprintf( buffer, "%s", menuitems[i] );
+            spFontDrawMiddle( screen->w / 2, y, 0, buffer, font );
+            y += font->maxheight + 4;
+            if ( i == 0 )
+            {
+                y += 4;
+            }
+        } 
+        
+        spFontDraw( 2, screen->h - 1*font->maxheight,0, "D-pad Navigate Menu", font); 
+    }
+    else
+    {
+        spFontDrawRight( screen->w - 2 , font-> maxheight+2, 0, "[S] Menu", font );
+        switch (pause)
+        {
+            case 0:  spFontDraw( 2, font-> maxheight+4, 0, "[E] Pause", font ); break;
+            case 1:  spFontDraw( 2, font-> maxheight+4, 0, "[E] Unpause", font ); break;
+        }
+
+        spFontDraw( 2, screen->h - 1*font->maxheight,0, "D-pad Move Player", font); 
     }
     //spFontDrawMiddle( screen->w /2, screen->h - 2*font-> maxheight, 0, input, font );
     spFontDrawRight( screen->w - 2, screen->h - 2*font-> maxheight, 0, "[Y] Zoom in", font ); 
     spFontDrawRight( screen->w - 2, screen->h - 1*font-> maxheight, 0, "[X] Zoom out", font );
 
 
-    spFontDraw( 2, screen->h - 1*font->maxheight,0, "D-pad Move Player", font); 
-    //spFontDraw( 2, screen->h - 2*font->maxheight,0, "[B] rotate right", font);
 
     char buffer[64]; 
     sprintf( buffer, "cube dump lvl. %i", level );
@@ -425,20 +455,67 @@ void Play::draw( SDL_Surface* screen )
 
 int Play::update( Uint32 dt )
 {
-    // inputy type things
-    if ( spGetInput()->axis[0]==-1 )
+    if (menu)
     {
-//        axis -= 150*dt;
-        //std::cout << " axis = " << axis << std::endl;
-    }
-    else if ( spGetInput()->axis[0]==1 )
-    {
-//        axis += 150*dt;
-        //std::cout << " axis = " << axis << std::endl;
+        // if we are showing the menu entries
+        // make sure to have it paused...
+        pause = 1;
+        // inputy type things
+        if ( spGetInput()->axis[1]==1 )
+        {
+            menu += 1;
+            if ( menu >= menuitems.size() )
+                menu = 1;
+            spGetInput()->axis[1] = 0;
+        }
+        else if ( spGetInput()->axis[1]==-1 )
+        {
+            menu -= 1;
+            if ( menu <= 0 )
+                menu = menuitems.size() - 1;
+            spGetInput()->axis[1] = 0;
+        }
+        else if ( spGetInput()->button[SP_BUTTON_START] || spGetInput()->button[SP_BUTTON_SELECT] )
+        {
+            // if we hit start or select
+            spGetInput()->button[SP_BUTTON_START] = 0;
+            spGetInput()->button[SP_BUTTON_SELECT] = 0;
+            // make sure the buttons are off.
+
+            switch (menu) 
+            {
+                case 1:  // Return to play
+                    menu=0;
+                    pause=0;
+                    return GAMESTATEplay;
+                    break;
+                case 2: // Next level
+                    menu=0; // unmenu
+                    pause=0; // unpause
+                    lives -= 10; // penalize the player
+                    clock=999; // penalize the player
+                    level += 1; // increase level
+                    return reset();
+                    break;
+                case 3: // Exit
+                    return GAMESTATEquit;
+                    break; 
+            }
+        }
+
+        // DON'T allow any other things to go on when you are navigating
+        // the menu.  so prematurely disrupt update function.
+        return GAMESTATEplay;
     }
 
+    // otherwise, if we hit start we want to get to menu
     if ( spGetInput()->button[SP_BUTTON_START] )
-        iamdone = 1;
+    {
+        menu = 1;
+        // unset the start button so it won't grab the first menu item.
+        spGetInput()->button[SP_BUTTON_START] = 0;
+        return GAMESTATEplay;
+    }
 
     if ( spGetInput()->button[SP_BUTTON_SELECT] )
     {
@@ -609,10 +686,7 @@ int Play::update( Uint32 dt )
     }
 
     // return a value
-    if (iamdone)
-        return GAMESTATEquit; // return the quit gamestate to quit
-    else
-        return GAMESTATEplay; // always return your own value if you want to continue updating
+    return GAMESTATEplay; // always return your own value if you want to continue updating
 }
 
 void Play::resize( Uint16 w, Uint16 h )

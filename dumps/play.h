@@ -44,13 +44,13 @@ private:
     std::vector<Ramp> ramps; // static ramps
 
     int pause;
+    int menu; // whether to show the menu, and which item it is displaying
+    std::vector<char*> menuitems;
+
     int no_movement;
     //std::string input;
     char input[32];
 
-    char* settings_play(char* caption,int button);
-    char* caption_play(char* caption);
-    
     int iamdone;
     int level;
     Physics physics;
