@@ -44,6 +44,8 @@ protected:
     int pause;
     int menu; // whether to show the menu, and which item it is displaying
     std::vector<char*> menuitems;
+    std::vector< std::vector<float> > menuitemvalues;
+    std::vector<int> menuitemvalueindices;
 
     int no_movement;
     //std::string input;
@@ -66,6 +68,8 @@ public:
     int update( Uint32 dt );
     void resize( Uint16 w, Uint16 h );
     void handle( SDL_Event* event );
+    int set_value( const char* name, float value);
+    void write_settings();
     void deinit();
     ~Play();
 };

@@ -7,6 +7,8 @@ Check the LICENSE file included for copyright information.
 #include <string>
 //using std::string;
 #include <iostream>
+#include <fstream>
+#include "util.h"
 
 Play::Play( int level_ ) // init play class
 {
@@ -14,9 +16,117 @@ Play::Play( int level_ ) // init play class
     lives = 12;
     totalclock = 0;
     clock = 0;
+  
+    // GAMEPLAY menu
+    // menu is the index of the currently selected menu item.  0 if menu is not shown,
+    // and conveniently 0 is not a selectable menu item, it is the title of the menu.
+    menuitems.push_back( "Game Menu" ); // not allowed to select this guy, menu > 0
+    menuitems.push_back( "Return to play" );
+    menuitems.push_back( "Next level (deduct 10 lives)" );
+    menuitems.push_back( "camerafollowhero" ); 
+    menuitems.push_back( "cameraalignhero" ); 
+    //menuitems.push_back( "Exit to main menu" );
+    menuitems.push_back( "Exit" );
+    
+    std::vector<float> emptylist;
+    menuitemvalues.push_back( emptylist );
+        menuitemvalueindices.push_back( 0 );
+    menuitemvalues.push_back( emptylist );
+        menuitemvalueindices.push_back( 0 );
+    menuitemvalues.push_back( emptylist );
+        menuitemvalueindices.push_back( 0 );
+    {
+        std::vector<float> camerafollowherovalues;
+        camerafollowherovalues.push_back(0.f);
+        camerafollowherovalues.push_back(0.4f);
+        camerafollowherovalues.push_back(0.8f);
+        camerafollowherovalues.push_back(1.6f);
+        camerafollowherovalues.push_back(3.1f);
+        camerafollowherovalues.push_back(4.1f);
+        camerafollowherovalues.push_back(5.9f);
+        menuitemvalues.push_back( camerafollowherovalues );
+            menuitemvalueindices.push_back( 1 );
+    }
+    {
+        std::vector<float> cameraalignherovalues;
+        cameraalignherovalues.push_back(0.f);
+        cameraalignherovalues.push_back(0.4f);
+        cameraalignherovalues.push_back(0.8f);
+        cameraalignherovalues.push_back(1.6f);
+        cameraalignherovalues.push_back(3.1f);
+        cameraalignherovalues.push_back(4.1f);
+        cameraalignherovalues.push_back(5.9f);
+        menuitemvalues.push_back( cameraalignherovalues );
+            menuitemvalueindices.push_back( 1 );
+    }
+    //menuitemvalues.push_back( emptylist );
+    menuitemvalues.push_back( emptylist );
+        menuitemvalueindices.push_back( 0 );
 
+    // default camera behavior
     camerafollowhero = 0.4;
     cameraalignhero = 0.4;
+    if ( file_exists( "settings.txt" ) )
+    {
+        std::ifstream fin("settings.txt");
+
+        std::string name;
+        float value;
+
+        while (fin >> name >> value)
+        {
+            /* do something with name and value */
+            std::cout << "Got setting "<< name << " = " << value << "\n";
+            int index = -1; // the index of the menu item, if it is allowed to be changed
+            if ( name == "camerafollowhero" )
+            {
+                camerafollowhero = value;
+                index = 3;
+            }
+            else if (name == "cameraalignhero" )
+            {
+                cameraalignhero = value;
+                index = 4;
+            }
+
+            if ( index > 0 )
+            {
+                // find value in the menu which is closest to this guy.
+                int itemvalueindex = 0;
+                int closestitemvalueindex = 0;
+                float closestvaluediff = 1234;
+                while ( itemvalueindex < menuitemvalues[index].size() )
+                {
+                    float valuediff = fabs( menuitemvalues[index][itemvalueindex] - value );
+                    if ( valuediff < closestvaluediff )
+                    {
+                        closestvaluediff = valuediff;
+                        closestitemvalueindex = itemvalueindex;
+                    }
+                    itemvalueindex += 1;
+                }
+                if ( menuitemvalues[index][closestitemvalueindex] > value )
+                {
+                    menuitemvalues[index].insert( menuitemvalues[index].begin()+closestitemvalueindex, value );
+                    menuitemvalueindices[index] = closestitemvalueindex;
+                }
+                else if ( menuitemvalues[index][closestitemvalueindex] < value )
+                {
+                    menuitemvalues[index].insert( menuitemvalues[index].begin()+closestitemvalueindex+1, value );
+                    menuitemvalueindices[index] = closestitemvalueindex+1;
+                }
+                else
+                    menuitemvalueindices[index] = closestitemvalueindex;
+            }
+        }
+
+
+    }
+    else
+    {
+        std::cout << " No settings file, using defaults" << std::endl;
+    }
+
     cameracenter = btVector3();
     cameradistance = spFloatToFixed( -25.0f );
     cameraaxis = SP_PI * 0.1; // for rotation around the z axis
@@ -27,14 +137,30 @@ Play::Play( int level_ ) // init play class
 
     level = level_;
 
-    // also, menu is the index of the currently selected menu item. 
-    menuitems.push_back( "Game Menu" ); // not allowed to select this guy, menu > 0
-    menuitems.push_back( "Return to play" );
-    menuitems.push_back( "Next level (deduct 10 lives)" );
-    //menuitems.push_back( "Exit to main menu" );
-    menuitems.push_back( "Exit" );
-
     reset();
+}
+
+int
+Play::set_value( const char* name, float value )
+{
+    if ( name == "camerafollowhero" )
+        camerafollowhero = value;
+    else if (name == "cameraalignhero" )
+        cameraalignhero = value;
+    else
+        return 1;
+
+    return 0;
+}
+
+void
+Play::write_settings()
+{
+    std::ofstream file;
+    file.open( "settings.txt" );
+    file << "camerafollowhero " << camerafollowhero << "\n";
+    file << "cameraalignhero " << cameraalignhero << "\n";
+    file.close();
 }
 
 void
@@ -349,7 +475,14 @@ void Play::draw( SDL_Surface* screen )
         for ( int i=1; i<menuitems.size(); i++)
         {
             if ( i == menu )
-                sprintf( buffer, "+ %s +", menuitems[i] );
+            {
+                if ( menuitemvalues[i].size() > 0 )
+                {
+                    sprintf( buffer, "+ %s < %.1f > +", menuitems[i], menuitemvalues[i][menuitemvalueindices[i]] );
+                }
+                else    
+                    sprintf( buffer, "+ %s +", menuitems[i] );
+            }
             else
                 sprintf( buffer, "%s", menuitems[i] );
             spFontDrawMiddle( screen->w / 2, y, 0, buffer, font );
@@ -486,6 +619,28 @@ int Play::update( Uint32 dt )
                 menu = menuitems.size() - 1;
             spGetInput()->axis[1] = 0;
         }
+        else if ( spGetInput()->axis[0]==1 )
+        {
+            if ( menuitemvalues[menu].size() > 0 )
+            {
+                if ( (menuitemvalueindices[menu] += 1) > menuitemvalues[menu].size() )
+                    menuitemvalueindices[menu] = 0;
+                set_value( menuitems[menu], menuitemvalues[menu][menuitemvalueindices[menu]] );
+                write_settings();
+            }
+            spGetInput()->axis[0] = 0;
+        }
+        else if ( spGetInput()->axis[0]==-1 )
+        {
+            if ( menuitemvalues[menu].size() > 0 )
+            {
+                if ( (menuitemvalueindices[menu] -= 1) < 0  )
+                    menuitemvalueindices[menu] = menuitemvalues[menu].size() - 1;
+                set_value( menuitems[menu], menuitemvalues[menu][menuitemvalueindices[menu]] );
+                write_settings();
+            }
+            spGetInput()->axis[0] = 0;
+        }
         else if ( spGetInput()->button[SP_BUTTON_START] || spGetInput()->button[SP_BUTTON_SELECT] )
         {
             // if we hit start or select
@@ -508,7 +663,13 @@ int Play::update( Uint32 dt )
                     level += 1; // increase level
                     return reset();
                     break;
-                case 3: // Exit
+                case 3: // camerafollowhero
+                case 4: // cameraalignhero
+                    menu=0;
+                    pause=0;
+                    return GAMESTATEplay;
+                    break;
+                case 5: // Exit
                     return GAMESTATEquit;
                     break; 
             }
