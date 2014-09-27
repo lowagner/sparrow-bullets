@@ -1,19 +1,55 @@
-could make the start menu a little world, where you pilot around to choose a level set or quit (fall off).
+ROADMAP
+
+
+SAVING AND LEVELS
+
+new levels / level sets defined by different play children.
+    make everybody inherit from the play class.
+    we can let the parent play class be the main menu "level".
+
+could make the start menu a little world, 
+    where you pilot around to choose a level set or quit (fall off).
+    you push off the block corresponding to the level set you want to play.
+
+mkdir lvl
+    lvl/low.cpp is the current set of levels
 
 get some statistics going, files saving:
     level j:  best time         -- time, lives lost
               fewest lives lost -- time, lives lost
     whole level set, same idea
     
+    in the main menu, after selecting level set...
+    make it possible to choose the different levels once you've beaten them,
+    or play a full round for glory.
 
-get "addboxes" from blocks id also in there.  tossing off one box can make one box appear, etc.
-you can have both going at the same time.  
+    C4A compo server action.
+    
+fancy new gimmicks for new levels
+    get "addboxes" from blocks id also in there.  tossing off one box can make one box appear, etc.
+    you can have both going at the same time.  
 
-make drawing boxes only give fully opaque if physics is on for them.
+    make drawing boxes only give fully opaque if physics is on for them.
 
 
+AESTHETICS, SOUNDS, and MUSIC
 
-get two player action all up-ons
+need to figure out how to get contact call backs talking to player object.
+    sum over all contacts processed, to give a final "intensity" to play a sound file at.
+
+music...?
+    different themes for different levels, level sets.
+    idea:
+        ChucK music:
+            sounds added for when you are going certain speeds - normal speed, pushing speed, etc.
+            extra intensity for when you're falling, on your face, etc., hit something, pushing forward, etc.
+
+        otherwise:
+            data/low/music*.ogg -- music files for the "low" level set.
+
+
+LONG TERM STUFF
+    get two player action all up-ons
 
 
 
