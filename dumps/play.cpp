@@ -23,8 +23,8 @@ Play::Play( int level_ ) // init play class
     menuitems.push_back( "Game Menu" ); // not allowed to select this guy, menu > 0
     menuitems.push_back( "Return to play" );
     menuitems.push_back( "Next level (deduct 10 lives)" );
-    menuitems.push_back( "camerafollowhero" ); 
-    menuitems.push_back( "cameraalignhero" ); 
+    menuitems.push_back( "Camera follow speed" ); 
+    menuitems.push_back( "Camera align speed" ); 
     //menuitems.push_back( "Exit to main menu" );
     menuitems.push_back( "Exit" );
     
@@ -36,27 +36,27 @@ Play::Play( int level_ ) // init play class
     menuitemvalues.push_back( emptylist );
         menuitemvalueindices.push_back( 0 );
     {
-        std::vector<float> camerafollowherovalues;
-        camerafollowherovalues.push_back(0.f);
-        camerafollowherovalues.push_back(0.4f);
-        camerafollowherovalues.push_back(0.8f);
-        camerafollowherovalues.push_back(1.6f);
-        camerafollowherovalues.push_back(3.1f);
-        camerafollowherovalues.push_back(4.1f);
-        camerafollowherovalues.push_back(5.9f);
-        menuitemvalues.push_back( camerafollowherovalues );
+        std::vector<float> camerafollowspeedvalues;
+        camerafollowspeedvalues.push_back(0.f);
+        camerafollowspeedvalues.push_back(0.4f);
+        camerafollowspeedvalues.push_back(0.8f);
+        camerafollowspeedvalues.push_back(1.6f);
+        camerafollowspeedvalues.push_back(3.1f);
+        camerafollowspeedvalues.push_back(4.1f);
+        camerafollowspeedvalues.push_back(5.9f);
+        menuitemvalues.push_back( camerafollowspeedvalues );
             menuitemvalueindices.push_back( 1 );
     }
     {
-        std::vector<float> cameraalignherovalues;
-        cameraalignherovalues.push_back(0.f);
-        cameraalignherovalues.push_back(0.4f);
-        cameraalignherovalues.push_back(0.8f);
-        cameraalignherovalues.push_back(1.6f);
-        cameraalignherovalues.push_back(3.1f);
-        cameraalignherovalues.push_back(4.1f);
-        cameraalignherovalues.push_back(5.9f);
-        menuitemvalues.push_back( cameraalignherovalues );
+        std::vector<float> cameraalignspeedvalues;
+        cameraalignspeedvalues.push_back(0.f);
+        cameraalignspeedvalues.push_back(0.4f);
+        cameraalignspeedvalues.push_back(0.8f);
+        cameraalignspeedvalues.push_back(1.6f);
+        cameraalignspeedvalues.push_back(3.1f);
+        cameraalignspeedvalues.push_back(4.1f);
+        cameraalignspeedvalues.push_back(5.9f);
+        menuitemvalues.push_back( cameraalignspeedvalues );
             menuitemvalueindices.push_back( 1 );
     }
     //menuitemvalues.push_back( emptylist );
@@ -64,8 +64,8 @@ Play::Play( int level_ ) // init play class
         menuitemvalueindices.push_back( 0 );
 
     // default camera behavior
-    camerafollowhero = 0.4;
-    cameraalignhero = 0.4;
+    camerafollowspeed = 0.4;
+    cameraalignspeed = 0.4;
     if ( file_exists( "settings.txt" ) )
     {
         std::ifstream fin("settings.txt");
@@ -78,14 +78,14 @@ Play::Play( int level_ ) // init play class
             /* do something with name and value */
             std::cout << "Got setting "<< name << " = " << value << "\n";
             int index = -1; // the index of the menu item, if it is allowed to be changed
-            if ( name == "camerafollowhero" )
+            if ( name == "camerafollowspeed" )
             {
-                camerafollowhero = value;
-                index = 3;
+                camerafollowspeed = value;
+                index = 3; // index of the menu item of camera follow hero...
             }
-            else if (name == "cameraalignhero" )
+            else if (name == "cameraalignspeed" )
             {
-                cameraalignhero = value;
+                cameraalignspeed = value; // index of the menu item of camera align with hero...
                 index = 4;
             }
 
@@ -143,10 +143,10 @@ Play::Play( int level_ ) // init play class
 int
 Play::set_value( const char* name, float value )
 {
-    if ( name == "camerafollowhero" )
-        camerafollowhero = value;
-    else if (name == "cameraalignhero" )
-        cameraalignhero = value;
+    if ( name == "camerafollowspeed" || name == "Camera follow speed" )
+        camerafollowspeed = value;
+    else if (name == "cameraalignspeed" || name == "Camera align speed" )
+        cameraalignspeed = value;
     else
         return 1;
 
@@ -158,8 +158,8 @@ Play::write_settings()
 {
     std::ofstream file;
     file.open( "settings.txt" );
-    file << "camerafollowhero " << camerafollowhero << "\n";
-    file << "cameraalignhero " << cameraalignhero << "\n";
+    file << "camerafollowspeed " << camerafollowspeed << "\n";
+    file << "cameraalignspeed " << cameraalignspeed << "\n";
     file.close();
 }
 
@@ -565,7 +565,7 @@ void Play::draw( SDL_Surface* screen )
     //spTranslate( 0, 0, spFloatToFixed( -1.0f ) ); // go a bit up from the player
 
     // also get to center of camera
-    if ( camerafollowhero > 0.f )
+    if ( camerafollowspeed > 0.f )
         spTranslate( spFloatToFixed( -cameracenter.x() ), 
                      spFloatToFixed( -cameracenter.y() ), 
                      spFloatToFixed( -cameracenter.z() ) - SP_ONE  );
@@ -663,8 +663,8 @@ int Play::update( Uint32 dt )
                     level += 1; // increase level
                     return reset();
                     break;
-                case 3: // camerafollowhero
-                case 4: // cameraalignhero
+                case 3: // camerafollowspeed
+                case 4: // cameraalignspeed
                     menu=0;
                     pause=0;
                     return GAMESTATEplay;
@@ -764,9 +764,9 @@ int Play::update( Uint32 dt )
             reset();
         }
 
-        if ( camerafollowhero > 0.f )
-            cameracenter = ( cameracenter + camerafollowhero * fdt * hero.get_position() ) / ( 1 + camerafollowhero * fdt );
-        if ( cameraalignhero > 0.f )
+        if ( camerafollowspeed > 0.f )
+            cameracenter = ( cameracenter + camerafollowspeed * fdt * hero.get_position() ) / ( 1 + camerafollowspeed * fdt );
+        if ( cameraalignspeed > 0.f )
         { 
             if ( cameramovecooldown == 0.f )
             {
@@ -805,11 +805,11 @@ int Play::update( Uint32 dt )
                         else
                         {
                             // here it's better to subtract 2pi from theta
-                            cameraaxis = ( cameraaxis + cameraalignhero * fdt * (theta-2*SP_PI) ) / ( 1 +cameraalignhero * fdt );
+                            cameraaxis = ( cameraaxis + cameraalignspeed * fdt * (theta-2*SP_PI) ) / ( 1 +cameraalignspeed * fdt );
                         }
                     }
                     else
-                        cameraaxis = ( cameraaxis + cameraalignhero * fdt * theta ) / ( 1 + cameraalignhero * fdt );
+                        cameraaxis = ( cameraaxis + cameraalignspeed * fdt * theta ) / ( 1 + cameraalignspeed * fdt );
                 }
                 else
                 { // currently don't spin camera around, if hero is in the air
