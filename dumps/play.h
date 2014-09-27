@@ -24,8 +24,7 @@ protected:
     Sint32 cameraaxis;
     Sint32 cameradistance;
     btVector3 cameracenter;
-    bool camerafollowhero, cameraalignhero;
-    float cameracooldown, cameraaligndelta, camerafollowdelta;
+    float cameramovecooldown, cameraalignhero, camerafollowhero;
 
     btVector3 outofbounds;
     btScalar clock;

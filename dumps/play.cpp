@@ -15,10 +15,8 @@ Play::Play( int level_ ) // init play class
     totalclock = 0;
     clock = 0;
 
-    camerafollowhero = true;
-    camerafollowdelta = 0.4;
-    cameraalignhero = true;
-    cameraaligndelta = 0.4;
+    camerafollowhero = 0.4;
+    cameraalignhero = 0.4;
     cameracenter = btVector3();
     cameradistance = spFloatToFixed( -25.0f );
     cameraaxis = SP_PI * 0.1; // for rotation around the z axis
@@ -434,7 +432,7 @@ void Play::draw( SDL_Surface* screen )
     //spTranslate( 0, 0, spFloatToFixed( -1.0f ) ); // go a bit up from the player
 
     // also get to center of camera
-    if ( camerafollowhero )
+    if ( camerafollowhero > 0.f )
         spTranslate( spFloatToFixed( -cameracenter.x() ), 
                      spFloatToFixed( -cameracenter.y() ), 
                      spFloatToFixed( -cameracenter.z() ) - SP_ONE  );
@@ -539,13 +537,13 @@ int Play::update( Uint32 dt )
     {
         // key A on a standard QWERTY keyboard
         cameraaxis += std::max(int(80*dt),1);
-        cameracooldown = 2;
+        cameramovecooldown = 2;
     }
     if ( spGetInput()->button[SP_BUTTON_B] )
     {
         // key D on a standard QWERTY keyboard
         cameraaxis -= std::max(int(80*dt),1);
-        cameracooldown = 2;
+        cameramovecooldown = 2;
     }
     if ( spGetInput()->button[SP_BUTTON_X] )
     {
@@ -605,11 +603,11 @@ int Play::update( Uint32 dt )
             reset();
         }
 
-        if ( camerafollowhero )
-            cameracenter = ( cameracenter + camerafollowdelta * fdt * hero.get_position() ) / ( 1 + camerafollowdelta * fdt );
-        if ( cameraalignhero )
+        if ( camerafollowhero > 0.f )
+            cameracenter = ( cameracenter + camerafollowhero * fdt * hero.get_position() ) / ( 1 + camerafollowhero * fdt );
+        if ( cameraalignhero > 0.f )
         { 
-            if ( cameracooldown == 0.f )
+            if ( cameramovecooldown == 0.f )
             {
                 if ( hero.on_ground() )
                 {   
@@ -646,11 +644,11 @@ int Play::update( Uint32 dt )
                         else
                         {
                             // here it's better to subtract 2pi from theta
-                            cameraaxis = ( cameraaxis + cameraaligndelta * fdt * (theta-2*SP_PI) ) / ( 1 +cameraaligndelta * fdt );
+                            cameraaxis = ( cameraaxis + cameraalignhero * fdt * (theta-2*SP_PI) ) / ( 1 +cameraalignhero * fdt );
                         }
                     }
                     else
-                        cameraaxis = ( cameraaxis + cameraaligndelta * fdt * theta ) / ( 1 + cameraaligndelta * fdt );
+                        cameraaxis = ( cameraaxis + cameraalignhero * fdt * theta ) / ( 1 + cameraalignhero * fdt );
                 }
                 else
                 { // currently don't spin camera around, if hero is in the air
@@ -659,9 +657,9 @@ int Play::update( Uint32 dt )
             }
             else
             { // camera was moved recently, give a cool down
-                cameracooldown -= fdt;
-                if ( cameracooldown < 0.f )
-                    cameracooldown = 0.f;
+                cameramovecooldown -= fdt;
+                if ( cameramovecooldown < 0.f )
+                    cameramovecooldown = 0.f;
             }
         }
         
