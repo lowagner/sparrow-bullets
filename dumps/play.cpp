@@ -66,9 +66,9 @@ Play::Play( int level_ ) // init play class
     // default camera behavior
     camerafollowspeed = 0.4;
     cameraalignspeed = 0.4;
-    if ( file_exists( "settings.txt" ) )
+    if ( file_exists( USERDATA("settings.txt") ) )
     {
-        std::ifstream fin("settings.txt");
+        std::ifstream fin( USERDATA("settings.txt") );
 
         std::string name;
         float value;
@@ -157,7 +157,7 @@ void
 Play::write_settings()
 {
     std::ofstream file;
-    file.open( "settings.txt" );
+    file.open( USERDATA("settings.txt") );
     file << "camerafollowspeed " << camerafollowspeed << "\n";
     file << "cameraalignspeed " << cameraalignspeed << "\n";
     file.close();
