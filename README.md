@@ -42,7 +42,7 @@ Keyboard controls:
 - WASD control the camera
 - E jumps
 - Q resets play
-- [Enter] quits the game
+- [Enter] opens gameplay menu 
 - [Backspace] pauses/unpauses
 - Arrow keys move the checkered dumptruck, RELATIVE motion!
 
