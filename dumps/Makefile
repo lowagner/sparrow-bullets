@@ -2,6 +2,13 @@ PROGRAM=dump
 include ../options.mk
 BULLET_DYNAMIC_LIB= -rdynamic $(BULLET_LIB_DIR)/libBulletDynamics.so $(BULLET_LIB_DIR)/libBulletCollision.so $(BULLET_LIB_DIR)/libLinearMath.so -Wl,-rpath,$(BULLET_SRC_DIR)/BulletDynamics:$(BULLET_SRC_DIR)/BulletCollision:$(BULLET_SRC_DIR)/LinearMath
 
+# the levels we need to compile
+LEVELS=lvllow
+
+# converting levels to .o
+LEVELS_CPP = $(patsubst %,%.cpp, $(LEVELS))
+LEVELS_O = $(patsubst %,%.o, $(LEVELS))
+
 #==stuff linked to
 DYNAMIC = -lSDL_ttf -lSDL_mixer -lSDL_image -lSDL -lm
 #==global Flags. Even on the gp2x with 16 kb Cache, -O3 is much better then -Os
@@ -33,24 +40,27 @@ all: $(PROGRAM)
 targets:
 	@echo "The targets are the same like for sparrow3d. :P"
 
-$(PROGRAM): copySparrow main.cpp play.o physics.o main.o objects.o shapes.o makeBuildDir  
-	$(CPP) $(CFLAGS) main.o play.o physics.o objects.o shapes.o $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(LIB) $(SDL_LIB) $(STATIC) $(DYNAMIC) -o $(BUILD)/$(PROGRAM) $(BULLET_DYNAMIC_LIB)
+$(PROGRAM): copySparrow main.cpp play.o $(LEVELS_O) physics.o main.o objects.o shapes.o makeBuildDir  
+	$(CPP) $(CFLAGS) main.o play.o $(LEVELS_O) physics.o objects.o shapes.o $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(LIB) $(SDL_LIB) $(STATIC) $(DYNAMIC) -o $(BUILD)/$(PROGRAM) $(BULLET_DYNAMIC_LIB)
 	rm main.o
 
-main.o: play.h
-	$(CPP) $(CFLAGS) -c main.cpp $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE)
+main.o: main.cpp play.h
+	$(CPP) $(CFLAGS) -c $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE) -o $@ $<
 
-play.o: play.cpp play.h physics.h meta.h objects.h shapes.h
-	$(CPP) $(CFLAGS) -c play.cpp $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE)
+play.o: play.cpp play.h physics.h meta.h objects.h shapes.h util.h
+	$(CPP) $(CFLAGS) -c $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE) -o $@ $<
+
+lvl%.o: lvl%.cpp play.h
+	$(CPP) $(CFLAGS) -c $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE) -o $@ $< 
 
 physics.o: physics.cpp physics.h 
-	$(CPP) $(CFLAGS) -c physics.cpp $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE)
+	$(CPP) $(CFLAGS) -c $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE) -o $@ $<
 
 objects.o: objects.cpp objects.h physics.h 
-	$(CPP) $(CFLAGS) -c objects.cpp $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE)
+	$(CPP) $(CFLAGS) -c $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE) -o $@ $<
 
-shapes.o: physics.h objects.h shapes.h
-	$(CPP) $(CFLAGS) -c shapes.cpp $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE)
+shapes.o: shapes.cpp physics.h objects.h shapes.h
+	$(CPP) $(CFLAGS) -c $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE) -o $@ $<
 
 
 makeBuildDir:
@@ -71,8 +81,9 @@ debug: copySparrow makeBuildDir
 	rm -f *.o
 	$(CPP) $(CDEBUGFLAGS) -c main.cpp $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE)
 	$(CPP) $(CDEBUGFLAGS) -c play.cpp $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE)
+	for lvl in $(LEVELS); do $(CPP) $(CDEBUGFLAGS) -c $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE) -o ${lvl}.o $@ $<; done
 	$(CPP) $(CDEBUGFLAGS) -c physics.cpp $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE)
 	$(CPP) $(CDEBUGFLAGS) -c objects.cpp $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE)
 	$(CPP) $(CDEBUGFLAGS) -c shapes.cpp $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE)
-	$(CPP) $(CDEBUGFLAGS) main.o play.o physics.o objects.o shapes.o $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(LIB) $(SDL_LIB) $(STATIC) $(DYNAMIC) -o $(BUILD)/$(PROGRAM)-g $(BULLET_DYNAMIC_LIB)
+	$(CPP) $(CDEBUGFLAGS) main.o play.o $(LEVELS_O) physics.o objects.o shapes.o $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(LIB) $(SDL_LIB) $(STATIC) $(DYNAMIC) -o $(BUILD)/$(PROGRAM)-g $(BULLET_DYNAMIC_LIB)
 	rm -f *.o
