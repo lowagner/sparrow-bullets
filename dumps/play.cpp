@@ -12,7 +12,8 @@ Check the LICENSE file included for copyright information.
 
 Play::Play( int level_ ) // init play class
 {
-    wintext = "win in"; // default text to use when winning...
+    level = level_;
+    sprintf( wintext, "win in" ); // default text to use when winning...
     spFontShadeButtons(1);
     lives = 12;
     totalclock = 0;
@@ -136,9 +137,7 @@ Play::Play( int level_ ) // init play class
     font=NULL;
     checkertexture=NULL;
 
-    level = level_;
-
-    reset();
+    //reset();
 }
 
 int
@@ -185,51 +184,58 @@ Play::deinit()
 int
 Play::reset()
 {
-    totalclock += clock;
+    return gamestate;
+//    std::cout << " play reset " << std::endl;
+//    sprintf( lvltext, "lvl. %i", level );
+//    std::cout << " lvltext = " << lvltext << std::endl;
+//    //sprintf( buffer, "lvl. %i", level );
+//
+//    totalclock += clock;
+//
+//    deinit(); // kill everything first
+////    previous_t = time(0);
+////    current_t = time(0);
+//
+//    killboxfromblockid = false;
+//
+//
+//    // then rebirth it all...
+//    winlevel = 0.f; // you haven't won yet!
+//    pause = 0; // default to no pause
+//    menu = 0;
+//    clock = 0;
+//    checkertexture = spLoadSurface("../data/check.png");
 
-    deinit(); // kill everything first
-//    previous_t = time(0);
-//    current_t = time(0);
-
-    killboxfromblockid = false;
-
-
-    // then rebirth it all...
-    winlevel = 0.f; // you haven't won yet!
-    pause = 0; // default to no pause
-    menu = 0;
-    clock = 0;
-    checkertexture = spLoadSurface("../data/check.png");
-
-    if ( level == 1 )
-    {
-        // load level obstacles and such
-    }
-    else
-    {
-        std::cout << " congratulations, you beated all levels! " << std::endl;
-        std::cout << " total accumulated time: " << totalclock << std::endl;
-        std::cout << " remaining lives: " << lives << std::endl;
-        std::cout << " hopefully they will get around to creating level " << level << std::endl;
-        return GAMESTATEquit;
-    }
+//    if ( level == 1 )
+//    {
+//        // load level obstacles and such
+//    }
+//    else
+//    {
+//        std::cout << " congratulations, you beated all levels! " << std::endl;
+//        std::cout << " total accumulated time: " << totalclock << std::endl;
+//        std::cout << " remaining lives: " << lives << std::endl;
+//        std::cout << " hopefully they will get around to creating level " << level << std::endl;
+//        return GAMESTATEquit;
+//    }
+//    
+//    // now add physics to everybody 
+//    physics.init();
+//    hero.object->add_physics( physics );
+//    
+//    for ( int i=0; i<blocks.size(); i++ )
+//        blocks[i].add_physics( physics );
+//    
+//    for ( int i=0; i<boxes.size(); i++ )
+//        boxes[i].add_physics( physics );
+//
+//    for ( int i=0; i<ramps.size(); i++ )
+//        ramps[i].add_physics( physics );
     
-    // now add physics to everybody 
-    physics.init();
-    hero.object->add_physics( physics );
-    
-    for ( int i=0; i<blocks.size(); i++ )
-        blocks[i].add_physics( physics );
-    
-    for ( int i=0; i<boxes.size(); i++ )
-        boxes[i].add_physics( physics );
-
-    for ( int i=0; i<ramps.size(); i++ )
-        ramps[i].add_physics( physics );
-    
-    spDrawInExtraThread(0);
+//    spDrawInExtraThread(0);
     //spDrawInExtraThread(1);
-    return GAMESTATEplay;
+//    std::cout << "end play reset " << std::endl;
+//    return GAMESTATEplay;
 }
 
 
@@ -305,8 +311,7 @@ void Play::draw( SDL_Surface* screen )
     //spFontDrawMiddle( screen->w /2, screen->h - 2*font-> maxheight, 0, input, font );
 
 
-
-    sprintf( buffer, "cube dump lvl. %i", level );
+    sprintf( buffer, "cube dump: %s", lvltext );
     spFontDrawMiddle( screen->w / 2, font->maxheight + 2, 0, buffer, font );
     
     sprintf( buffer, "fps: %i", spGetFPS() );
@@ -444,7 +449,7 @@ int Play::update( Uint32 dt )
                 case 1:  // Return to play
                     menu=0;
                     pause=0;
-                    return GAMESTATEplay;
+                    return gamestate;
                     break;
                 case 2: // Next level
                     menu=0; // unmenu
@@ -459,7 +464,7 @@ int Play::update( Uint32 dt )
                 case 4: // cameraalignspeed
                     menu=0;
                     pause=0;
-                    return GAMESTATEplay;
+                    return gamestate;
                     break;
                 case 5: // Exit
                     return GAMESTATEquit;
@@ -469,7 +474,7 @@ int Play::update( Uint32 dt )
 
         // DON'T allow any other things to go on when you are navigating
         // the menu.  so prematurely disrupt update function.
-        return GAMESTATEplay;
+        return gamestate;
     }
 
     // otherwise, if we hit start we want to get to menu
@@ -478,7 +483,7 @@ int Play::update( Uint32 dt )
         menu = 1;
         // unset the start button so it won't grab the first menu item.
         spGetInput()->button[SP_BUTTON_START] = 0;
-        return GAMESTATEplay;
+        return gamestate;
     }
 
     if ( spGetInput()->button[SP_BUTTON_SELECT] )
@@ -537,7 +542,7 @@ int Play::update( Uint32 dt )
     }
 
     // return a value
-    return GAMESTATEplay; // always return your own value if you want to continue updating
+    return gamestate; // always return your own value if you want to continue updating
 }
 
 int Play::update_hero( btScalar fdt )

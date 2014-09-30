@@ -11,11 +11,11 @@ Check the LICENSE file included for copyright information.
 
 // various gamestates to be in
 int GAMESTATEquit = 0; // quit asap
-int GAMESTATEplay = 1; // play
+int GAMESTATEmenu = 1; // main menu
+int GAMESTATElovels = 2; // low levels
 
 // NOT IMPLEMENTED YET
-int GAMESTATEsplash = 2; // splash screen (first to see)
-int GAMESTATEmenu = 3; // main menu
+int GAMESTATEsplash = -1; // splash screen (first to see)
 
 GameChunk* gamechunk;  // pointer to the currently active game chunk
 SDL_Surface* screen;   // pointer to the screen.
@@ -43,8 +43,8 @@ void init()
     screen = spCreateDefaultWindow();
 
     // set gamestate and gamechunk to the right variables...
-    gamestate = GAMESTATEplay;
-    gamechunk = new LowLevels();
+    gamestate = GAMESTATEmenu;
+    gamechunk = new MainMenu();
 
     spUsePrecalculatedNormals(0);
     resize( screen->w, screen->h );
@@ -66,7 +66,20 @@ int update( Uint32 dt )
     if (newgamestate != gamestate)
     {
         // this shouldn't actually return 1 here.
-        return 1;
+        delete gamechunk;
+        if ( newgamestate == 1 )
+        {
+            std::cout << " initiating main menu" << std::endl;
+            gamechunk = new MainMenu(); 
+        }
+        else if ( newgamestate == 2 )
+        {
+            std::cout << " initiating low levels" << std::endl;
+            gamechunk = new LowLevels(); 
+        }
+        else
+            return 1;
+
         // instead, it should actually kill the previous gamechunk:
         // delete gamechunk;
         // and move to the new gamechunk

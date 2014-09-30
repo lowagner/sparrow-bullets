@@ -5,6 +5,16 @@ Check the LICENSE file included for copyright information.
 #include <string>
 #include <iostream>
 
+LowLevels::LowLevels( int level_ )
+{
+    level = level_;
+    gamestate = GAMESTATElovels;
+
+    reset();
+}
+
+
+
 int
 LowLevels::reset()
 {
@@ -271,7 +281,7 @@ LowLevels::reset()
     
     spDrawInExtraThread(0);
     //spDrawInExtraThread(1);
-    return GAMESTATEplay;
+    return gamestate;
 }
 
 

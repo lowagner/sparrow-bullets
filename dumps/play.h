@@ -18,6 +18,8 @@ Check the LICENSE file included for copyright information.
 class Play : public GameChunk
 {
 protected:
+    int gamestate;
+
     SDL_Surface* checkertexture;
 
     Sint32 cameraincline;
@@ -33,8 +35,9 @@ protected:
     spFontPointer font;
 
     Player hero;
-    float winlevel; // 0 until we won the level, then jumps to some preset time
-    char* wintext; // 
+    btScalar winlevel; // 0 until we won the level, then jumps to some preset time
+    char wintext[60]; // 
+    char lvltext[60];
     int lives; // number of lives left
 
     std::vector<Cube> blocks; // dynamic blocks
@@ -67,8 +70,8 @@ public:
 
     virtual int reset();
     virtual int update( Uint32 dt );
-    virtual int update_hero( btScalar dt );
-    virtual int update_level( btScalar dt );
+    virtual int update_hero( btScalar fdt );
+    virtual int update_level( btScalar fdt );
     virtual void handle( SDL_Event* event );
 
     void draw( SDL_Surface* screen );
@@ -76,19 +79,26 @@ public:
     int set_value( const char* name, float value);
     void write_settings();
     void deinit();
+
     ~Play();
 };
 
 
 class MainMenu : public Play
 {
+protected:
+    int levelset;
+public:
+    MainMenu( int level_ = 1 );
     int reset();
-    int update_level( float dt );
+    int update_level( btScalar fdt );
 };
 
 
 class LowLevels : public Play
 {
+public:
+    LowLevels( int level_ = 1 );
     int reset();
 };
 
