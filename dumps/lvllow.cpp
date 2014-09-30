@@ -18,6 +18,7 @@ LowLevels::LowLevels( int level_ )
 int
 LowLevels::reset()
 {
+    sprintf( lvltext, "low lvl. %i", level );
     totalclock += clock;
 
     deinit(); // kill everything first
