@@ -44,7 +44,7 @@ void init()
 
     // set gamestate and gamechunk to the right variables...
     gamestate = GAMESTATEplay;
-    gamechunk = new Play();
+    gamechunk = new LowLevels();
 
     spUsePrecalculatedNormals(0);
     resize( screen->w, screen->h );

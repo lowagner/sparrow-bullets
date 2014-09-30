@@ -34,6 +34,7 @@ protected:
 
     Player hero;
     float winlevel; // 0 until we won the level, then jumps to some preset time
+    char* wintext; // 
     int lives; // number of lives left
 
     std::vector<Cube> blocks; // dynamic blocks
@@ -58,16 +59,20 @@ protected:
 //    time_t previous_t;
 //    time_t current_t;
     
+    void load_font();
     
 public:
 
     Play( int level_ = 1 );
-    int reset();
+
+    virtual int reset();
+    virtual int update( Uint32 dt );
+    virtual int update_hero( btScalar dt );
+    virtual int update_level( btScalar dt );
+    virtual void handle( SDL_Event* event );
+
     void draw( SDL_Surface* screen );
-    void load_font();
-    int update( Uint32 dt );
     void resize( Uint16 w, Uint16 h );
-    void handle( SDL_Event* event );
     int set_value( const char* name, float value);
     void write_settings();
     void deinit();
@@ -75,6 +80,17 @@ public:
 };
 
 
+class MainMenu : public Play
+{
+    int reset();
+    int update_level( float dt );
+};
+
+
+class LowLevels : public Play
+{
+    int reset();
+};
 
 
 #endif

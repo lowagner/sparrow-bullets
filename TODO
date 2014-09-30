@@ -1,11 +1,21 @@
-ROADMAP
+ROADMAP FOR DUMPS
 
+DOWN IN THE DUMPS.
+
+FIX MAKEFILE FOR DEBUGS
+    fix makefile for DEBUG target.
+
+ALERTS
+    when loading a level, show a name on screen,
+    and allow other messages to be displayed, too.
 
 SAVING AND LEVELS
 
 new levels / level sets defined by different play children.
     make everybody inherit from the play class.
     we can let the parent play class be the main menu "level".
+        NAH, let's let the parent play class be bland.
+        make a derivative "menu.cpp" file.
 
 could make the start menu a little world, 
     where you pilot around to choose a level set or quit (fall off).

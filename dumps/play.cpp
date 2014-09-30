@@ -12,6 +12,7 @@ Check the LICENSE file included for copyright information.
 
 Play::Play( int level_ ) // init play class
 {
+    wintext = "win in"; // default text to use when winning...
     spFontShadeButtons(1);
     lives = 12;
     totalclock = 0;
@@ -202,226 +203,7 @@ Play::reset()
 
     if ( level == 1 )
     {
-        outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
-
-        // this guy includes the floor.  all static rectangular prisms.
-        boxes.push_back( Box( btVector3(10,10,1), btVector3(0,0,-5), 0x05FF ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(7,7,-3), 0x055F ) ); // half-sizes, pos, color 
-        boxes.push_back( Box( btVector3(6,1,2), btVector3(3,-1,-2), 0xF50F ) ); // half-sizes, pos, color
-
-        ramps.push_back( Ramp( btVector3(10,2,4), btVector3(-8,0,-4), 0xF0FF ) ); // sizes, pos, color
-        ramps.push_back( Ramp( btVector3(10,2.5,1), btVector3(0,-10,-4), 0xFFFF ) ); // sizes, pos, color
-        ramps[0].rotateZ( M_PI/2 );
-        ramps[1].rotateZ( 2*M_PI );
-
-        hero = Player( btVector3(0,8,5), 0xF00F, checkertexture );
-        hero.object->debug = true;
-       
-        // add some blocks pieces
-        for ( int i=0; i<5; i++ )
-        {
-            blocks.push_back(  Cube( btVector3(2*i-3,0,10+2*i), 0x0F0F )  );
-        }
-        blocks[4].impulse( btVector3(0,10,0) );
-        blocks[3].impulse( btVector3(10,15,0) );
-        blocks[2].impulse( btVector3(-10,-10,0) );
-        blocks[1].impulse( btVector3(-5,-10,0) );
-    }
-    else if ( level == 2 )
-    {
-        outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
-
-        // this guy includes the floor.  all static rectangular prisms.
-        boxes.push_back( Box( btVector3(7,7,1), btVector3(0,0,-5), 0x05FF ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(7,7,-3), 0x055F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(-7,7,-3), 0x055F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(7,-7,-3), 0x055F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(-7,-7,-3), 0x055F ) ); // half-sizes, pos, color
-
-        ramps.push_back( Ramp( btVector3(4,2,2.8), btVector3(-4,-5.1,2.8), 0xFFFF ) ); // half-sizes, pos, color
-        ramps.push_back( Ramp( btVector3(4,2,2.8), btVector3(-7.1,-4,2.8), 0xFFFF ) ); // half-sizes, pos, color
-        ramps[0].rotate( btVector3(1,0,0), M_PI );
-        ramps[1].rotate( btVector3(1,0,0), M_PI );
-        ramps[1].rotateZ( -M_PI/ 2);
-
-        hero = Player( btVector3(0,4,5), 0xF00F, checkertexture );
-        hero.object->rotateZ( M_PI/2 );
-        hero.object->debug = true;
-       
-        // add some blocks pieces
-        for ( int i=0; i<6; i++ )
-        {
-            blocks.push_back(  Cube( btVector3(2*i-4,2*i-4,10+2*i), 0xFF0F )  );
-        }
-        blocks[4].impulse( btVector3(0,10,0) );
-    }
-    else if ( level == 3 )
-    {
-        outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
-
-        // this guy includes the floor.  all static rectangular prisms.
-        boxes.push_back( Box( btVector3(7,7,1), btVector3(0,0,-5), 0xF00F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(7,5,-3), 0xF50F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(3,7,-1), 0x0F0F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(1,3,1), 0x03FF ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(7,-1,3), 0x00FF ) ); // half-sizes, pos, color
-
-        hero = Player( btVector3(0,4,5), 0xF00F, checkertexture );
-        hero.object->rotateZ( -M_PI/2 );
-        hero.object->debug = true;
-       
-        // add some blocks pieces
-        for ( int i=0; i<6; i++ )
-        {
-            blocks.push_back(  Cube( btVector3(2*i-4,2*i-6,10+2*i), 0xFFFF )  );
-        }
-        //blocks[4].impulse( btVector3(0,10,0) );
-    }
-    else if ( level == 4 )
-    {
-        outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
-
-        // this guy includes the floor.  all static rectangular prisms.
-        boxes.push_back( Box( btVector3(6,6,1), btVector3(-14,0,-5), 0x05FF ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(-4,10,-5), 0x055F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(4,2,-5), 0x055F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(3,3,1), btVector3(13,5,-4), 0x055F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(2,2,1), btVector3(6,-5,-5), 0x055F ) ); // half-sizes, pos, color
-
-        hero = Player( btVector3(-14,4,5), 0xF00F, checkertexture );
-        hero.object->rotateZ( -M_PI/2 );
-        hero.object->debug = true;
-      
-        blocks.push_back( Cube( btVector3(-15,-3,19), 0xF00F ) );
-        blocks.push_back( Cube( btVector3(-4,7,3), 0xF00F ) );
-        blocks.push_back( Cube( btVector3(13,7,3), 0xF00F ) );
-        blocks.push_back( Cube( btVector3(6,-6,3), 0xF00F ) );
-        blocks.push_back( Cube( btVector3(-14,2,0), 0xF00F ) );
-
-        // add some blocks pieces
-        blocks[4].impulse( btVector3(23,0,40) );
-    }
-    else if ( level == 5 )
-    {
-        outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
-
-        // this guy includes the floor.  all static rectangular prisms.
-        boxes.push_back( Box( btVector3(4,5,1), btVector3(2,5,-5), 0x05FF ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(2,2,1), btVector3(-5,0,-5), 0x05FF ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(10,1,1), btVector3(0,-5,-5), 0x05FF ) ); // half-sizes, pos, color
-
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(7,7,-3), 0x055F ) ); // half-sizes, pos, color 
-        boxes.push_back( Box( btVector3(6,1,2), btVector3(3,-1,-2), 0xF50F ) ); // half-sizes, pos, color
-
-        ramps.push_back( Ramp( btVector3(10,2,4), btVector3(-8,0,-4), 0xF0FF ) ); // sizes, pos, color
-        ramps.push_back( Ramp( btVector3(10,2.5,1), btVector3(0,-10,-4), 0xFFFF ) ); // sizes, pos, color
-        ramps[0].rotateZ( M_PI/2 );
-        ramps[1].rotateZ( 2*M_PI );
-
-        hero = Player( btVector3(0,8,5), 0xF00F, checkertexture );
-        hero.object->debug = true;
-       
-        // add some blocks pieces
-        for ( int i=0; i<5; i++ )
-        {
-            blocks.push_back(  Cube( btVector3(2*i-3.5,-1,10+2*i), 0x0F0F )  );
-        }
-        blocks[4].impulse( btVector3(0,10,0) );
-        blocks[3].impulse( btVector3(10,15,0) );
-        blocks[2].impulse( btVector3(10,-7,0) );
-        blocks[0].impulse( btVector3(-10,10,0) );
-    }
-    else if ( level == 6 )
-    {
-        outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
-
-        // this guy includes the floor.  all static rectangular prisms.
-        boxes.push_back( Box( btVector3(1,5,1), btVector3(5,2,4), 0x1100 ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(7,1,1), btVector3(10,-2,0), 0x1100 ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(5,1,1), btVector3(5,2,-3), 0x1100 ) ); // half-sizes, pos, color
-        
-        boxes.push_back( Box( btVector3(5,0.15,1), btVector3(-5,0.9,-3.5), 0xA030 ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(5,0.15,1), btVector3(-5,-0.9,-3.5), 0xA030 ) ); // half-sizes, pos, color
-
-        hero = Player( btVector3(5,6,7), 0xF00F, checkertexture );
-        hero.object->rotateZ( -M_PI/2 );
-        hero.object->debug = true;
-      
-        blocks.push_back( Cube( btVector3(-9,0,5), 0xF000 ) );
-        blocks[0].rotate( btVector3(1,0,0), M_PI/4 );
-        
-        blocks.push_back( Cube( btVector3(15,-2,2), 0xF000 ) );
-    }
-    else if ( level == 7 )
-    {
-        // fun level, where boxes will die if cubes do
-        killboxfromblockid = true;
-
-        outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
-
-        // this guy includes the floor.  all static rectangular prisms.
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(4,4,-3), 0x500F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(-4,4,-3), 0x505F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(4,-4,-3), 0x055F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(-4,-4,-3), 0x0F5F ) ); // half-sizes, pos, color
-
-        blocks.push_back(  Cube( btVector3(4,4,1), 0x500F )  );
-        blocks.push_back(  Cube( btVector3(-4,4,1), 0x505F )  );
-        blocks.push_back(  Cube( btVector3(4,-4,1), 0x055F )  );
-        blocks.push_back(  Cube( btVector3(-4,-4,1), 0x0F5F )  );
-        
-        boxes.push_back( Box( btVector3(1,4,1), btVector3(9,4,-1), 0xFFFF ) ); // half-sizes, pos, color
-
-
-        hero = Player( btVector3(4,4,5), 0xF00F, checkertexture );
-        hero.object->rotateZ( M_PI/2 );
-        hero.object->debug = true;
-       
-        // add some blocks pieces
-        for ( int i=0; i<4; i++ )
-        {
-            blocks[i].id = i;
-            boxes[i].id = i;
-        }
-        boxes[4].id = 1234;
-    }
-    else if ( level == 8 )
-    {
-        // fun level, where boxes will die if cubes do
-        killboxfromblockid = true;
-
-        outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
-
-        // this guy includes the floor.  all static rectangular prisms.
-        boxes.push_back( Box( btVector3(1,1,1), btVector3(-6,0,7), 0x109F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(1,1,1), btVector3(-3,0,5), 0x307F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(1,1,1), btVector3(0,0,3), 0x505F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(1,1,1), btVector3(3,0,1), 0x703F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(1,1,1), btVector3(6,0,-1), 0x901F ) ); // half-sizes, pos, color
-        
-        boxes.push_back( Box( btVector3(10,5,5), btVector3(0,-7,-7), 0x000F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(10,5,5), btVector3(0,7,5), 0x000F ) ); // half-sizes, pos, color
-
-        blocks.push_back(  Cube( btVector3(4,4,12), 0xFFFF )  );
-        blocks.push_back(  Cube( btVector3(-4,4,12), 0xFFFF )  );
-        blocks.push_back(  Cube( btVector3(4,-4,12), 0xFFFF )  );
-        blocks.push_back(  Cube( btVector3(-4,-4,12), 0xFFFF )  );
-
-        hero = Player( btVector3(-9,-6,12), 0xF00F, checkertexture );
-        //hero.object->rotateZ( M_PI/2 );
-        hero.object->debug = true;
-       
-        // add some blocks pieces
-        for ( int i=0; i<4; i++ )
-        {
-            blocks[i].id = 0;
-            boxes[i].id = 0;
-        }
-        boxes[4].id = 0;
-        for ( int i=5; i<7; i++ )
-        {
-            boxes[i].id = 1234;
-        }
+        // load level obstacles and such
     }
     else
     {
@@ -510,11 +292,14 @@ void Play::draw( SDL_Surface* screen )
 
         if ( winlevel > 0.f )
         {
-            sprintf( buffer, "win in %d", int(ceil(winlevel)) );
+            sprintf( buffer, "%s %d", wintext, int(ceil(winlevel)) );
             spFontDrawMiddle( screen->w / 2, screen->h / 2, 0, buffer, font );
 
-            sprintf( buffer, "accumulated time: %.2f", (totalclock+clock) );
-            spFontDrawMiddle( screen->w / 2, screen->h / 2 + font->maxheight + 2, 0, buffer, font );
+            if ( totalclock+clock < 1000.0f )
+            {
+                sprintf( buffer, "accumulated time: %.2f", (totalclock+clock) );
+                spFontDrawMiddle( screen->w / 2, screen->h / 2 + font->maxheight + 2, 0, buffer, font );
+            }
         }
     }
     //spFontDrawMiddle( screen->w /2, screen->h - 2*font-> maxheight, 0, input, font );
@@ -527,14 +312,20 @@ void Play::draw( SDL_Surface* screen )
     sprintf( buffer, "fps: %i", spGetFPS() );
     spFontDrawMiddle( screen->w/2, 1, 0, buffer, font ); 
 
-    sprintf( buffer, "time: %.2f", clock );
-    spFontDrawMiddle( screen->w / 2, 2*(font->maxheight) + 4 , 0, buffer, font );
-   
-    if ( lives == 1 )
-        sprintf( buffer, "life: %d", lives );
-    else
-        sprintf( buffer, "lives: %d", lives );
-    spFontDrawMiddle( screen->w / 2, screen->h  - (font->maxheight), 0, buffer, font );
+    if ( clock < 1000.0f )
+    {
+        sprintf( buffer, "time: %.2f", clock );
+        spFontDrawMiddle( screen->w / 2, 2*(font->maxheight) + 4 , 0, buffer, font );
+    }
+  
+    if ( lives < 1000 )
+    {
+        if ( lives == 1 )
+            sprintf( buffer, "life: %d", lives );
+        else
+            sprintf( buffer, "lives: %d", lives );
+        spFontDrawMiddle( screen->w / 2, screen->h  - (font->maxheight), 0, buffer, font );
+    }
 
     // this displays everything. (??)
     spFlip(); 
@@ -658,7 +449,8 @@ int Play::update( Uint32 dt )
                 case 2: // Next level
                     menu=0; // unmenu
                     pause=0; // unpause
-                    lives -= 10; // penalize the player
+                    if ( lives < 100000 )
+                        lives -= 10; // penalize the player
                     clock=999; // penalize the player
                     level += 1; // increase level
                     return reset();
@@ -721,22 +513,8 @@ int Play::update( Uint32 dt )
         cameraincline -= 50*dt;
     }
 
-    if ( spGetInput()->axis[1] == 1 )
-    {
-        //rotation += 100*dt;
-    }
-    else if ( spGetInput()->axis[1] == -1 )
-    {
-        //rotation -= 100*dt;
-    }
-
-    if ( spGetInput()->button[SP_BUTTON_R] )
-    {
-        // randomize
-        //spGetInput()->button[SP_BUTTON_R] = 0;
-    }
     if ( spGetInput()->button[SP_BUTTON_L] )
-    {
+    {   // the reset button
         spGetInput()->button[SP_BUTTON_L] = 0;
         lives -= 1;
         clock = 0;
@@ -747,180 +525,190 @@ int Play::update( Uint32 dt )
     {
         btScalar fdt = dt*1.0/1000;
         
-//        current_t = time(0);
-//        double time = difftime(current_t, previous_t);
-//        sleep(3);
-//        std::cerr << " sparrow dt = " << fdt << ", c++ sec = " << time << ";  ";
-//        previous_t = current_t;
-        
-
+        // update the physics world
         physics.update( fdt );
         // update hero stuff
-        hero.update( fdt );
-        if ( hero.object->out_of_bounds( outofbounds ) )
-        {
-            lives -= 1;
-            clock = 0;
-            reset();
-        }
-
-        if ( camerafollowspeed > 0.f )
-            cameracenter = ( cameracenter + camerafollowspeed * fdt * hero.get_position() ) / ( 1 + camerafollowspeed * fdt );
-        if ( cameraalignspeed > 0.f )
-        { 
-            if ( cameramovecooldown == 0.f )
-            {
-                if ( hero.on_ground() )
-                {   
-                    btVector3 cameraforward = hero.get_forward();
-                    if ( fabs( cameraforward.z() ) > 0.91f )
-                    {   // if we are looking up or down...
-                        if ( cameraforward.z() < 0 )
-                            cameraforward = hero.get_up();
-                        else
-                            cameraforward = -hero.get_up();
-                    }
-                    else if ( hero.topside_up() == -1 )
-                    {   // if we're on our head...
-                        cameraforward *= -1;
-                    }
-                    Sint32 theta = spFloatToFixed( atan2( -cameraforward.x(), -cameraforward.y() ) + M_PI ) ;
-//                    std::cerr << " theta / (2 Pi ) = " << ( ( theta )*1.0/(2*SP_PI) ) << std::endl;
-
-                    if ( cameraaxis > 2*SP_PI )
-                        cameraaxis -= 2*SP_PI;
-                    else if (cameraaxis < 0 )
-                        cameraaxis += 2*SP_PI;
-                    //std::cerr << " camera / (2 Pi ) = " << ( ( cameraaxis )*1.0/(2*SP_PI) ) << std::endl;
-
-                    if ( abs( cameraaxis - theta ) > SP_PI )
-                    {
-                        // check if the distance between the two is very large...
-                        // because we want to go the quickest way around...
-                        if ( abs( cameraaxis - ( theta + 2*SP_PI ) ) < abs( cameraaxis - (theta - 2*SP_PI ) ) )
-                        {
-                            // here, it's best to add 2pi to theta...
-                            cameraaxis = ( cameraaxis + fdt * (theta+2*SP_PI) ) / ( 1 + fdt );
-                        }
-                        else
-                        {
-                            // here it's better to subtract 2pi from theta
-                            cameraaxis = ( cameraaxis + cameraalignspeed * fdt * (theta-2*SP_PI) ) / ( 1 +cameraalignspeed * fdt );
-                        }
-                    }
-                    else
-                        cameraaxis = ( cameraaxis + cameraalignspeed * fdt * theta ) / ( 1 + cameraalignspeed * fdt );
-                }
-                else
-                { // currently don't spin camera around, if hero is in the air
-
-                }
-            }
-            else
-            { // camera was moved recently, give a cool down
-                cameramovecooldown -= fdt;
-                if ( cameramovecooldown < 0.f )
-                    cameramovecooldown = 0.f;
-            }
-        }
-        
-        if ( spGetInput()->axis[0] )
-        {
-            spGetInput()->axis[0] = hero.turn( fdt, spGetInput()->axis[0] );
-            //std::cout << " turning hero " << (spGetInput()->axis[0]) << std::endl;
-        }
-        // this function will check to see if the hero can actually walk.
-        if ( spGetInput()->axis[1] )
-            spGetInput()->axis[1] = hero.walk( fdt, spGetInput()->axis[1] );
-
-        if ( spGetInput()->button[SP_BUTTON_R] )
-        {
-            spGetInput()->button[SP_BUTTON_R] = hero.jump();
-        }
-
-        
-        if ( winlevel == 0.f )
-        {
-            // if we have not won the level yet...
-            // update level time
-            clock += fdt;
-
-            // update blocks
-            int i=0;
-            int blocksize = blocks.size();
-            bool activate = false;
-            while ( i < blocksize )
-            {
-                //std::cout << i << "; id " << blocks[i].id << " ";
-                blocks[i].update( fdt );
-
-                if (  blocks[i].out_of_bounds( outofbounds )   )
-                {
-                    //std::cout << "\n WARNING!  block " << i << " out of bounds!\n";
-                    blocks[i].remove_physics();  // remove this guy from physics world
-                    if ( killboxfromblockid )
-                    { // here we kill any boxes which have the same id as block j
-
-                        int blockid = blocks[i].id;
-                        int j=0;
-                        int boxsize = boxes.size();
-                        //std::cout << "\n deleting  block " << blockid << "; ";
-                        while ( j < boxsize )
-                        {
-                            //std::cout << "checking  box " << boxes[j].id << "; "; 
-                            if ( boxes[j].id == blockid )
-                            {
-                                //std::cout << "deleting  box " << boxes[j].id << "; "; 
-                                boxes[j].remove_physics();  // remove this guy from physics world
-                                boxes.erase(boxes.begin() + j);
-                                boxsize --;
-                                activate = true;
-                            }
-                            else
-                            {
-                                //std::cout << "skipping  box " << boxes[j].id << "; "; 
-                                j++;
-                            }
-                        }
-                    }
-                    blocks.erase(blocks.begin() + i);
-                    blocksize --;
-                    //std::cout << "\n deleted  block " << i << " since it was out of bounds.\n";
-                }
-                else
-                {
-                    i++;
-                }
-            }
-            if (blocksize == 0)
-            {
-                winlevel = 3;
-            }
-            else if ( activate )
-            {
-                // boxes disappeared or something, we should reactivate everything
-                for ( int i=0; i<blocks.size(); i++ )
-                {
-                    blocks[i].activate();
-                }
-                hero.object->activate();
-            }
-        } 
-        else
-        { // we have won and are waiting to start next level
-            winlevel -= fdt;
-            if ( winlevel <= 0.f )
-            {
-                level += 1;
-                return reset();
-            }
-
-        }
+        if ( update_hero( fdt ) )
+            return reset();
+        // update blocks and what not 
+        if ( update_level( fdt ) )
+            return reset();
         //std::cout << std::endl;
     }
 
     // return a value
     return GAMESTATEplay; // always return your own value if you want to continue updating
+}
+
+int Play::update_hero( btScalar fdt )
+{
+    hero.update( fdt );
+    if ( hero.object->out_of_bounds( outofbounds ) )
+    {
+        lives -= 1;
+        clock = 0;
+        return 1;
+    }
+
+    if ( camerafollowspeed > 0.f )
+        cameracenter = ( cameracenter + camerafollowspeed * fdt * hero.get_position() ) / ( 1 + camerafollowspeed * fdt );
+    if ( cameraalignspeed > 0.f )
+    { 
+        if ( cameramovecooldown == 0.f )
+        {
+            if ( hero.on_ground() )
+            {   
+                btVector3 cameraforward = hero.get_forward();
+                if ( fabs( cameraforward.z() ) > 0.91f )
+                {   // if we are looking up or down...
+                    if ( cameraforward.z() < 0 )
+                        cameraforward = hero.get_up();
+                    else
+                        cameraforward = -hero.get_up();
+                }
+                else if ( hero.topside_up() == -1 )
+                {   // if we're on our head...
+                    cameraforward *= -1;
+                }
+                Sint32 theta = spFloatToFixed( atan2( -cameraforward.x(), -cameraforward.y() ) + M_PI ) ;
+//                    std::cerr << " theta / (2 Pi ) = " << ( ( theta )*1.0/(2*SP_PI) ) << std::endl;
+
+                if ( cameraaxis > 2*SP_PI )
+                    cameraaxis -= 2*SP_PI;
+                else if (cameraaxis < 0 )
+                    cameraaxis += 2*SP_PI;
+                //std::cerr << " camera / (2 Pi ) = " << ( ( cameraaxis )*1.0/(2*SP_PI) ) << std::endl;
+
+                if ( abs( cameraaxis - theta ) > SP_PI )
+                {
+                    // check if the distance between the two is very large...
+                    // because we want to go the quickest way around...
+                    if ( abs( cameraaxis - ( theta + 2*SP_PI ) ) < abs( cameraaxis - (theta - 2*SP_PI ) ) )
+                    {
+                        // here, it's best to add 2pi to theta...
+                        cameraaxis = ( cameraaxis + fdt * (theta+2*SP_PI) ) / ( 1 + fdt );
+                    }
+                    else
+                    {
+                        // here it's better to subtract 2pi from theta
+                        cameraaxis = ( cameraaxis + cameraalignspeed * fdt * (theta-2*SP_PI) ) / ( 1 +cameraalignspeed * fdt );
+                    }
+                }
+                else
+                    cameraaxis = ( cameraaxis + cameraalignspeed * fdt * theta ) / ( 1 + cameraalignspeed * fdt );
+            }
+            else
+            { // currently don't spin camera around, if hero is in the air
+
+            }
+        }
+        else
+        { // camera was moved recently, give a cool down
+            cameramovecooldown -= fdt;
+            if ( cameramovecooldown < 0.f )
+                cameramovecooldown = 0.f;
+        }
+    }
+    
+    if ( spGetInput()->axis[0] )
+    {
+        spGetInput()->axis[0] = hero.turn( fdt, spGetInput()->axis[0] );
+        //std::cout << " turning hero " << (spGetInput()->axis[0]) << std::endl;
+    }
+    // this function will check to see if the hero can actually walk.
+    if ( spGetInput()->axis[1] )
+        spGetInput()->axis[1] = hero.walk( fdt, spGetInput()->axis[1] );
+
+    if ( spGetInput()->button[SP_BUTTON_R] )
+    {
+        spGetInput()->button[SP_BUTTON_R] = hero.jump();
+    }
+
+    return 0;
+}
+
+
+int Play::update_level( btScalar fdt )
+{
+
+    if ( winlevel == 0.f )
+    {
+        // if we have not won the level yet...
+        // update level time
+        clock += fdt;
+        // update blocks
+        int i=0;
+        int blocksize = blocks.size();
+        bool activate = false;
+        while ( i < blocksize )
+        {
+            //std::cout << i << "; id " << blocks[i].id << " ";
+            blocks[i].update( fdt );
+
+            if (  blocks[i].out_of_bounds( outofbounds )   )
+            {
+                //std::cout << "\n WARNING!  block " << i << " out of bounds!\n";
+                blocks[i].remove_physics();  // remove this guy from physics world
+                if ( killboxfromblockid )
+                { // here we kill any boxes which have the same id as block j
+
+                    int blockid = blocks[i].id;
+                    int j=0;
+                    int boxsize = boxes.size();
+                    //std::cout << "\n deleting  block " << blockid << "; ";
+                    while ( j < boxsize )
+                    {
+                        //std::cout << "checking  box " << boxes[j].id << "; "; 
+                        if ( boxes[j].id == blockid )
+                        {
+                            //std::cout << "deleting  box " << boxes[j].id << "; "; 
+                            boxes[j].remove_physics();  // remove this guy from physics world
+                            boxes.erase(boxes.begin() + j);
+                            boxsize --;
+                            activate = true;
+                        }
+                        else
+                        {
+                            //std::cout << "skipping  box " << boxes[j].id << "; "; 
+                            j++;
+                        }
+                    }
+                }
+                blocks.erase(blocks.begin() + i);
+                blocksize --;
+                //std::cout << "\n deleted  block " << i << " since it was out of bounds.\n";
+            }
+            else
+            {
+                i++;
+            }
+        }
+        if (blocksize == 0)
+        {
+            winlevel = 3; // amount of time you must survive before transitioning to next level
+        }
+        else if ( activate )
+        {
+            // boxes disappeared or something, we should reactivate everything
+            for ( int i=0; i<blocks.size(); i++ )
+            {
+                blocks[i].activate();
+            }
+            hero.object->activate();
+        }
+    } 
+    else
+    { // we have won and are waiting to start next level
+        winlevel -= fdt;
+        if ( winlevel <= 0.f )
+        {
+            level += 1;
+            return 1;
+        }
+
+    }
+    return 0; // no reset if update_level doesn't do nothing
+
 }
 
 void Play::resize( Uint16 w, Uint16 h )
