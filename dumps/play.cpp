@@ -27,7 +27,7 @@ Play::Play( int level_ ) // init play class
     menuitems.push_back( "Next level (deduct 10 lives)" );
     menuitems.push_back( "Camera follow speed" ); 
     menuitems.push_back( "Camera align speed" ); 
-    //menuitems.push_back( "Exit to main menu" );
+    menuitems.push_back( "Return to main menu" );
     menuitems.push_back( "Exit" );
     
     std::vector<float> emptylist;
@@ -62,6 +62,8 @@ Play::Play( int level_ ) // init play class
             menuitemvalueindices.push_back( 1 );
     }
     //menuitemvalues.push_back( emptylist );
+    menuitemvalues.push_back( emptylist );
+        menuitemvalueindices.push_back( 0 );
     menuitemvalues.push_back( emptylist );
         menuitemvalueindices.push_back( 0 );
 
@@ -132,7 +134,7 @@ Play::Play( int level_ ) // init play class
     cameracenter = btVector3();
     cameradistance = spFloatToFixed( -25.0f );
     cameraaxis = SP_PI * 0.1; // for rotation around the z axis
-    cameraincline = spFloatToFixed( -1.5f ); // closer to zero - more from top down.
+    cameraincline = spFloatToFixed( -0.8f ); // closer to zero - more from top down.
 
     font=NULL;
     checkertexture=NULL;
@@ -254,7 +256,7 @@ void Play::draw( SDL_Surface* screen )
     {
         spFontDrawRight( screen->w - 2 , font-> maxheight+2, 0, "[S] Select", font );
         spFontDraw( 2, font-> maxheight+4, 0, "[E] Select", font ); 
-        int y = 2*screen->h/5 - ((menuitems.size()+1)/2)*(font->maxheight);
+        int y = 3*screen->h/7 - ((menuitems.size()+1)/2)*(font->maxheight);
 
         sprintf( buffer, "= %s =", menuitems[0] );
         spFontDrawMiddle( screen->w / 2, y, 0, buffer, font );
@@ -466,7 +468,12 @@ int Play::update( Uint32 dt )
                     pause=0;
                     return gamestate;
                     break;
-                case 5: // Exit
+                case 5: // return to menu
+                    menu=0;
+                    pause=0;
+                    return GAMESTATEmenu;
+                    break; 
+                case 6: // Exit
                     return GAMESTATEquit;
                     break; 
             }
