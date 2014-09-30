@@ -68,7 +68,7 @@ MainMenu::reset()
         blocks[0].id = 2;
 
         hero = Player( btVector3(0,4,5), 0xF00F, checkertexture );
-        hero.object->rotateZ( M_PI/2 );
+        hero.object->rotateZ( 3*M_PI/2 );
         hero.object->debug = true;
     }
     else if ( level == 2 )
