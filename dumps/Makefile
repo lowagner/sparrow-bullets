@@ -1,9 +1,8 @@
 PROGRAM=dump
 include ../options.mk
 BULLET_DYNAMIC_LIB= -rdynamic $(BULLET_LIB_DIR)/libBulletDynamics.so $(BULLET_LIB_DIR)/libBulletCollision.so $(BULLET_LIB_DIR)/libLinearMath.so -Wl,-rpath,$(BULLET_SRC_DIR)/BulletDynamics:$(BULLET_SRC_DIR)/BulletCollision:$(BULLET_SRC_DIR)/LinearMath
-
 # the levels we need to compile
-LEVELS=lvllow
+LEVELS=lvllow lvlmenu
 
 # converting levels to .o
 LEVELS_CPP = $(patsubst %,%.cpp, $(LEVELS))
@@ -81,7 +80,9 @@ debug: copySparrow makeBuildDir
 	rm -f *.o
 	$(CPP) $(CDEBUGFLAGS) -c main.cpp $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE)
 	$(CPP) $(CDEBUGFLAGS) -c play.cpp $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE)
-	for lvl in $(LEVELS); do $(CPP) $(CDEBUGFLAGS) -c $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE) -o ${lvl}.o $@ $<; done
+	for lvl in $(LEVELS); do \
+	    $(CPP) $(CDEBUGFLAGS) -c $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE) -o $$lvl.o $$lvl.cpp; \
+	    done
 	$(CPP) $(CDEBUGFLAGS) -c physics.cpp $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE)
 	$(CPP) $(CDEBUGFLAGS) -c objects.cpp $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE)
 	$(CPP) $(CDEBUGFLAGS) -c shapes.cpp $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE)
