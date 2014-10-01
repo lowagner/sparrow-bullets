@@ -22,7 +22,7 @@ protected:
 
 public:
     Cube( btVector3 pos=btVector3(), Uint16 color_=0xFFFF, 
-          SDL_Surface* texture_ = NULL, btScalar mass_ = btScalar(1) );
+          int id_ = -1, SDL_Surface* texture_ = NULL, btScalar mass_ = btScalar(1) );
 
     void update( float dt );
 
@@ -47,7 +47,7 @@ protected:
 
 public:
     Box( btVector3 size_=btVector3(1,1,1), 
-         btVector3 pos=btVector3(), Uint16 color_=0xFFFF, btScalar mass_=0 );
+         btVector3 pos=btVector3(), Uint16 color_=0xFFFF, int id_ = -1, btScalar mass_=0 );
 
     void update( float dt );
     
@@ -75,7 +75,7 @@ protected:
 
 public:
     Ramp( btVector3 size_=btVector3(1,1,1), 
-          btVector3 pos=btVector3(), Uint16 color_=0xFFFF, btScalar mass_=0 );
+          btVector3 pos=btVector3(), Uint16 color_=0xFFFF, int id_ = -1, btScalar mass_=0 );
 
     void update( float dt );
     

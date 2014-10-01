@@ -101,12 +101,14 @@ draw_ramp( Sint32 sizex, Sint32 sizey, Sint32 sizez,  Uint16 color )
                   color );
 }
 
-Cube::Cube( btVector3 pos, Uint16 color_, SDL_Surface* texture_,
+Cube::Cube( btVector3 pos, Uint16 color_, 
+            int id_,
+            SDL_Surface* texture_, 
             btScalar mass_ )
 {    
     mass = mass_;
     //std::cout << " Cube mass = " << mass << std::endl;
-    id = 0;
+    id = id_;
     debug = false;
     // setup GL orientation/transform matrix
     for (int i=0; i<16; i++)
@@ -231,10 +233,12 @@ Cube::operator = ( Cube other ) // Copy Assignment Operator
 
 Box::Box( btVector3 size_, 
           btVector3 pos, 
-          Uint16 color_, btScalar mass_ )
+          Uint16 color_, 
+          int id_,
+          btScalar mass_ )
 {
     mass = mass_;
-    id = 0;
+    id = id_;
     debug = false;
     for (int i=0; i<16; i++)
         lastpor[i] = 0;
@@ -357,11 +361,13 @@ Box::operator = ( Box other ) // Copy Assignment Operator
 
 
 Ramp::Ramp( btVector3 size_, 
-          btVector3 pos, 
-          Uint16 color_, btScalar mass_ )
+            btVector3 pos, 
+            Uint16 color_, 
+            int id_,
+            btScalar mass_ )
 {
     mass = mass_;
-    id = 0;
+    id = id_;
     debug = false;
     for (int i=0; i<16; i++)
         lastpor[i] = 0;

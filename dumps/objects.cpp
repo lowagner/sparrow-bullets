@@ -520,7 +520,7 @@ BaseObject::draw( Sint32* original_camera_matrix, int alpha )
 Player::Player( btVector3 pos, Uint16 color_, SDL_Surface* texture_,
                 btScalar mass_ )
 {
-    object = new Cube( pos, color_, texture_, mass_ );
+    object = new Cube( pos, color_, 13374340, texture_, mass_ );
     init();
 }
 

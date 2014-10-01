@@ -195,30 +195,23 @@ LowLevels::reset()
         outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
 
         // this guy includes the floor.  all static rectangular prisms.
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(4,4,-3), 0x500F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(-4,4,-3), 0x505F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(4,-4,-3), 0x055F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(-4,-4,-3), 0x0F5F ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(4,4,1), btVector3(4,4,-3), 0x500F, 0 ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(4,4,1), btVector3(-4,4,-3), 0x505F, 1 ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(4,4,1), btVector3(4,-4,-3), 0x055F, 2 ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(4,4,1), btVector3(-4,-4,-3), 0x0F5F, 3 ) ); // half-sizes, pos, color
 
-        blocks.push_back(  Cube( btVector3(4,4,1), 0x500F )  );
-        blocks.push_back(  Cube( btVector3(-4,4,1), 0x505F )  );
-        blocks.push_back(  Cube( btVector3(4,-4,1), 0x055F )  );
-        blocks.push_back(  Cube( btVector3(-4,-4,1), 0x0F5F )  );
+        blocks.push_back(  Cube( btVector3(4,4,1), 0x500F, 0 )  );
+        blocks.push_back(  Cube( btVector3(-4,4,1), 0x505F, 1 )  );
+        blocks.push_back(  Cube( btVector3(4,-4,1), 0x055F, 2 )  );
+        blocks.push_back(  Cube( btVector3(-4,-4,1), 0x0F5F, 3 )  );
         
-        boxes.push_back( Box( btVector3(1,4,1), btVector3(9,4,-1), 0xFFFF ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(1,4,1), btVector3(9,4,-1), 0xFFFF, 1234 ) ); // half-sizes, pos, color
 
 
         hero = Player( btVector3(4,4,5), 0xF00F, checkertexture );
         hero.object->rotateZ( M_PI/2 );
         hero.object->debug = true;
        
-        // add some blocks pieces
-        for ( int i=0; i<4; i++ )
-        {
-            blocks[i].id = i;
-            boxes[i].id = i;
-        }
-        boxes[4].id = 1234;
     }
     else if ( level == 8 )
     {
@@ -228,35 +221,23 @@ LowLevels::reset()
         outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
 
         // this guy includes the floor.  all static rectangular prisms.
-        boxes.push_back( Box( btVector3(1,1,1), btVector3(-6,0,7), 0x109F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(1,1,1), btVector3(-3,0,5), 0x307F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(1,1,1), btVector3(0,0,3), 0x505F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(1,1,1), btVector3(3,0,1), 0x703F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(1,1,1), btVector3(6,0,-1), 0x901F ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(1,1,1), btVector3(-6,0,7), 0x109F, 0 ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(1,1,1), btVector3(-3,0,5), 0x307F, 0 ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(1,1,1), btVector3(0,0,3), 0x505F, 0 ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(1,1,1), btVector3(3,0,1), 0x703F, 0 ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(1,1,1), btVector3(6,0,-1), 0x901F, 0 ) ); // half-sizes, pos, color
         
-        boxes.push_back( Box( btVector3(10,5,5), btVector3(0,-7,-7), 0x000F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(10,5,5), btVector3(0,7,5), 0x000F ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(10,5,5), btVector3(0,-7,-7), 0x000F, 1234 ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(10,5,5), btVector3(0,7,5), 0x000F, 1234 ) ); // half-sizes, pos, color
 
-        blocks.push_back(  Cube( btVector3(4,4,12), 0xFFFF )  );
-        blocks.push_back(  Cube( btVector3(-4,4,12), 0xFFFF )  );
-        blocks.push_back(  Cube( btVector3(4,-4,12), 0xFFFF )  );
-        blocks.push_back(  Cube( btVector3(-4,-4,12), 0xFFFF )  );
+        blocks.push_back(  Cube( btVector3(4,4,12), 0xFFFF, 0 )  );
+        blocks.push_back(  Cube( btVector3(-4,4,12), 0xFFFF, 0 )  );
+        blocks.push_back(  Cube( btVector3(4,-4,12), 0xFFFF, 0 )  );
+        blocks.push_back(  Cube( btVector3(-4,-4,12), 0xFFFF, 0 )  );
 
         hero = Player( btVector3(-9,-6,12), 0xF00F, checkertexture );
         //hero.object->rotateZ( M_PI/2 );
         hero.object->debug = true;
-       
-        // add some blocks pieces
-        for ( int i=0; i<4; i++ )
-        {
-            blocks[i].id = 0;
-            boxes[i].id = 0;
-        }
-        boxes[4].id = 0;
-        for ( int i=5; i<7; i++ )
-        {
-            boxes[i].id = 1234;
-        }
     }
     else
     {

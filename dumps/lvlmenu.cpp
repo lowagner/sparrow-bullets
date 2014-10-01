@@ -55,8 +55,7 @@ MainMenu::reset()
             // this guy includes the floor.  all static rectangular prisms.
             boxes.push_back( Box( btVector3(7,7,1), btVector3(0,0,-3), 0x05FF ) ); // half-sizes, pos, color
 
-            blocks.push_back( Cube( btVector3(0,0,5), 0x05FF ) ); // half-sizes, pos, color
-            blocks[0].id = 2;
+            blocks.push_back( Cube( btVector3(0,0,5), 0x05FF, 2 ) ); // half-sizes, pos, color
 
             hero = Player( btVector3(0,4,5), 0xF00F, checkertexture );
             hero.object->rotateZ( 3*M_PI/2 );
@@ -86,8 +85,15 @@ MainMenu::reset()
             // this guy includes the floor.  all static rectangular prisms.
             boxes.push_back( Box( btVector3(7,7,1), btVector3(0,0,-3), 0x05FF ) ); // half-sizes, pos, color
 
-            blocks.push_back( Cube( btVector3(0,0,5), 0x05FF ) ); // half-sizes, pos, color
-            blocks[0].id = 1;
+            blocks.push_back( Cube( btVector3(5,-3,5), 0x05FF, 1 ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(3,-3,5), 0x05FF, 2 ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(1,-3,5), 0x05FF, 3 ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(-1,-3,5), 0x05FF, 4 ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(-3,-3,5), 0x05FF, 5 ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(-5,-3,5), 0x05FF, 6 ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(-5,-1,5), 0x05FF, 7 ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(-5,1,5), 0x05FF, 8 ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(-5,3,5), 0x05FF, 9 ) ); // half-sizes, pos, color
 
             hero = Player( btVector3(0,4,5), 0xF00F, checkertexture );
             hero.object->rotateZ( 3*M_PI/2 );
