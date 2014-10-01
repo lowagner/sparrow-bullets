@@ -62,23 +62,33 @@ int update( Uint32 dt )
     {
         return 1;
     }
-    else
-    if (newgamestate != gamestate)
+    else if (newgamestate != gamestate)
     {
-        // this shouldn't actually return 1 here.
-        delete gamechunk;
-        if ( newgamestate == 1 )
+        if ( newgamestate == GAMESTATEmenu )
         {
             std::cout << " initiating main menu" << std::endl;
+            delete gamechunk;
             gamechunk = new MainMenu(); 
         }
-        else if ( newgamestate == 2 )
+        else 
         {
-            std::cout << " initiating low levels" << std::endl;
-            gamechunk = new LowLevels(); 
+            int level=1;
+            if ( gamestate == GAMESTATEmenu )
+                level = gamechunk->level;
+            
+            delete gamechunk;
+
+            if ( newgamestate == GAMESTATElovels )
+            {
+                std::cout << "initiating low levels at level " << level << std::endl;
+                gamechunk = new LowLevels( level ); 
+            }
+            else
+            {
+                std::cout << "unknown gamestate / level set " << newgamestate << std::endl;
+                return 1;
+            }
         }
-        else
-            return 1;
 
         // instead, it should actually kill the previous gamechunk:
         // delete gamechunk;

@@ -34,11 +34,16 @@ protected:
 
     spFontPointer font;
 
+    char lvltext[60]; // level name
+    char alerttext[60]; // if there are any alerts to be broadcast
+    btScalar alerttime; // how long left to broadcast
+
     Player hero;
+    int lives; // number of lives left
+
     btScalar winlevel; // 0 until we won the level, then jumps to some preset time
     char wintext[60]; // 
-    char lvltext[60];
-    int lives; // number of lives left
+
 
     std::vector<Cube> blocks; // dynamic blocks
     std::vector<Box> boxes; // static boxes
@@ -56,7 +61,6 @@ protected:
     char input[32];
 
     int iamdone;
-    int level;
     Physics physics;
     
 //    time_t previous_t;
@@ -79,6 +83,8 @@ public:
     int set_value( const char* name, float value);
     void write_settings();
     void deinit();
+
+    void set_alert( const char* alert, btScalar deltat = 3 );
 
     ~Play();
 };

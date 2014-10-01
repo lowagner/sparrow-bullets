@@ -15,6 +15,8 @@ extern int GAMESTATEsplash; // loading
 class GameChunk
 {
 public:
+    int level; // one piece of information that the gamechunk has, that everyone can see
+
     GameChunk() {};
     virtual int update( Uint32 dt ) {}; // dt measured in milliseconds
     virtual void resize( Uint16 w, Uint16 h ) {};

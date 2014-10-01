@@ -142,6 +142,13 @@ Play::Play( int level_ ) // init play class
     //reset();
 }
 
+void
+Play::set_alert( const char* alert, btScalar deltat )
+{
+    alerttime = deltat;
+    sprintf( alerttext, "%s", alert );
+}
+
 int
 Play::set_value( const char* name, float value )
 {
@@ -298,6 +305,7 @@ void Play::draw( SDL_Surface* screen )
         spFontDrawRight( screen->w - 2, screen->h - 2*font-> maxheight, 0, "[Y] Zoom in", font ); 
         spFontDrawRight( screen->w - 2, screen->h - 1*font-> maxheight, 0, "[X] Zoom out", font );
 
+        
         if ( winlevel > 0.f )
         {
             sprintf( buffer, "%s %d", wintext, int(ceil(winlevel)) );
@@ -308,6 +316,10 @@ void Play::draw( SDL_Surface* screen )
                 sprintf( buffer, "accumulated time: %.2f", (totalclock+clock) );
                 spFontDrawMiddle( screen->w / 2, screen->h / 2 + font->maxheight + 2, 0, buffer, font );
             }
+        }
+        else if ( alerttime > 0.f )
+        {
+            spFontDrawMiddle( screen->w / 2, screen->h / 2, 0, alerttext, font ); 
         }
     }
     //spFontDrawMiddle( screen->w /2, screen->h - 2*font-> maxheight, 0, input, font );
@@ -707,6 +719,15 @@ int Play::update_level( btScalar fdt )
                 blocks[i].activate();
             }
             hero.object->activate();
+        }
+        
+        if ( alerttime > 0.f )
+        {
+            alerttime -= fdt;
+            if ( alerttime <= 0.f )
+            {
+                alerttime = 0.f;
+            }
         }
     } 
     else

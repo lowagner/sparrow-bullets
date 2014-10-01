@@ -10,8 +10,8 @@ MainMenu::MainMenu( int level_ )
     gamestate = GAMESTATEmenu;
 
     level = level_;
-    levelset = 1; // levelset = 0 is the main menu.
-                  // levelset = 1 is the low levels
+    levelset = 1; // levelset = 1 is the main menu.
+                  // levelset = 2 is the low levels, etc.
     reset();
 }
 
@@ -19,20 +19,6 @@ MainMenu::MainMenu( int level_ )
 int
 MainMenu::reset()
 {
-    std::cout << " levelset = " << levelset << std::endl;
-    std::cout << " level = " << level << std::endl;
-    switch ( levelset )
-    {
-        case 1:
-            sprintf( lvltext, "main menu" );
-            break;
-        case 2:
-            sprintf( lvltext, "low levels" );
-            break;
-
-    }
-    std::cout << " leveltext = " << lvltext << std::endl;
-
     if ( lives == 999998 )
     {
         // if you lose a life on the Main menu, that is tantamount to quitting
@@ -57,30 +43,64 @@ MainMenu::reset()
     menu = 0;
     checkertexture = spLoadSurface("../data/check.png");
 
-    if ( level == 1 )
+    if ( levelset == GAMESTATEmenu )
     {
-        outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
+        if ( level == 1 )
+        {
+            sprintf( lvltext, "main menu" );
+            set_alert( "- choose your stage -" );
 
-        // this guy includes the floor.  all static rectangular prisms.
-        boxes.push_back( Box( btVector3(7,7,1), btVector3(0,0,-3), 0x05FF ) ); // half-sizes, pos, color
+            outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
 
-        blocks.push_back( Cube( btVector3(0,0,5), 0x05FF ) ); // half-sizes, pos, color
-        blocks[0].id = 2;
+            // this guy includes the floor.  all static rectangular prisms.
+            boxes.push_back( Box( btVector3(7,7,1), btVector3(0,0,-3), 0x05FF ) ); // half-sizes, pos, color
 
-        hero = Player( btVector3(0,4,5), 0xF00F, checkertexture );
-        hero.object->rotateZ( 3*M_PI/2 );
-        hero.object->debug = true;
+            blocks.push_back( Cube( btVector3(0,0,5), 0x05FF ) ); // half-sizes, pos, color
+            blocks[0].id = 2;
+
+            hero = Player( btVector3(0,4,5), 0xF00F, checkertexture );
+            hero.object->rotateZ( 3*M_PI/2 );
+            hero.object->debug = true;
+        }
+        else 
+        {
+            levelset = level;
+            level = 0;
+        }
     }
-    else if ( level == 2 )
-    {
-        // low levels
-        std::cout << " switching to low levels" << std::endl;
 
-        return GAMESTATElovels;
+
+    if ( levelset == GAMESTATEmenu )
+    {
+    // run through once more just in case we switched...
+    }
+    else if ( levelset == GAMESTATElovels )
+    {
+        if ( level == 0 )
+        { // choose your level of the low levels
+            sprintf( lvltext, "low levels" );
+            set_alert( "- choose level for low -" );
+
+            outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
+
+            // this guy includes the floor.  all static rectangular prisms.
+            boxes.push_back( Box( btVector3(7,7,1), btVector3(0,0,-3), 0x05FF ) ); // half-sizes, pos, color
+
+            blocks.push_back( Cube( btVector3(0,0,5), 0x05FF ) ); // half-sizes, pos, color
+            blocks[0].id = 1;
+
+            hero = Player( btVector3(0,4,5), 0xF00F, checkertexture );
+            hero.object->rotateZ( 3*M_PI/2 );
+            hero.object->debug = true;
+        }
+        else
+        {
+            return GAMESTATElovels;
+        }
     }
     else
     {
-        std::cout << "There are no levels past this point.  But please contribute!" << std::endl; 
+        std::cout << "There are no level sets past this point.  But please contribute!" << std::endl; 
         return GAMESTATEquit;
     }
 
@@ -132,19 +152,14 @@ int MainMenu::update_level( btScalar fdt )
                 i++;
             }
         }
-//        if (blocksize == 0)
-//        {
-//            winlevel = 3;
-//        }
-//        else if ( activate )
-//        {
-//            // boxes disappeared or something, we should reactivate everything
-//            for ( int i=0; i<blocks.size(); i++ )
-//            {
-//                blocks[i].activate();
-//            }
-//            hero.object->activate();
-//        }
+        if ( alerttime > 0.f )
+        {
+            alerttime -= fdt;
+            if ( alerttime <= 0.f )
+            {
+                alerttime = 0.f;
+            }
+        }
     } 
     else
     { // we have won and are waiting to start next level
