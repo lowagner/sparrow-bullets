@@ -5,13 +5,13 @@ Check the LICENSE file included for copyright information.
 #include <string>
 #include <iostream>
 
-MainMenu::MainMenu( int level_ ) 
+MainMenu::MainMenu( int level_, int levelset_ ) 
 {
     gamestate = GAMESTATEmenu;
 
     level = level_;
-    levelset = 1; // levelset = 1 is the main menu.
-                  // levelset = 2 is the low levels, etc.
+    levelset = levelset_; // levelset = 1 is the main menu.
+                          // levelset = 2 is the low levels, etc.
     reset();
 }
 

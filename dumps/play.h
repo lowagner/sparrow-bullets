@@ -95,7 +95,7 @@ class MainMenu : public Play
 protected:
     int levelset;
 public:
-    MainMenu( int level_ = 1 );
+    MainMenu( int level_ = 1, int levelset_ = 1 );
     int reset();
     int update_level( btScalar fdt );
 };

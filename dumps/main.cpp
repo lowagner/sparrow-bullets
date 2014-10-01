@@ -44,7 +44,7 @@ void init()
 
     // set gamestate and gamechunk to the right variables...
     gamestate = GAMESTATEmenu;
-    gamechunk = new MainMenu();
+    gamechunk = new MainMenu(0,2); // NOTE:  change when there are more levelsets available.
 
     spUsePrecalculatedNormals(0);
     resize( screen->w, screen->h );

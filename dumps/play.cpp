@@ -284,6 +284,8 @@ void Play::draw( SDL_Surface* screen )
                 sprintf( buffer, "%s", menuitems[i] );
             spFontDrawMiddle( screen->w / 2, y, 0, buffer, font );
             y += font->maxheight + 4;
+            if ( i == 2 || i == 4 )
+                y += (font->maxheight*2/5);
         } 
         
         spFontDraw( 2, screen->h - 1*font->maxheight,0, "D-pad Navigate Menu", font); 
