@@ -186,6 +186,14 @@ Play::deinit()
     if ( checkertexture )
         spDeleteSurface(checkertexture);
     checkertexture=NULL;
+
+    for ( int i=0; i<numbertexture.size(); i++ )
+        if ( numbertexture[i] )
+        {
+            spDeleteSurface( numbertexture[i] );
+            numbertexture[i] = NULL;
+        }
+    numbertexture.clear();
     
     physics.deinit();
 }

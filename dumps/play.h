@@ -21,6 +21,7 @@ protected:
     int gamestate;
 
     SDL_Surface* checkertexture;
+    std::vector<SDL_Surface*> numbertexture;
 
     Sint32 cameraincline;
     Sint32 cameraaxis;

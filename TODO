@@ -5,6 +5,14 @@ DOWN IN THE DUMPS.
 
 SAVING AND LEVELS
 
+main menu:
+    allow to select only one level at a time (and check whether you're able to load that one)
+        '' single track mode ''
+    or play all for a time trial. ''marathon mode'' (block.id = 0; removal of id=0 will trigger 
+        fancier game logic, to put in marathon mode running)
+        marathons will also track statistics of which levels are longest and hardest (lives lost),
+        but only the aggregate matters.
+
 level upgrades:
     allow blocks to be different sized cubes
     have physics have a set of cube sizes which it has already included as collision shapes
@@ -29,6 +37,12 @@ fancy new gimmicks for new levels
 
 
 AESTHETICS, SOUNDS, and MUSIC
+
+in main menu, let cubes have textures corresponding to levels (M, 1,2,3,4,...) or level sets ("low").
+
+create a billboard blitter class, intangible, which can follow an object, and show information
+about it.
+    to every play class, add a blitter vector which is automatically drawn.
 
 need to figure out how to get contact call backs talking to player object.
     sum over all contacts processed, to give a final "intensity" to play a sound file at.

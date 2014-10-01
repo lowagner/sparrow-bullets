@@ -42,6 +42,14 @@ MainMenu::reset()
     pause = 0; // default to no pause
     menu = 0;
     checkertexture = spLoadSurface("../data/check.png");
+    numbertexture.push_back( spLoadSurface("../data/number_M.png") );
+
+    for ( int i=1; i<2; i++)
+    {
+        char buffer[60];
+        sprintf( buffer, "../data/number_%i.png", i );
+        numbertexture.push_back( spLoadSurface(buffer) );
+    }
 
     if ( levelset == GAMESTATEmenu )
     {
@@ -85,7 +93,7 @@ MainMenu::reset()
             // this guy includes the floor.  all static rectangular prisms.
             boxes.push_back( Box( btVector3(7,7,1), btVector3(0,0,-3), 0x05FF ) ); // half-sizes, pos, color
 
-            blocks.push_back( Cube( btVector3(5,-3,5), 0x05FF, 1 ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(5,-3,5), 0x05FF, 1, numbertexture[1] ) ); // half-sizes, pos, color
             blocks.push_back( Cube( btVector3(3,-3,5), 0x05FF, 2 ) ); // half-sizes, pos, color
             blocks.push_back( Cube( btVector3(1,-3,5), 0x05FF, 3 ) ); // half-sizes, pos, color
             blocks.push_back( Cube( btVector3(-1,-3,5), 0x05FF, 4 ) ); // half-sizes, pos, color
