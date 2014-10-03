@@ -4,6 +4,7 @@
 #include "objects.h"
 
 
+void draw_flip_textured_cube( SDL_Surface* texture, Sint32 halfsize = SP_ONE, Uint16 color = 0xFFFF );
 void draw_textured_cube( SDL_Surface* texture, Sint32 halfsize = SP_ONE, Uint16 color = 0xFFFF );
 void draw_box( Sint32 halfsize_x = SP_ONE, 
                Sint32 halfsize_y = SP_ONE, 
@@ -21,8 +22,11 @@ protected:
     SDL_Surface* texture;
 
 public:
+    bool fliptexture;
+
     Cube( btVector3 pos=btVector3(), Uint16 color_=0xFFFF, 
-          int id_ = -1, SDL_Surface* texture_ = NULL, btScalar mass_ = btScalar(1) );
+          int id_ = -1, SDL_Surface* texture_ = NULL, 
+          bool fliptexture_=false, btScalar mass_ = btScalar(1) );
 
     void update( float dt );
 

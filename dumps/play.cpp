@@ -10,9 +10,13 @@ Check the LICENSE file included for copyright information.
 #include <fstream>
 #include "util.h"
 
-Play::Play( int level_ ) // init play class
+Play::Play( int level_, int levelset_ ) // init play class
 {
+    won = false;
+    alive = true;
+
     level = level_;
+    levelset = levelset_;
     sprintf( wintext, "win in" ); // default text to use when winning...
     spFontShadeButtons(1);
     lives = 12;
@@ -24,7 +28,7 @@ Play::Play( int level_ ) // init play class
     // and conveniently 0 is not a selectable menu item, it is the title of the menu.
     menuitems.push_back( "Game Menu" ); // not allowed to select this guy, menu > 0
     menuitems.push_back( "Return to play" );
-    menuitems.push_back( "Next level (deduct 10 lives)" );
+    menuitems.push_back( "Next level" );
     menuitems.push_back( "Camera follow speed" ); 
     menuitems.push_back( "Camera align speed" ); 
     menuitems.push_back( "Return to main menu" );
@@ -271,7 +275,7 @@ void Play::draw( SDL_Surface* screen )
     {
         spFontDrawRight( screen->w - 2 , font-> maxheight+2, 0, "[S] Select", font );
         spFontDraw( 2, font-> maxheight+4, 0, "[E] Select", font ); 
-        int y = 3*screen->h/7 - ((menuitems.size()+1)/2)*(font->maxheight);
+        int y = 3*screen->h/7 - ((menuitems.size()-1)/2)*(font->maxheight);
 
         sprintf( buffer, "= %s =", menuitems[0] );
         spFontDrawMiddle( screen->w / 2, y, 0, buffer, font );
@@ -347,7 +351,7 @@ void Play::draw( SDL_Surface* screen )
         spFontDrawMiddle( screen->w / 2, 2*(font->maxheight) + 4 , 0, buffer, font );
     }
   
-    if ( lives < 1000 )
+    if ( lives < 1000 && levelset )
     {
         if ( lives == 1 )
             sprintf( buffer, "life: %d", lives );
@@ -410,7 +414,8 @@ void Play::draw( SDL_Surface* screen )
         // draw blocks at partial transparency.  max alpha = 255 (fully opaque), 0 = fully transparent
     }
 
-    hero.object->draw( matrix );
+    if ( alive )
+        hero.object->draw( matrix );
 
     //spDeactivatePattern();
     spSetPerspectiveTextureMapping(0);
@@ -493,6 +498,20 @@ int Play::update( Uint32 dt )
                 case 5: // return to menu
                     menu=0;
                     pause=0;
+                    if ( gamestate == GAMESTATEmenu )
+                    {
+                        if ( levelset > 1 )
+                        {
+                            levelset = 1;
+                            level = 1;
+                            reset();
+                        }
+                    }
+                    else
+                    {
+                        level=0;
+                        levelset=gamestate;
+                    }
                     return GAMESTATEmenu;
                     break; 
                 case 6: // Exit
@@ -551,8 +570,8 @@ int Play::update( Uint32 dt )
     {   // the reset button
         spGetInput()->button[SP_BUTTON_L] = 0;
         lives -= 1;
-        clock = 0;
-        reset();
+        clock = 0.f;
+        return reset();
     }
 
     if (!(pause))
@@ -581,6 +600,7 @@ int Play::update_hero( btScalar fdt )
     {
         lives -= 1;
         clock = 0;
+        alive = false;
         return 1;
     }
 
@@ -717,11 +737,12 @@ int Play::update_level( btScalar fdt )
                 i++;
             }
         }
+        // check win conditions...
         if (blocksize == 0)
         {
             winlevel = 3; // amount of time you must survive before transitioning to next level
         }
-        else if ( activate )
+        if ( activate )
         {
             // boxes disappeared or something, we should reactivate everything
             for ( int i=0; i<blocks.size(); i++ )
@@ -730,7 +751,6 @@ int Play::update_level( btScalar fdt )
             }
             hero.object->activate();
         }
-        
         if ( alerttime > 0.f )
         {
             alerttime -= fdt;
@@ -746,6 +766,7 @@ int Play::update_level( btScalar fdt )
         if ( winlevel <= 0.f )
         {
             level += 1;
+            won = true;
             return 1;
         }
 

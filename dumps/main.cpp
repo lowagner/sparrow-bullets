@@ -64,37 +64,33 @@ int update( Uint32 dt )
     }
     else if (newgamestate != gamestate)
     {
+        // we can choose a level and a levelset...
+        int level=1;
+        int levelset=GAMESTATEmenu;
+        if ( gamestate >= GAMESTATEmenu )
+        {
+            level = gamechunk->level;
+            levelset = gamechunk->levelset;
+        }
+        
         if ( newgamestate == GAMESTATEmenu )
         {
             std::cout << " initiating main menu" << std::endl;
             delete gamechunk;
-            gamechunk = new MainMenu(); 
+            gamechunk = new MainMenu( level, levelset ); 
         }
-        else 
+        else if ( newgamestate == GAMESTATElovels )
         {
-            int level=1;
-            if ( gamestate == GAMESTATEmenu )
-                level = gamechunk->level;
-            
+            std::cout << "initiating low levels at level " << level << std::endl;
             delete gamechunk;
-
-            if ( newgamestate == GAMESTATElovels )
-            {
-                std::cout << "initiating low levels at level " << level << std::endl;
-                gamechunk = new LowLevels( level ); 
-            }
-            else
-            {
-                std::cout << "unknown gamestate / level set " << newgamestate << std::endl;
-                return 1;
-            }
+            gamechunk = new LowLevels( level, levelset ); 
+        }
+        else
+        {
+            std::cout << "unknown gamestate / level set " << newgamestate << std::endl;
+            return 1;
         }
 
-        // instead, it should actually kill the previous gamechunk:
-        // delete gamechunk;
-        // and move to the new gamechunk
-        // gamechunk = new GameChunk
-        // based on the newgamestate.
         gamestate = newgamestate;
     }
     return 0;

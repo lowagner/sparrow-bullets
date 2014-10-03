@@ -7,6 +7,8 @@ Check the LICENSE file included for copyright information.
 
 MainMenu::MainMenu( int level_, int levelset_ ) 
 {
+    won = false;
+
     gamestate = GAMESTATEmenu;
 
     level = level_;
@@ -21,9 +23,26 @@ MainMenu::reset()
 {
     if ( lives == 999998 )
     {
-        // if you lose a life on the Main menu, that is tantamount to quitting
-        std::cout << " You fell off the map and ended the game. " << std::endl;
-        return GAMESTATEquit;
+        if ( alive )
+        {
+            // do nothing if you reset at the main menu
+            std::cout << " nothing to reset " << std::endl;
+            clock = 1000;
+            lives = 999999;
+            return GAMESTATEmenu;
+        }
+        else if ( levelset == 1 )
+        {
+            // if you lose a life on the Main menu, that is tantamount to quitting
+            std::cout << " You fell off the map and ended the game. " << std::endl;
+            return GAMESTATEquit;
+        }
+        else
+        {
+            std::cout << " Going back one level in main menu. " << std::endl;
+            levelset = 1;
+            level = 1;
+        }
     }
 
     totalclock = 0;
@@ -52,7 +71,8 @@ MainMenu::reset()
     }
 
     if ( levelset == GAMESTATEmenu )
-    {
+    { 
+        won = false;
         if ( level == 1 )
         {
             sprintf( lvltext, "main menu" );
@@ -83,7 +103,14 @@ MainMenu::reset()
     }
     else if ( levelset == GAMESTATElovels )
     {
-        if ( level == 0 )
+        if ( won && level == 0 )
+        {
+            // play marathon play
+            std::cout << " playing marathon of level set " << levelset << "\n";
+            level = 1;
+            return GAMESTATElovels;
+        }
+        else if ( level == 0 )
         { // choose your level of the low levels
             sprintf( lvltext, "low levels" );
             set_alert( "- choose level for low -" );
@@ -91,24 +118,34 @@ MainMenu::reset()
             outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
 
             // this guy includes the floor.  all static rectangular prisms.
-            boxes.push_back( Box( btVector3(7,7,1), btVector3(0,0,-3), 0x05FF ) ); // half-sizes, pos, color
+            boxes.push_back( Box( btVector3(5,5,1), btVector3(-6,4,-3), 0x05FF ) ); // half-sizes, pos, color
+            boxes.push_back( Box( btVector3(3,3,1), btVector3(0,-5,-3), 0x05FF ) ); // half-sizes, pos, color
+            boxes.push_back( Box( btVector3(4,4,1), btVector3(7,0,-3), 0x05FF ) ); // half-sizes, pos, color
 
-            blocks.push_back( Cube( btVector3(5,-3,5), 0x05FF, 1, numbertexture[1] ) ); // half-sizes, pos, color
-            blocks.push_back( Cube( btVector3(3,-3,5), 0x05FF, 2 ) ); // half-sizes, pos, color
-            blocks.push_back( Cube( btVector3(1,-3,5), 0x05FF, 3 ) ); // half-sizes, pos, color
-            blocks.push_back( Cube( btVector3(-1,-3,5), 0x05FF, 4 ) ); // half-sizes, pos, color
-            blocks.push_back( Cube( btVector3(-3,-3,5), 0x05FF, 5 ) ); // half-sizes, pos, color
-            blocks.push_back( Cube( btVector3(-5,-3,5), 0x05FF, 6 ) ); // half-sizes, pos, color
-            blocks.push_back( Cube( btVector3(-5,-1,5), 0x05FF, 7 ) ); // half-sizes, pos, color
-            blocks.push_back( Cube( btVector3(-5,1,5), 0x05FF, 8 ) ); // half-sizes, pos, color
-            blocks.push_back( Cube( btVector3(-5,3,5), 0x05FF, 9 ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(7,0,5), 0x05FF, 0, numbertexture[0] ) ); // half-sizes, pos, color
 
-            hero = Player( btVector3(0,4,5), 0xF00F, checkertexture );
-            hero.object->rotateZ( 3*M_PI/2 );
+            blocks.push_back( Cube( btVector3(2,-7,5), 0x05FF, 1, numbertexture[1] ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(0,-7,5), 0x05FF, 2 ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(-2,-7,5), 0x05FF, 3 ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(-2,-3,5), 0x05FF, 4 ) ); // half-sizes, pos, color
+
+            blocks.push_back( Cube( btVector3(-6,0,5), 0x05FF, 5 ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(-8,0,5), 0x05FF, 6 ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(-10,0,5), 0x05FF, 7 ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(-10,8,5), 0x05FF, 8 ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(-6,8,5), 0x05FF, 9 ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(-4,8,5), 0x05FF, 10 ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(-4,6,5), 0x05FF, 10 ) ); // half-sizes, pos, color
+
+            hero = Player( btVector3(10,0,5), 0xF00F, checkertexture );
+            hero.object->rotateZ( M_PI );
             hero.object->debug = true;
         }
         else
-        {
+        {   
+            // single level play
+            std::cout << " playing single level " << level << " in level set " << levelset << "\n";
+            levelset = 0; 
             return GAMESTATElovels;
         }
     }
@@ -118,7 +155,9 @@ MainMenu::reset()
         return GAMESTATEquit;
     }
 
-    
+    won = false; 
+    alive = true;
+
     // now add physics to everybody 
     physics.init();
     hero.object->add_physics( physics );
@@ -158,7 +197,8 @@ int MainMenu::update_level( btScalar fdt )
 
             if (  blocks[i].out_of_bounds( outofbounds )   )
             {
-                level = blocks[i].id;  // eventually this will be levelset = blocks[i].id
+                won = true;
+                level = blocks[i].id;  // this becomes levelset = blocks[i].id in reset()
                 return 1;
             }
             else

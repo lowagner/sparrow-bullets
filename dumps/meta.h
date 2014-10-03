@@ -16,6 +16,7 @@ class GameChunk
 {
 public:
     int level; // one piece of information that the gamechunk has, that everyone can see
+    int levelset;
 
     GameChunk() {};
     virtual int update( Uint32 dt ) {}; // dt measured in milliseconds

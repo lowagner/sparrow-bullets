@@ -9,6 +9,40 @@ draw_textured_cube( SDL_Surface* texture, Sint32 halfsize, Uint16 color )
 
     spBindTexture( texture );
     // Top / Bottom
+    spQuadTex3D( -halfsize, halfsize, halfsize, texture->w, 0, // TOP
+                -halfsize, -halfsize, halfsize, 0, 0,
+                halfsize, -halfsize, halfsize,  0, texture->h,
+                halfsize, halfsize, halfsize,   texture->w, texture->h, color );
+    spQuadTex3D( halfsize, halfsize, -halfsize,  texture->w, 0, // BOTTOM
+                halfsize, -halfsize, -halfsize,  0, 0,
+                -halfsize, -halfsize, -halfsize, 0, texture->h,
+                -halfsize, halfsize, -halfsize,  texture->w, texture->h, color );
+    // Front / Back  
+    spQuadTex3D( -halfsize, halfsize, halfsize,  0, 0, // BACK
+                -halfsize, halfsize, -halfsize,  0, texture->h,
+                -halfsize, -halfsize, -halfsize, texture->w, texture->h,
+                -halfsize, -halfsize, halfsize,  texture->w, 0, color );
+    spQuadTex3D( halfsize, -halfsize, halfsize,  0, 0, // FRONT
+                halfsize, -halfsize, -halfsize,  0, texture->h,
+                halfsize, halfsize, -halfsize,   texture->w, texture->h,
+                halfsize, halfsize, halfsize,    texture->w, 0, color );
+    // Left / Right
+    spQuadTex3D( halfsize, halfsize, halfsize,   0, 0, // LEFT
+                halfsize, halfsize, -halfsize,   0, texture->h,
+                -halfsize, halfsize, -halfsize,  texture->w, texture->h,
+                -halfsize, halfsize, halfsize,   texture->w, 0, color );
+    spQuadTex3D( -halfsize, -halfsize, halfsize,  0, 0, // RIGHT
+                -halfsize, -halfsize, -halfsize,  0, texture->h,
+                halfsize, -halfsize, -halfsize,   texture->w, texture->h,
+                halfsize, -halfsize, halfsize,    texture->w, 0, color );
+}
+
+void 
+draw_flip_textured_cube( SDL_Surface* texture, Sint32 halfsize, Uint16 color )
+{
+
+    spBindTexture( texture );
+    // Top / Bottom
     spQuadTex3D( -halfsize, halfsize, halfsize, 0, texture->h,
                 -halfsize, -halfsize, halfsize, 0, 0,
                 halfsize, -halfsize, halfsize,  texture->w, 0,
@@ -17,7 +51,7 @@ draw_textured_cube( SDL_Surface* texture, Sint32 halfsize, Uint16 color )
                 halfsize, -halfsize, -halfsize,  0, 0,
                 -halfsize, -halfsize, -halfsize, texture->w, 0,
                 -halfsize, halfsize, -halfsize,  texture->w, texture->h, color );
-    //Left / Right
+    // Front / Back  
     spQuadTex3D( -halfsize, halfsize, halfsize,  0, texture->h,
                 -halfsize, halfsize, -halfsize,  0, 0,
                 -halfsize, -halfsize, -halfsize, texture->w, 0,
@@ -26,7 +60,7 @@ draw_textured_cube( SDL_Surface* texture, Sint32 halfsize, Uint16 color )
                 halfsize, -halfsize, -halfsize,  0, 0,
                 halfsize, halfsize, -halfsize,   texture->w, 0,
                 halfsize, halfsize, halfsize,    texture->w, texture->h, color );
-    //Up / Down  // play_texture->w - 1, play_texture->h - 1, 
+    //Left / Right
     spQuadTex3D( halfsize, halfsize, halfsize,   0, texture->h,
                 halfsize, halfsize, -halfsize,   0, 0,
                 -halfsize, halfsize, -halfsize,  texture->w, 0,
@@ -104,11 +138,13 @@ draw_ramp( Sint32 sizex, Sint32 sizey, Sint32 sizez,  Uint16 color )
 Cube::Cube( btVector3 pos, Uint16 color_, 
             int id_,
             SDL_Surface* texture_, 
+            bool fliptexture_,
             btScalar mass_ )
 {    
     mass = mass_;
     //std::cout << " Cube mass = " << mass << std::endl;
     id = id_;
+    fliptexture = fliptexture_;
     debug = false;
     // setup GL orientation/transform matrix
     for (int i=0; i<16; i++)
@@ -166,7 +202,12 @@ Cube::draw( Sint32* matrix, int alpha )
         spSetAlphaPattern4x4(alpha,8);
         //spSetAlphaPattern4x4(255,8);  // max is 255.  not sure what the second arg does.  seems to help with texture.
         if (texture)
-            draw_textured_cube( texture, SP_ONE, color );
+        {
+            if ( fliptexture )
+                draw_flip_textured_cube( texture, SP_ONE, color );
+            else
+                draw_textured_cube( texture, SP_ONE, color );
+        }
         else
             draw_box( SP_ONE, SP_ONE, SP_ONE, color );
 
@@ -194,6 +235,7 @@ Cube::Cube( const Cube& other ) // copy constructor
     dynamics = other.dynamics;
     mass = other.mass;
     id = other.id;
+    fliptexture = other.fliptexture;
     debug = other.debug;
     texture = other.texture;
     physics = other.physics;
@@ -215,6 +257,7 @@ Cube::operator = ( Cube other ) // Copy Assignment Operator
     dynamics = other.dynamics;
     mass = other.mass;
     id = other.id;
+    fliptexture = other.fliptexture;
     debug = other.debug;
     texture = other.texture;
     physics = other.physics;

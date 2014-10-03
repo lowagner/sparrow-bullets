@@ -2,6 +2,16 @@ ROADMAP FOR DUMPS
 
 DOWN IN THE DUMPS.
 
+BUGS:  
+    UNKNOWN CAUSE:
+    FPS drops to 20 or so, when it usually is around 40 (on my machine at full screen)
+
+    POSSIBLE BUGS:
+    latest fixes to menu options.
+    Main menu vs. level handling gameplay "next level" menu option... 
+
+    SEGFAULT when unknown level encountered.  push off block.id = 10, for instance.
+
 
 SAVING AND LEVELS
 

@@ -19,6 +19,8 @@ class Play : public GameChunk
 {
 protected:
     int gamestate;
+    bool won;
+    bool alive;
 
     SDL_Surface* checkertexture;
     std::vector<SDL_Surface*> numbertexture;
@@ -71,7 +73,7 @@ protected:
     
 public:
 
-    Play( int level_ = 1 );
+    Play( int level_ = 1, int levelset_ = 1 );
 
     virtual int reset();
     virtual int update( Uint32 dt );
@@ -93,8 +95,6 @@ public:
 
 class MainMenu : public Play
 {
-protected:
-    int levelset;
 public:
     MainMenu( int level_ = 1, int levelset_ = 1 );
     int reset();
@@ -105,7 +105,7 @@ public:
 class LowLevels : public Play
 {
 public:
-    LowLevels( int level_ = 1 );
+    LowLevels( int level_ = 1, int levelset_ = 2 );
     int reset();
 };
 

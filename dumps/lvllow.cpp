@@ -5,11 +5,14 @@ Check the LICENSE file included for copyright information.
 #include <string>
 #include <iostream>
 
-LowLevels::LowLevels( int level_ )
+LowLevels::LowLevels( int level_, int levelset_ )
 {
     level = level_;
+    levelset = levelset_;
+
     gamestate = GAMESTATElovels;
 
+    won = false;
     reset();
 }
 
@@ -17,7 +20,7 @@ LowLevels::LowLevels( int level_ )
 
 int
 LowLevels::reset()
-{
+{   
     sprintf( lvltext, "low lvl. %i", level );
     totalclock += clock;
 
@@ -34,6 +37,13 @@ LowLevels::reset()
     menu = 0;
     clock = 0;
     checkertexture = spLoadSurface("../data/check.png");
+
+    if ( won && levelset == 0 )
+    {   // if we play only one level
+        level = 0;
+        levelset = gamestate;
+        return GAMESTATEmenu;
+    }
 
     if ( level == 1 )
     {
@@ -241,13 +251,25 @@ LowLevels::reset()
     }
     else
     {
-        std::cout << " congratulations, you beated all levels! " << std::endl;
-        std::cout << " total accumulated time: " << totalclock << std::endl;
-        std::cout << " remaining lives: " << lives << std::endl;
-        std::cout << " hopefully they will get around to creating level " << level << std::endl;
-        return GAMESTATEquit;
+        if ( won ) 
+        {
+            // we beat all levels... go back to main menu for this levelset
+            std::cout << " congratulations, you beated all levels! " << std::endl;
+            std::cout << " total accumulated time: " << totalclock << std::endl;
+            std::cout << " remaining lives: " << lives << std::endl;
+            level = 0;
+            levelset = gamestate;
+            return GAMESTATEmenu;
+        }
+        else 
+        {
+            std::cout << " unknown level " << level << " in levelset " << gamestate << std::endl;
+            return GAMESTATEquit;
+        }
     }
     
+    won = false;
+    alive = true;
     // now add physics to everybody 
     physics.init();
     hero.object->add_physics( physics );
