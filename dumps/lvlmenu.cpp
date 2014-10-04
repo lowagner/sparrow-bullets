@@ -63,7 +63,7 @@ MainMenu::reset()
     checkertexture = spLoadSurface("../data/check.png");
     numbertexture.push_back( spLoadSurface("../data/number_M.png") );
 
-    for ( int i=1; i<2; i++)
+    for ( int i=1; i<13; i++)
     {
         char buffer[60];
         sprintf( buffer, "../data/number_%i.png", i );
@@ -125,17 +125,18 @@ MainMenu::reset()
             blocks.push_back( Cube( btVector3(7,0,5), 0x05FF, 0, numbertexture[0] ) ); // half-sizes, pos, color
 
             blocks.push_back( Cube( btVector3(2,-7,5), 0x05FF, 1, numbertexture[1] ) ); // half-sizes, pos, color
-            blocks.push_back( Cube( btVector3(0,-7,5), 0x05FF, 2 ) ); // half-sizes, pos, color
-            blocks.push_back( Cube( btVector3(-2,-7,5), 0x05FF, 3 ) ); // half-sizes, pos, color
-            blocks.push_back( Cube( btVector3(-2,-3,5), 0x05FF, 4 ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(0,-7,5), 0x05FF, 2, numbertexture[2] ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(-2,-7,5), 0x05FF, 3, numbertexture[3] ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(-2,-3,5), 0x05FF, 4, numbertexture[4] ) ); // half-sizes, pos, color
 
-            blocks.push_back( Cube( btVector3(-6,0,5), 0x05FF, 5 ) ); // half-sizes, pos, color
-            blocks.push_back( Cube( btVector3(-8,0,5), 0x05FF, 6 ) ); // half-sizes, pos, color
-            blocks.push_back( Cube( btVector3(-10,0,5), 0x05FF, 7 ) ); // half-sizes, pos, color
-            blocks.push_back( Cube( btVector3(-10,8,5), 0x05FF, 8 ) ); // half-sizes, pos, color
-            blocks.push_back( Cube( btVector3(-6,8,5), 0x05FF, 9 ) ); // half-sizes, pos, color
-            blocks.push_back( Cube( btVector3(-4,8,5), 0x05FF, 10 ) ); // half-sizes, pos, color
-            blocks.push_back( Cube( btVector3(-4,6,5), 0x05FF, 10 ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(-6,0,5), 0x05FF, 5, numbertexture[5] ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(-8,0,5), 0x05FF, 6, numbertexture[6] ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(-10,0,5), 0x05FF, 7, numbertexture[7] ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(-10,8,5), 0x05FF, 8, numbertexture[8] ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(-6,8,5), 0x05FF, 9, numbertexture[9] ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(-4,8,5), 0x05FF, 10, numbertexture[10] ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(-4,6,5), 0x05FF, 11, numbertexture[11] ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(-4,6,8), 0x05FF, 12, numbertexture[12] ) ); // half-sizes, pos, color
 
             hero = Player( btVector3(10,0,5), 0xF00F, checkertexture );
             hero.object->rotateZ( M_PI );
