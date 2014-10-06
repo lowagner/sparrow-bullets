@@ -400,22 +400,22 @@ void Play::draw( SDL_Surface* screen )
 
     for (int i=0; i<boxes.size(); i++)
     {
-        boxes[i].draw( matrix );  // this draws and resets the model view to matrix
+        boxes[i].draw( matrix, font );  // this draws and resets the model view to matrix
     }
     
     for (int i=0; i<ramps.size(); i++)
     {
-        ramps[i].draw( matrix ); 
+        ramps[i].draw( matrix, font ); 
     }
 
     for (int i=0; i<blocks.size(); i++)
     {
-        blocks[i].draw( matrix, 200 ); 
+        blocks[i].draw( matrix, font, 200 ); 
         // draw blocks at partial transparency.  max alpha = 255 (fully opaque), 0 = fully transparent
     }
 
     if ( alive )
-        hero.object->draw( matrix );
+        hero.object->draw( matrix, font );
 
     //spDeactivatePattern();
     spSetPerspectiveTextureMapping(0);
@@ -815,12 +815,12 @@ void Play::load_font()
 void Play::handle( SDL_Event* event )
 {
     // get all SDL events and do something with them...  if you want...
-    if (event->type == SDL_KEYDOWN)
-    {
-        int lastKey = event->key.keysym.unicode;
+//    if (event->type == SDL_KEYDOWN)
+//    {
+//        int lastKey = event->key.keysym.unicode;
 //        char buffer[5];
 //        printf("keydown event 0x%x = \"%s\" keysym=%i\n",lastKey,spFontGetUTF8FromUnicode(lastKey,buffer,5),event->key.keysym.sym);
-    }
+//    }
 }
 
 Play::~Play()

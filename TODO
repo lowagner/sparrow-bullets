@@ -12,6 +12,30 @@ BUGS:
 
     SEGFAULT when unknown level encountered.  push off block.id = 10, for instance.
 
+    SEGFAULT when trying to add text
+        Program received signal SIGSEGV, Segmentation fault.
+        spFontGetLetter (font=font@entry=0x0, character=104) at sparrowFont.c:573
+        573     if ( character >= font->cacheOffset && character < font->cacheOffset + font->cache.size )
+        (gdb) bt
+        #0  spFontGetLetter (font=font@entry=0x0, character=104) at sparrowFont.c:573
+        #1  0x00007ffff79c3b8d in spFontWidth (text=text@entry=0x7ffffffed930 "hi", font=font@entry=0x0) at sparrowFont.c:802
+        #2  0x00007ffff79c3f66 in spCreateTextBlock (text=<optimized out>, max_width=50, font=0x0) at sparrowFont.c:917
+        #3  0x0000000000412d05 in BaseObject::set_text (this=0x689110, text_=text_@entry=0x4186cd "hi", maxwidth=maxwidth@entry=50, font=0x0) at objects.cpp:50
+        #4  0x0000000000410bc7 in MainMenu::reset (this=this@entry=0x663480) at lvlmenu.cpp:144
+        #5  0x00000000004110b4 in MainMenu::MainMenu (this=0x663480, level_=0, levelset_=2) at lvlmenu.cpp:17
+        #6  0x0000000000407d34 in init () at main.cpp:47
+        #7  0x0000000000407db9 in main (argc=<optimized out>, argv=<optimized out>) at main.cpp:114
+        (gdb) 
+        #0  spFontGetLetter (font=font@entry=0x0, character=104) at sparrowFont.c:573
+        #1  0x00007ffff79c3b8d in spFontWidth (text=text@entry=0x7ffffffed930 "hi", font=font@entry=0x0) at sparrowFont.c:802
+        #2  0x00007ffff79c3f66 in spCreateTextBlock (text=<optimized out>, max_width=50, font=0x0) at sparrowFont.c:917
+        #3  0x0000000000412d05 in BaseObject::set_text (this=0x689110, text_=text_@entry=0x4186cd "hi", maxwidth=maxwidth@entry=50, font=0x0) at objects.cpp:50
+        #4  0x0000000000410bc7 in MainMenu::reset (this=this@entry=0x663480) at lvlmenu.cpp:144
+        #5  0x00000000004110b4 in MainMenu::MainMenu (this=0x663480, level_=0, levelset_=2) at lvlmenu.cpp:17
+        #6  0x0000000000407d34 in init () at main.cpp:47
+        #7  0x0000000000407db9 in main (argc=<optimized out>, argv=<optimized out>) at main.cpp:114
+
+
 
 SAVING AND LEVELS
 

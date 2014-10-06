@@ -39,6 +39,8 @@ protected:
 
     void locate_and_move( btScalar dt );
     void reset_camera( Sint32* matrix );
+
+    spTextBlockPointer text;
     
 
 public:
@@ -60,6 +62,9 @@ public:
     void rotate( btVector3 axis, btScalar angle );
     void impulse( btVector3 forcedt );
 
+    void set_text( const char* text_, int maxwidth, spFontPointer font );
+    void remove_text();
+
     //void transform( Sint32* m );
 
     
@@ -70,7 +75,7 @@ public:
     //virtual void remove();
 
     // translate/rotate the model-view matrix, draws, then resets the model-view to "matrix"
-    virtual void draw( Sint32* matrix, int alpha=255 ); 
+    virtual void draw( Sint32* matrix, spFontPointer font, int alpha=255 ); 
 
     // rule of three, define all these or none at all.
     virtual ~BaseObject();

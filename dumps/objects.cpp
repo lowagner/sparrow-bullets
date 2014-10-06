@@ -8,6 +8,7 @@ Check the LICENSE file included for copyright information.
 BaseObject::BaseObject()
 {
 //    std::cout << " calling base object constructor " << id << std::endl;
+    text = NULL;
     debug = false;
     physics = NULL;
     body = NULL;
@@ -38,8 +39,25 @@ BaseObject::~BaseObject()
     // it's called after the inherited class' own destructor.
     // don't put any virtual methods in it.
 //    std::cout << " finished calling base object " << id << " destructor " << std::endl;
+    remove_text();
 }
 
+void 
+BaseObject::set_text( const char* text_, int maxwidth, spFontPointer font )
+{
+    remove_text();
+    
+    std::cerr << " attempting text " << text_ << std::endl;
+    text = spCreateTextBlock( text_, maxwidth, font );
+
+}
+
+void 
+BaseObject::remove_text()
+{
+    if ( text )
+        spDeleteTextBlock( text );
+}
 
 void
 BaseObject::update_por( btScalar dt )
@@ -513,7 +531,7 @@ BaseObject::reset_camera( Sint32* matrix )
 }
 
 void
-BaseObject::draw( Sint32* original_camera_matrix, int alpha )
+BaseObject::draw( Sint32* original_camera_matrix, spFontPointer font, int alpha )
 {}
 
 

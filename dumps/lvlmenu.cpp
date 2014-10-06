@@ -44,6 +44,11 @@ MainMenu::reset()
             level = 1;
         }
     }
+    
+    if (!(font))
+        load_font();
+
+    std::cerr << " font size = " << font->maxheight << "\n";
 
     totalclock = 0;
     clock = 1000; // hack to make the clock not appear
@@ -137,6 +142,16 @@ MainMenu::reset()
             blocks.push_back( Cube( btVector3(-4,8,5), 0x05FF, 10, numbertexture[10] ) ); // half-sizes, pos, color
             blocks.push_back( Cube( btVector3(-4,6,5), 0x05FF, 11, numbertexture[11] ) ); // half-sizes, pos, color
             blocks.push_back( Cube( btVector3(-4,6,8), 0x05FF, 12, numbertexture[12] ) ); // half-sizes, pos, color
+
+            //blocks[0].set_text( "hello", 50, font );
+//            std::cerr << " width =  " << spGetWindowSurface()->w << "\n";
+//            spTextBlockPointer block = spCreateTextBlock( "example text",
+//                                            50,font);
+//            for (int i = 0; i < block->line_count; i++)
+//            {
+//                printf("%i: %s\n",i,block->line[i].text);
+//            }
+
 
             hero = Player( btVector3(10,0,5), 0xF00F, checkertexture );
             hero.object->rotateZ( M_PI );

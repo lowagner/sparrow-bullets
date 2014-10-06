@@ -33,7 +33,7 @@ public:
     void add_physics( Physics& new_physics, short int dynamics_=3 );
 
     // translate/rotate the model-view matrix and then draw:
-    void draw( Sint32* matrix, int alpha=255 ); 
+    void draw( Sint32* matrix, spFontPointer font, int alpha=255 ); 
 
     ~Cube();
     Cube( const Cube& other ); // copy constructor
@@ -58,7 +58,7 @@ public:
     void add_physics( Physics& new_physics, short int dynamics_=1 );
 
     // translate/rotate the model-view matrix and then draw:
-    void draw( Sint32* matrix, int alpha=255 ); 
+    void draw( Sint32* matrix, spFontPointer font, int alpha=255 ); 
 
     //void remove();
 
@@ -86,7 +86,7 @@ public:
     void add_physics( Physics& new_physics, short int dynamics_=1 );
 
     // translate/rotate the model-view matrix and then draw:
-    void draw( Sint32* matrix, int alpha=255 ); 
+    void draw( Sint32* matrix, spFontPointer font, int alpha=255 ); 
 
     //void remove();
 

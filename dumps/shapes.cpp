@@ -194,7 +194,7 @@ Cube::update( float dt )
 
 
 void 
-Cube::draw( Sint32* matrix, int alpha )
+Cube::draw( Sint32* matrix, spFontPointer font, int alpha )
 {
     if ( alpha > 0 )
     {
@@ -217,6 +217,13 @@ Cube::draw( Sint32* matrix, int alpha )
             spLine3D(0,0,0, 0,2*SP_ONE,0, 0x0F0F);
             spLine3D(0,0,0, 0,0,2*SP_ONE, 0x00FF);
         }
+        
+        if ( text )
+            spFontDrawTextBlock( left, 
+                                 10, 10, 3,  /* x, y, z */
+                                 text, 
+                                 30,  /* height */
+                                 0, font );
 
         reset_camera( matrix );
     }
@@ -332,7 +339,7 @@ Box::update( float dt )
 }
 
 void
-Box::draw( Sint32* matrix, int alpha )
+Box::draw( Sint32* matrix, spFontPointer font, int alpha )
 {
     //spTranslate( lastpos.x, lastpos.y, lastpos.z );
     if ( alpha > 0 )
@@ -460,7 +467,7 @@ Ramp::update( float dt )
 }
 
 void
-Ramp::draw( Sint32* matrix, int alpha )
+Ramp::draw( Sint32* matrix, spFontPointer font, int alpha )
 {
     if ( alpha > 0 )
     {
