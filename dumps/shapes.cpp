@@ -194,36 +194,72 @@ Cube::update( float dt )
 
 
 void 
-Cube::draw( Sint32* matrix, spFontPointer font, int alpha )
+Cube::draw( SDL_Surface* screen, Sint32* matrix, spFontPointer font, int alpha_ )
 {
+    short int alpha = selfa * alpha_ / 255;
     if ( alpha > 0 )
     {
         spMulMatrix( lastpor );
-        spSetAlphaPattern4x4(alpha,8);
-        //spSetAlphaPattern4x4(255,8);  // max is 255.  not sure what the second arg does.  seems to help with texture.
-        if (texture)
+            
+        Sint32 Z = spGetMatrix()[14];
+        if ( Z < -5*SP_ONE )
         {
-            if ( fliptexture )
-                draw_flip_textured_cube( texture, SP_ONE, color );
+            spSetAlphaPattern4x4(alpha,8);
+            //spSetAlphaPattern4x4(255,8);  // max is 255.  not sure what the second arg does.  seems to help with texture.
+            if (texture)
+            {
+                if ( fliptexture )
+                    draw_flip_textured_cube( texture, SP_ONE, color );
+                else
+                    draw_textured_cube( texture, SP_ONE, color );
+            }
             else
-                draw_textured_cube( texture, SP_ONE, color );
-        }
-        else
-            draw_box( SP_ONE, SP_ONE, SP_ONE, color );
+                draw_box( SP_ONE, SP_ONE, SP_ONE, color );
 
-        if ( debug )
-        {
-            spLine3D(0,0,0, 2*SP_ONE,0,0, 0xF00F);
-            spLine3D(0,0,0, 0,2*SP_ONE,0, 0x0F0F);
-            spLine3D(0,0,0, 0,0,2*SP_ONE, 0x00FF);
+            if ( debug )
+            {
+//                std::cerr << " x, y, z camera = " << spGetMatrix()[12] << ", "
+//                                                  << spGetMatrix()[13] << ", "
+//                                                  << spGetMatrix()[14] << "; -5*ONE = " << -5*SP_ONE << "\n"; 
+//                std::cerr << " w, h screen = " << screen->w << ", "
+//                                                  << screen->h << "\n"; 
+//                int X = screen->w/2 + (spGetMatrix()[12] / 800);
+//                int Y = screen->h/2 - (spGetMatrix()[13] / 800);
+//                std::cerr << " X, Y screen = " << X << ", "
+//                                                  << Y << "\n"; 
+                spLine3D(0,0,0, 2*SP_ONE,0,0, 0xF00F);
+                spLine3D(0,0,0, 0,2*SP_ONE,0, 0x0F0F);
+                spLine3D(0,0,0, 0,0,2*SP_ONE, 0x00FF);
+            }
+            
+            if ( text.size() ) 
+            if ( font )
+            {
+                //std::cerr << " text zero = " << text[0] << "\n";
+                // figure out how to center the text on the object using the 
+                // local camera coordinates
+                // i'm not exactly sure why "2*screen->h" works well here, multiplied by strange factors of 0.95, but it does.
+                int X = (int) ( (screen->w/2  - 0.95*(spGetMatrix()[12] *2*screen->h/ (Z))) ); 
+                int Y = (int) ( 0.95*(screen->h/2 + ( spGetMatrix()[13]  *2*screen->h/ (Z))) );
+
+                //std::cerr << " w, h screen = " << screen->w << ", " << screen->h << "; size = " << spGetSizeFactor() << "\n"; 
+
+                //std::cerr << " X, Y, Z screen = " << X << ", " << Y << ", " << Z << "\n"; 
+//                std::cerr << " X, Y, Z camera coord = " << spFixedToFloat(spGetMatrix()[12]) 
+//                                << ", " << spFixedToFloat(spGetMatrix()[13]) << ", " 
+//                                << spFixedToFloat(Z) << "\n"; 
+
+                spSetAlphaTest( 1 );
+                Y -= (font->maxheight)*(text.size()/2 ) - 8*(text.size()-1);
+                for ( int i=0; i<text.size(); i++ )
+                {
+                    spFontDrawMiddle( X,Y, 0, text[i], font );
+                    Y += font->maxheight+2;
+                }
+                spSetAlphaTest( 0 );  // this makes purple not invisible
+            }
+                
         }
-        
-        if ( text )
-            spFontDrawTextBlock( left, 
-                                 10, 10, 3,  /* x, y, z */
-                                 text, 
-                                 30,  /* height */
-                                 0, font );
 
         reset_camera( matrix );
     }
@@ -239,6 +275,7 @@ Cube::~Cube()
 Cube::Cube( const Cube& other ) // copy constructor
 {
     //std::cout << " calling cube copy constructor from " << other.id << " to " << id << std::endl;
+    text = other.text;
     dynamics = other.dynamics;
     mass = other.mass;
     id = other.id;
@@ -248,6 +285,7 @@ Cube::Cube( const Cube& other ) // copy constructor
     physics = other.physics;
     body = other.body;
     color = other.color;
+    selfa = other.selfa;
     transform = other.transform;
     lastposition = other.lastposition;
     lastvelocity = other.lastvelocity;
@@ -261,6 +299,7 @@ Cube::Cube( const Cube& other ) // copy constructor
 Cube& 
 Cube::operator = ( Cube other ) // Copy Assignment Operator
 {
+    text = other.text;
     dynamics = other.dynamics;
     mass = other.mass;
     id = other.id;
@@ -270,6 +309,7 @@ Cube::operator = ( Cube other ) // Copy Assignment Operator
     physics = other.physics;
     body = other.body;
     color = other.color;
+    selfa = other.selfa;
     transform = other.transform;
     lastposition = other.lastposition;
     lastvelocity = other.lastvelocity;
@@ -339,14 +379,19 @@ Box::update( float dt )
 }
 
 void
-Box::draw( Sint32* matrix, spFontPointer font, int alpha )
+Box::draw( SDL_Surface* screen, Sint32* matrix, spFontPointer font, int alpha_ )
 {
+    short int alpha = selfa * alpha_ / 255;
     //spTranslate( lastpos.x, lastpos.y, lastpos.z );
     if ( alpha > 0 )
     {
         spMulMatrix( lastpor );
-        spSetAlphaPattern4x4(alpha,8);
-        draw_box( sizex, sizey, sizez, color );
+        Sint32 Z = spGetMatrix()[14];
+        if ( Z < -5*SP_ONE )
+        {
+            spSetAlphaPattern4x4(alpha,8);
+            draw_box( sizex, sizey, sizez, color );
+        }
         reset_camera( matrix );
     }
 }
@@ -359,6 +404,7 @@ Box::~Box()
 
 Box::Box( const Box& other ) // copy constructor
 {
+    text = other.text;
     dynamics = other.dynamics;
     //std::cout << " calling box copy constructor " << std::endl;
     mass = other.mass;
@@ -371,6 +417,7 @@ Box::Box( const Box& other ) // copy constructor
     sizey = other.sizey;
     sizez = other.sizez;
     color = other.color;
+    selfa = other.selfa;
     transform = other.transform;
     lastposition = other.lastposition;
     lastvelocity = other.lastvelocity;
@@ -384,6 +431,7 @@ Box::Box( const Box& other ) // copy constructor
 Box& 
 Box::operator = ( Box other ) // Copy Assignment Operator
 {
+    text = other.text;
     //std::cout << " calling box copy assignment " << std::endl;
     dynamics = other.dynamics;
     physics = other.physics;
@@ -396,6 +444,7 @@ Box::operator = ( Box other ) // Copy Assignment Operator
     sizey = other.sizey;
     sizez = other.sizez;
     color = other.color;
+    selfa = other.selfa;
     transform = other.transform;
     lastposition = other.lastposition;
     lastvelocity = other.lastvelocity;
@@ -467,13 +516,18 @@ Ramp::update( float dt )
 }
 
 void
-Ramp::draw( Sint32* matrix, spFontPointer font, int alpha )
+Ramp::draw( SDL_Surface* screen, Sint32* matrix, spFontPointer font, int alpha_ )
 {
+    short int alpha = selfa * alpha_ / 255;
     if ( alpha > 0 )
     {
-        spSetAlphaPattern4x4(alpha,8);
         spMulMatrix( lastpor );
-        draw_ramp( sizex, sizey, sizez, color );
+        Sint32 Z = spGetMatrix()[14];
+        if ( Z < -5*SP_ONE )
+        {
+            spSetAlphaPattern4x4(alpha,8);
+            draw_ramp( sizex, sizey, sizez, color );
+        }
         reset_camera( matrix );
     }
 }
@@ -486,6 +540,7 @@ Ramp::~Ramp()
 
 Ramp::Ramp( const Ramp& other ) // copy constructor
 {
+    text = other.text;
     //std::cout << " calling ramp copy constructor " << std::endl;
     dynamics = other.dynamics;
     mass = other.mass;
@@ -498,6 +553,7 @@ Ramp::Ramp( const Ramp& other ) // copy constructor
     sizey = other.sizey;
     sizez = other.sizez;
     color = other.color;
+    selfa = other.selfa;
     transform = other.transform;
     lastposition = other.lastposition;
     lastvelocity = other.lastvelocity;
@@ -511,6 +567,7 @@ Ramp::Ramp( const Ramp& other ) // copy constructor
 Ramp& 
 Ramp::operator = ( Ramp other ) // Copy Assignment Operator
 {
+    text = other.text;
     //std::cout << " calling ramp copy assignment " << std::endl;
     dynamics = other.dynamics;
     mass = other.mass;
@@ -523,6 +580,7 @@ Ramp::operator = ( Ramp other ) // Copy Assignment Operator
     sizey = other.sizey;
     sizez = other.sizez;
     color = other.color;
+    selfa = other.selfa;
     transform = other.transform;
     lastposition = other.lastposition;
     lastvelocity = other.lastvelocity;

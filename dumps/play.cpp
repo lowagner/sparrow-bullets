@@ -31,6 +31,7 @@ Play::Play( int level_, int levelset_ ) // init play class
     menuitems.push_back( "Next level" );
     menuitems.push_back( "Camera follow speed" ); 
     menuitems.push_back( "Camera align speed" ); 
+    menuitems.push_back( "Camera timeout" ); 
     menuitems.push_back( "Return to main menu" );
     menuitems.push_back( "Exit" );
     
@@ -65,6 +66,16 @@ Play::Play( int level_, int levelset_ ) // init play class
         menuitemvalues.push_back( cameraalignspeedvalues );
             menuitemvalueindices.push_back( 1 );
     }
+    {
+        std::vector<float> cameratimeoutvalues;
+        cameratimeoutvalues.push_back(0.5f);
+        cameratimeoutvalues.push_back(1.0f);
+        cameratimeoutvalues.push_back(2.0f);
+        cameratimeoutvalues.push_back(3.0f);
+        cameratimeoutvalues.push_back(6.0f);
+        menuitemvalues.push_back( cameratimeoutvalues );
+            menuitemvalueindices.push_back( 2 );
+    }
     //menuitemvalues.push_back( emptylist );
     menuitemvalues.push_back( emptylist );
         menuitemvalueindices.push_back( 0 );
@@ -72,6 +83,7 @@ Play::Play( int level_, int levelset_ ) // init play class
         menuitemvalueindices.push_back( 0 );
 
     // default camera behavior
+    cameratimeout = 2;
     camerafollowspeed = 0.4;
     cameraalignspeed = 0.4;
     if ( file_exists( USERDATA("settings.txt") ) )
@@ -95,6 +107,11 @@ Play::Play( int level_, int levelset_ ) // init play class
             {
                 cameraalignspeed = value; // index of the menu item of camera align with hero...
                 index = 4;
+            }
+            else if (name == "cameratimeout" )
+            {
+                cameratimeout = value; // index of the menu item of camera timeout
+                index = 5;
             }
 
             if ( index > 0 )
@@ -160,6 +177,8 @@ Play::set_value( const char* name, float value )
         camerafollowspeed = value;
     else if (name == "cameraalignspeed" || name == "Camera align speed" )
         cameraalignspeed = value;
+    else if (name == "cameratimeout" || name == "Camera timeout" )
+        cameratimeout = value;
     else
         return 1;
 
@@ -173,6 +192,7 @@ Play::write_settings()
     file.open( USERDATA("settings.txt") );
     file << "camerafollowspeed " << camerafollowspeed << "\n";
     file << "cameraalignspeed " << cameraalignspeed << "\n";
+    file << "cameratimeout " << cameratimeout << "\n";
     file.close();
 }
 
@@ -296,7 +316,7 @@ void Play::draw( SDL_Surface* screen )
                 sprintf( buffer, "%s", menuitems[i] );
             spFontDrawMiddle( screen->w / 2, y, 0, buffer, font );
             y += font->maxheight + 4;
-            if ( i == 2 || i == 4 )
+            if ( i == 2 || i == 5 )
                 y += (font->maxheight*2/5);
         } 
         
@@ -400,22 +420,22 @@ void Play::draw( SDL_Surface* screen )
 
     for (int i=0; i<boxes.size(); i++)
     {
-        boxes[i].draw( matrix, font );  // this draws and resets the model view to matrix
+        boxes[i].draw( screen, matrix, font );  // this draws and resets the model view to matrix
     }
     
     for (int i=0; i<ramps.size(); i++)
     {
-        ramps[i].draw( matrix, font ); 
+        ramps[i].draw( screen, matrix, font ); 
     }
 
     for (int i=0; i<blocks.size(); i++)
     {
-        blocks[i].draw( matrix, font, 200 ); 
+        blocks[i].draw( screen, matrix, font, 200 ); 
         // draw blocks at partial transparency.  max alpha = 255 (fully opaque), 0 = fully transparent
     }
 
     if ( alive )
-        hero.object->draw( matrix, font );
+        hero.object->draw( screen, matrix, font );
 
     //spDeactivatePattern();
     spSetPerspectiveTextureMapping(0);
@@ -491,11 +511,12 @@ int Play::update( Uint32 dt )
                     break;
                 case 3: // camerafollowspeed
                 case 4: // cameraalignspeed
+                case 5: // cameratimeout
                     menu=0;
                     pause=0;
                     return gamestate;
                     break;
-                case 5: // return to menu
+                case 6: // return to menu
                     menu=0;
                     pause=0;
                     if ( gamestate == GAMESTATEmenu )
@@ -514,7 +535,7 @@ int Play::update( Uint32 dt )
                     }
                     return GAMESTATEmenu;
                     break; 
-                case 6: // Exit
+                case 7: // Exit
                     return GAMESTATEquit;
                     break; 
             }
@@ -543,13 +564,13 @@ int Play::update( Uint32 dt )
     {
         // key A on a standard QWERTY keyboard
         cameraaxis += std::max(int(80*dt),1);
-        cameramovecooldown = 2;
+        cameramovecooldown = cameratimeout;
     }
     if ( spGetInput()->button[SP_BUTTON_B] )
     {
         // key D on a standard QWERTY keyboard
         cameraaxis -= std::max(int(80*dt),1);
-        cameramovecooldown = 2;
+        cameramovecooldown = cameratimeout;
     }
     if ( spGetInput()->button[SP_BUTTON_X] )
     {

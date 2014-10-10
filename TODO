@@ -36,7 +36,6 @@ BUGS:
         #7  0x0000000000407db9 in main (argc=<optimized out>, argv=<optimized out>) at main.cpp:114
 
 
-
 SAVING AND LEVELS
 
 main menu:
@@ -72,7 +71,11 @@ fancy new gimmicks for new levels
 
 AESTHETICS, SOUNDS, and MUSIC
 
-in main menu, let cubes have textures corresponding to levels (M, 1,2,3,4,...) or level sets ("low").
+better first menu level...
+
+don't draw shapes that aren't in the view (or are really close???)
+
+in main menu, let cubes have textures with level sets ("low").
 
 create a billboard blitter class, intangible, which can follow an object, and show information
 about it.

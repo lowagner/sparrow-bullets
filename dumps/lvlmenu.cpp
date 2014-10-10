@@ -25,11 +25,6 @@ MainMenu::reset()
     {
         if ( alive )
         {
-            // do nothing if you reset at the main menu
-            std::cout << " nothing to reset " << std::endl;
-            clock = 1000;
-            lives = 999999;
-            return GAMESTATEmenu;
         }
         else if ( levelset == 1 )
         {
@@ -45,11 +40,6 @@ MainMenu::reset()
         }
     }
     
-    if (!(font))
-        load_font();
-
-    std::cerr << " font size = " << font->maxheight << "\n";
-
     totalclock = 0;
     clock = 1000; // hack to make the clock not appear
     lives = 999999; // hack to make lives not appear
@@ -89,10 +79,16 @@ MainMenu::reset()
             boxes.push_back( Box( btVector3(7,7,1), btVector3(0,0,-3), 0x05FF ) ); // half-sizes, pos, color
 
             blocks.push_back( Cube( btVector3(0,0,5), 0x05FF, 2 ) ); // half-sizes, pos, color
+            blocks[0].text.push_back( "low" );
+            blocks[0].text.push_back( "lvls" );
+            blocks[0].text.push_back( "are" );
+            blocks[0].text.push_back( "fun" );
 
             hero = Player( btVector3(0,4,5), 0xF00F, checkertexture );
             hero.object->rotateZ( 3*M_PI/2 );
             hero.object->debug = true;
+            hero.object->text.push_back("hero");
+            hero.object->text.push_back("man");
         }
         else 
         {
@@ -118,44 +114,38 @@ MainMenu::reset()
         else if ( level == 0 )
         { // choose your level of the low levels
             sprintf( lvltext, "low levels" );
-            set_alert( "- choose level for low -" );
+            set_alert( "- choose low level -" );
 
             outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
 
             // this guy includes the floor.  all static rectangular prisms.
-            boxes.push_back( Box( btVector3(5,5,1), btVector3(-6,4,-3), 0x05FF ) ); // half-sizes, pos, color
-            boxes.push_back( Box( btVector3(3,3,1), btVector3(0,-5,-3), 0x05FF ) ); // half-sizes, pos, color
-            boxes.push_back( Box( btVector3(4,4,1), btVector3(7,0,-3), 0x05FF ) ); // half-sizes, pos, color
+            boxes.push_back( Box( btVector3(4,4,1), btVector3(7,0,-3), 0x35B7 ) ); 
+            boxes.push_back( Box( btVector3(3,3,1), btVector3(0,-5,-3), 0x1131 ) ); 
+            boxes.push_back( Box( btVector3(5,5,1), btVector3(-6,4,-3), 0x0007 ) ); 
 
-            blocks.push_back( Cube( btVector3(7,0,5), 0x05FF, 0, numbertexture[0] ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(7,0,5), 0x05FF, 0, numbertexture[0] ) ); 
 
-            blocks.push_back( Cube( btVector3(2,-7,5), 0x05FF, 1, numbertexture[1] ) ); // half-sizes, pos, color
-            blocks.push_back( Cube( btVector3(0,-7,5), 0x05FF, 2, numbertexture[2] ) ); // half-sizes, pos, color
-            blocks.push_back( Cube( btVector3(-2,-7,5), 0x05FF, 3, numbertexture[3] ) ); // half-sizes, pos, color
-            blocks.push_back( Cube( btVector3(-2,-3,5), 0x05FF, 4, numbertexture[4] ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(2,-7,5), 0x35FF, 1, numbertexture[1] ) );
+            blocks.push_back( Cube( btVector3(0,-7,5), 0x343A, 2, numbertexture[2] ) );
+            blocks.push_back( Cube( btVector3(-2,-7,5), 0x350F, 3, numbertexture[3] ) ); 
+            blocks.push_back( Cube( btVector3(-2,-3,5), 0xF00F, 4, numbertexture[4] ) ); 
 
-            blocks.push_back( Cube( btVector3(-6,0,5), 0x05FF, 5, numbertexture[5] ) ); // half-sizes, pos, color
-            blocks.push_back( Cube( btVector3(-8,0,5), 0x05FF, 6, numbertexture[6] ) ); // half-sizes, pos, color
-            blocks.push_back( Cube( btVector3(-10,0,5), 0x05FF, 7, numbertexture[7] ) ); // half-sizes, pos, color
-            blocks.push_back( Cube( btVector3(-10,8,5), 0x05FF, 8, numbertexture[8] ) ); // half-sizes, pos, color
-            blocks.push_back( Cube( btVector3(-6,8,5), 0x05FF, 9, numbertexture[9] ) ); // half-sizes, pos, color
-            blocks.push_back( Cube( btVector3(-4,8,5), 0x05FF, 10, numbertexture[10] ) ); // half-sizes, pos, color
-            blocks.push_back( Cube( btVector3(-4,6,5), 0x05FF, 11, numbertexture[11] ) ); // half-sizes, pos, color
-            blocks.push_back( Cube( btVector3(-4,6,8), 0x05FF, 12, numbertexture[12] ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(-8,0,5), 0x35FF, 5, numbertexture[5] ) ); 
+            blocks.push_back( Cube( btVector3(-10,0,5), 0x3300, 6, numbertexture[6] ) ); 
+            blocks.push_back( Cube( btVector3(-10,2,5), 0x700F, 7, numbertexture[7] ) ); 
 
-            //blocks[0].set_text( "hello", 50, font );
-//            std::cerr << " width =  " << spGetWindowSurface()->w << "\n";
-//            spTextBlockPointer block = spCreateTextBlock( "example text",
-//                                            50,font);
-//            for (int i = 0; i < block->line_count; i++)
-//            {
-//                printf("%i: %s\n",i,block->line[i].text);
-//            }
-
-
+            blocks.push_back( Cube( btVector3(-8,8,5), 0xFFFF, 8, numbertexture[8] ) );
+            blocks.push_back( Cube( btVector3(-4,8,5), 0x05FF, 9, numbertexture[9] ) );
+            blocks.push_back( Cube( btVector3(-2,8,5), 0x05FF, 10, numbertexture[10] ) );
+            blocks.push_back( Cube( btVector3(-2,6,5), 0x05FF, 11, numbertexture[11] ) );
+            blocks.push_back( Cube( btVector3(-2,6,8), 0x05FF, 12, numbertexture[12] ) );
+   
             hero = Player( btVector3(10,0,5), 0xF00F, checkertexture );
             hero.object->rotateZ( M_PI );
             hero.object->debug = true;
+            
+            hero.object->text.push_back("hero");
+            blocks[0].text.push_back("hello");
         }
         else
         {   

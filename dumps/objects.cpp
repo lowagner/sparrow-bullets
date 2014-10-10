@@ -8,7 +8,8 @@ Check the LICENSE file included for copyright information.
 BaseObject::BaseObject()
 {
 //    std::cout << " calling base object constructor " << id << std::endl;
-    text = NULL;
+    selfa = 256;
+    text.clear();
     debug = false;
     physics = NULL;
     body = NULL;
@@ -39,24 +40,18 @@ BaseObject::~BaseObject()
     // it's called after the inherited class' own destructor.
     // don't put any virtual methods in it.
 //    std::cout << " finished calling base object " << id << " destructor " << std::endl;
-    remove_text();
+    text.clear();
 }
 
 void 
-BaseObject::set_text( const char* text_, int maxwidth, spFontPointer font )
+BaseObject::set_alpha( short int selfa_ )
 {
-    remove_text();
-    
-    std::cerr << " attempting text " << text_ << std::endl;
-    text = spCreateTextBlock( text_, maxwidth, font );
-
-}
-
-void 
-BaseObject::remove_text()
-{
-    if ( text )
-        spDeleteTextBlock( text );
+    if ( selfa_ > 255 )
+        selfa = 255;
+    else if ( selfa_ < 0 )
+        selfa = 0;
+    else
+        selfa = selfa_;
 }
 
 void
@@ -491,7 +486,7 @@ BaseObject::translate( btVector3 dist )
 void
 BaseObject::add_physics( Physics& new_physics, short int dynamics_ )
 { 
-//std::cerr << " base object add_physics " << std::endl;
+    std::cerr << " base object add_physics " << std::endl;
 }
 
 
@@ -531,7 +526,7 @@ BaseObject::reset_camera( Sint32* matrix )
 }
 
 void
-BaseObject::draw( Sint32* original_camera_matrix, spFontPointer font, int alpha )
+BaseObject::draw( SDL_Surface* screen, Sint32* original_camera_matrix, spFontPointer font, int alpha_ )
 {}
 
 

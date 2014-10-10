@@ -3,12 +3,15 @@
 
 #include "physics.h"
 #include "../csparrow.h"
+#include <vector>
 
 class BaseObject
 {
     friend class Player;
 protected:
-    Uint16 color;
+    Uint16 color; 
+    short int selfa;
+
     Sint32 lastpor[16]; // last position and orientation (rotation), for display.  stored as openGL matrix.
    
     // INTERFACING TO PHYSICS ENGINE
@@ -40,14 +43,15 @@ protected:
     void locate_and_move( btScalar dt );
     void reset_camera( Sint32* matrix );
 
-    spTextBlockPointer text;
-    
-
 public:
+    std::vector<char*> text;
+
     int id;
     bool debug;
 
     BaseObject();
+
+    void set_alpha( short int selfa_ );
 
     virtual void update( float dt );
 
@@ -62,9 +66,6 @@ public:
     void rotate( btVector3 axis, btScalar angle );
     void impulse( btVector3 forcedt );
 
-    void set_text( const char* text_, int maxwidth, spFontPointer font );
-    void remove_text();
-
     //void transform( Sint32* m );
 
     
@@ -75,7 +76,7 @@ public:
     //virtual void remove();
 
     // translate/rotate the model-view matrix, draws, then resets the model-view to "matrix"
-    virtual void draw( Sint32* matrix, spFontPointer font, int alpha=255 ); 
+    virtual void draw( SDL_Surface* screen, Sint32* matrix, spFontPointer font=NULL, int alpha_=255 ); 
 
     // rule of three, define all these or none at all.
     virtual ~BaseObject();
