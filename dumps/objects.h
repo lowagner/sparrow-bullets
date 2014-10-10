@@ -42,6 +42,7 @@ protected:
 
     void locate_and_move( btScalar dt );
     void reset_camera( Sint32* matrix );
+    void write_text( SDL_Surface* screen, spFontPointer font );
 
 public:
     std::vector<char*> text;

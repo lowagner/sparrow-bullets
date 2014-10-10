@@ -24,7 +24,7 @@ MainMenu::reset()
     if ( lives == 999998 )
     {
         if ( alive )
-        {
+        { // reset the level
         }
         else if ( levelset == 1 )
         {
@@ -76,7 +76,10 @@ MainMenu::reset()
             outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
 
             // this guy includes the floor.  all static rectangular prisms.
-            boxes.push_back( Box( btVector3(7,7,1), btVector3(0,0,-3), 0x05FF ) ); // half-sizes, pos, color
+            boxes.push_back( Box( btVector3(5,5,1), btVector3(0,0,-3), 0x05FF ) ); // half-sizes, pos, color
+            boxes.push_back( Box( btVector3(1,1,1), btVector3(0,-7,-1), 0x05FF ) ); // half-sizes, pos, color
+            boxes[1].text.push_back( "push a lvl cube off" );
+            boxes[1].text.push_back( "to play that level" );
 
             blocks.push_back( Cube( btVector3(0,0,5), 0x05FF, 2 ) ); // half-sizes, pos, color
             blocks[0].text.push_back( "low" );
@@ -88,7 +91,7 @@ MainMenu::reset()
             hero.object->rotateZ( 3*M_PI/2 );
             hero.object->debug = true;
             hero.object->text.push_back("hero");
-            hero.object->text.push_back("man");
+            hero.object->text.push_back("the cube dumper");
         }
         else 
         {
@@ -128,7 +131,7 @@ MainMenu::reset()
             blocks.push_back( Cube( btVector3(2,-7,5), 0x35FF, 1, numbertexture[1] ) );
             blocks.push_back( Cube( btVector3(0,-7,5), 0x343A, 2, numbertexture[2] ) );
             blocks.push_back( Cube( btVector3(-2,-7,5), 0x350F, 3, numbertexture[3] ) ); 
-            blocks.push_back( Cube( btVector3(-2,-3,5), 0xF00F, 4, numbertexture[4] ) ); 
+            blocks.push_back( Cube( btVector3(-2,-3,5), 0xF10F, 4, numbertexture[4] ) ); 
 
             blocks.push_back( Cube( btVector3(-8,0,5), 0x35FF, 5, numbertexture[5] ) ); 
             blocks.push_back( Cube( btVector3(-10,0,5), 0x3300, 6, numbertexture[6] ) ); 

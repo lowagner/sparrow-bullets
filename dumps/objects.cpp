@@ -44,6 +44,34 @@ BaseObject::~BaseObject()
 }
 
 void 
+BaseObject::write_text( SDL_Surface* screen, spFontPointer font )
+{
+    Sint32 Z = spGetMatrix()[14];
+    //std::cerr << " text zero = " << text[0] << "\n";
+    // figure out how to center the text on the object using the 
+    // local camera coordinates
+    // i'm not exactly sure why "2*screen->h" works well here, multiplied by strange factors of 0.95, but it does.
+    int X = (int) ( (screen->w/2  - 0.95*(spGetMatrix()[12] *2*screen->h/ (Z))) ); 
+    int Y = (int) ( 0.95*(screen->h/2 + ( spGetMatrix()[13]  *2*screen->h/ (Z))) );
+
+    //std::cerr << " w, h screen = " << screen->w << ", " << screen->h << "; size = " << spGetSizeFactor() << "\n"; 
+
+    //std::cerr << " X, Y, Z screen = " << X << ", " << Y << ", " << Z << "\n"; 
+//                std::cerr << " X, Y, Z camera coord = " << spFixedToFloat(spGetMatrix()[12]) 
+//                                << ", " << spFixedToFloat(spGetMatrix()[13]) << ", " 
+//                                << spFixedToFloat(Z) << "\n"; 
+
+    spSetAlphaTest( 1 );
+    Y -= (font->maxheight)*(text.size()/2 ) - 8*(text.size()-1);
+    for ( int i=0; i<text.size(); i++ )
+    {
+        spFontDrawMiddle( X,Y, 0, text[i], font );
+        Y += font->maxheight+2;
+    }
+    spSetAlphaTest( 0 );  // this makes purple not invisible
+
+}
+void 
 BaseObject::set_alpha( short int selfa_ )
 {
     if ( selfa_ > 255 )
