@@ -418,24 +418,52 @@ void Play::draw( SDL_Surface* screen )
     Sint32 matrix[16]; //pointer to array of 16 Sint32's.
     memcpy(matrix,spGetMatrix(),16*sizeof(Sint32)); //need to reload this after every draw.
 
-    for (int i=0; i<boxes.size(); i++)
+    if ( alerttime > 0.f )
     {
-        boxes[i].draw( screen, matrix, font );  // this draws and resets the model view to matrix
+        spFontPointer nofont;
+        nofont = NULL;
+        for (int i=0; i<boxes.size(); i++)
+        {
+            boxes[i].draw( screen, matrix, nofont );  // this draws and resets the model view to matrix
+        }
+        
+        for (int i=0; i<ramps.size(); i++)
+        {
+            ramps[i].draw( screen, matrix, nofont ); 
+        }
+
+        for (int i=0; i<blocks.size(); i++)
+        {
+            blocks[i].draw( screen, matrix, nofont, 200 ); 
+            // draw blocks at partial transparency.  max alpha = 255 (fully opaque), 0 = fully transparent
+        }
+
+        if ( alive )
+            hero.object->draw( screen, matrix, nofont );
     }
-    
-    for (int i=0; i<ramps.size(); i++)
+    else
     {
-        ramps[i].draw( screen, matrix, font ); 
+        for (int i=0; i<boxes.size(); i++)
+        {
+            boxes[i].draw( screen, matrix, font );  // this draws and resets the model view to matrix
+        }
+        
+        for (int i=0; i<ramps.size(); i++)
+        {
+            ramps[i].draw( screen, matrix, font ); 
+        }
+
+        for (int i=0; i<blocks.size(); i++)
+        {
+            blocks[i].draw( screen, matrix, font, 200 ); 
+            // draw blocks at partial transparency.  max alpha = 255 (fully opaque), 0 = fully transparent
+        }
+
+        if ( alive )
+            hero.object->draw( screen, matrix, font );
+
     }
 
-    for (int i=0; i<blocks.size(); i++)
-    {
-        blocks[i].draw( screen, matrix, font, 200 ); 
-        // draw blocks at partial transparency.  max alpha = 255 (fully opaque), 0 = fully transparent
-    }
-
-    if ( alive )
-        hero.object->draw( screen, matrix, font );
 
     //spDeactivatePattern();
     spSetPerspectiveTextureMapping(0);

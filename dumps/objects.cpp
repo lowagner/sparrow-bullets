@@ -46,6 +46,8 @@ BaseObject::~BaseObject()
 void 
 BaseObject::write_text( SDL_Surface* screen, spFontPointer font )
 {
+  if ( font )
+  {
     Sint32 Z = spGetMatrix()[14];
     //std::cerr << " text zero = " << text[0] << "\n";
     // figure out how to center the text on the object using the 
@@ -69,7 +71,7 @@ BaseObject::write_text( SDL_Surface* screen, spFontPointer font )
         Y += font->maxheight+2;
     }
     spSetAlphaTest( 0 );  // this makes purple not invisible
-
+  }
 }
 void 
 BaseObject::set_alpha( short int selfa_ )

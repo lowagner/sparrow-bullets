@@ -91,7 +91,6 @@ MainMenu::reset()
             hero.object->rotateZ( 3*M_PI/2 );
             hero.object->debug = true;
             hero.object->text.push_back("hero");
-            hero.object->text.push_back("the cube dumper");
         }
         else 
         {
@@ -123,7 +122,7 @@ MainMenu::reset()
 
             // this guy includes the floor.  all static rectangular prisms.
             boxes.push_back( Box( btVector3(4,4,1), btVector3(7,0,-3), 0x35B7 ) ); 
-            boxes.push_back( Box( btVector3(3,3,1), btVector3(0,-5,-3), 0x1131 ) ); 
+            boxes.push_back( Box( btVector3(3,3,1), btVector3(0,-5,-4), 0x1131 ) ); 
             boxes.push_back( Box( btVector3(5,5,1), btVector3(-6,4,-3), 0x0007 ) ); 
 
             blocks.push_back( Cube( btVector3(7,0,5), 0x05FF, 0, numbertexture[0] ) ); 
