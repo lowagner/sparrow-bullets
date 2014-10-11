@@ -420,26 +420,25 @@ void Play::draw( SDL_Surface* screen )
 
     if ( alerttime > 0.f )
     {
-        spFontPointer nofont;
-        nofont = NULL;
+        // don't draw text if alert is showing
         for (int i=0; i<boxes.size(); i++)
         {
-            boxes[i].draw( screen, matrix, nofont );  // this draws and resets the model view to matrix
+            boxes[i].draw( screen, matrix, NULL );  // this draws and resets the model view to matrix
         }
         
         for (int i=0; i<ramps.size(); i++)
         {
-            ramps[i].draw( screen, matrix, nofont ); 
+            ramps[i].draw( screen, matrix, NULL ); 
         }
 
         for (int i=0; i<blocks.size(); i++)
         {
-            blocks[i].draw( screen, matrix, nofont, 200 ); 
+            blocks[i].draw( screen, matrix, NULL, 200 ); 
             // draw blocks at partial transparency.  max alpha = 255 (fully opaque), 0 = fully transparent
         }
 
         if ( alive )
-            hero.object->draw( screen, matrix, nofont );
+            hero.object->draw( screen, matrix, NULL );
     }
     else
     {
