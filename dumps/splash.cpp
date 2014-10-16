@@ -6,7 +6,7 @@ Splash::Splash( int level_, int levelset_, int winintrolose_ )
     level = level_;
     levelset = levelset_;
     winintrolose = winintrolose_;
-    clock = 5.f;
+    clock = 3.f;
     font = NULL;
     won = false;
 }
@@ -25,12 +25,12 @@ void Splash::draw( SDL_Surface* screen )
     if ( winintrolose == 1)
     {
         // 
-        spFontDrawMiddle( screen->w /2, screen->h/2, 0, "the \"you have done it\" screen!", font );
+        spFontDrawMiddle( screen->w /2, screen->h/2, 0, "you have done it!", font );
     }
     else if ( winintrolose == -1 )
     { 
         // losing screen
-        spFontDrawMiddle( screen->w /2, screen->h/2, 0, "the \"you lost\" screen!", font );
+        spFontDrawMiddle( screen->w /2, screen->h/2, 0, "you lost!", font );
     }
     else 
     {
