@@ -19,7 +19,6 @@ class Play : public GameChunk
 {
 protected:
     int gamestate;
-    bool won;
     bool alive;
 
     SDL_Surface* checkertexture;
@@ -71,6 +70,8 @@ protected:
 //    time_t current_t;
     
     void load_font();
+
+    int save_time_if_best();
     
 public:
 

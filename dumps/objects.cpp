@@ -84,6 +84,12 @@ BaseObject::set_alpha( short int selfa_ )
         selfa = selfa_;
 }
 
+void 
+BaseObject::add_text( char* text_ )
+{
+    text.push_back( text_ );
+}
+
 void
 BaseObject::update_por( btScalar dt )
 { 

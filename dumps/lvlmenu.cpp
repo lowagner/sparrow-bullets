@@ -4,6 +4,7 @@ Check the LICENSE file included for copyright information.
 #include "play.h"
 #include <string>
 #include <iostream>
+#include "util.h"
 
 MainMenu::MainMenu( int level_, int levelset_ ) 
 {
@@ -77,20 +78,18 @@ MainMenu::reset()
 
             // this guy includes the floor.  all static rectangular prisms.
             boxes.push_back( Box( btVector3(5,5,1), btVector3(0,0,-3), 0x05FF ) ); // half-sizes, pos, color
-            boxes.push_back( Box( btVector3(1,1,1), btVector3(0,-7,-1), 0x05FF ) ); // half-sizes, pos, color
-            boxes[1].text.push_back( "push a lvl cube off" );
-            boxes[1].text.push_back( "to play that level" );
+            boxes.push_back( Box( btVector3(1,1,1), btVector3(0,-7,1), 0x05FF ) ); // half-sizes, pos, color
+            boxes[1].add_text( "push a lvl cube off" );
+            boxes[1].add_text( "to play that level" );
 
             blocks.push_back( Cube( btVector3(0,0,5), 0x05FF, 2 ) ); // half-sizes, pos, color
-            blocks[0].text.push_back( "low" );
-            blocks[0].text.push_back( "lvls" );
-            blocks[0].text.push_back( "are" );
-            blocks[0].text.push_back( "fun" );
+            blocks[0].add_text( "low" );
+            blocks[0].add_text( "lvls" );
 
             hero = Player( btVector3(0,4,5), 0xF00F, checkertexture );
             hero.object->rotateZ( 3*M_PI/2 );
             hero.object->debug = true;
-            hero.object->text.push_back("hero");
+            hero.object->add_text("hero");
         }
         else 
         {
@@ -123,9 +122,11 @@ MainMenu::reset()
             // this guy includes the floor.  all static rectangular prisms.
             boxes.push_back( Box( btVector3(4,4,1), btVector3(7,0,-3), 0x35B7 ) ); 
             boxes.push_back( Box( btVector3(3,3,1), btVector3(0,-5,-4), 0x1131 ) ); 
-            boxes.push_back( Box( btVector3(5,5,1), btVector3(-6,4,-3), 0x0007 ) ); 
+            boxes.push_back( Box( btVector3(5,5,1), btVector3(-6,4,-1), 0x0007 ) ); 
+            boxes.push_back( Box( btVector3(2,2,1), btVector3(2,4,3), 0x0000 ) ); 
 
             blocks.push_back( Cube( btVector3(7,0,5), 0x05FF, 0, numbertexture[0] ) ); 
+            blocks[0].add_text("MARATHON");
 
             blocks.push_back( Cube( btVector3(2,-7,5), 0x35FF, 1, numbertexture[1] ) );
             blocks.push_back( Cube( btVector3(0,-7,5), 0x343A, 2, numbertexture[2] ) );
@@ -135,19 +136,56 @@ MainMenu::reset()
             blocks.push_back( Cube( btVector3(-8,0,5), 0x35FF, 5, numbertexture[5] ) ); 
             blocks.push_back( Cube( btVector3(-10,0,5), 0x3300, 6, numbertexture[6] ) ); 
             blocks.push_back( Cube( btVector3(-10,2,5), 0x700F, 7, numbertexture[7] ) ); 
-
             blocks.push_back( Cube( btVector3(-8,8,5), 0xFFFF, 8, numbertexture[8] ) );
             blocks.push_back( Cube( btVector3(-4,8,5), 0x05FF, 9, numbertexture[9] ) );
             blocks.push_back( Cube( btVector3(-2,8,5), 0x05FF, 10, numbertexture[10] ) );
             blocks.push_back( Cube( btVector3(-2,6,5), 0x05FF, 11, numbertexture[11] ) );
-            blocks.push_back( Cube( btVector3(-2,6,8), 0x05FF, 12, numbertexture[12] ) );
+
+            blocks.push_back( Cube( btVector3(3,4,8), 0x05FF, 12, numbertexture[12] ) );
+          
+            int i = 1;
+            std::cout << "LEVELSET " << levelset << " TIMES:\n";
+            while ( i <= 12 )
+            {
+                char buffer[64];
+                sprintf( buffer, "%i-%i.dat", levelset, i ); 
+                float oldbest = loadtime( buffer );
+                if ( oldbest < 999.0f )
+                {
+                    sprintf( buffer, "%.3f", oldbest );
+                    std::cout << " level " << i << ": " << oldbest << "\n";
+                    blocks[i].add_text( buffer );
+                    i += 1;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            if ( i <= 12 )
+            {
+                // delete any blocks which we haven't beaten yet
+                int times = 13 - i;
+                while ( times > 0 )
+                {
+                    // probably a more efficient way than to do this, but i don't have internet right now...
+                    blocks.erase(blocks.begin() + i); 
+                    times-=1;
+                }
+
+                boxes.erase( boxes.begin() + 3 );
+                if ( i <= 5 )
+                    boxes.erase( boxes.begin() + 2 );
+                if ( i <= 1 )
+                    boxes.erase( boxes.begin() + 1 );
+            }
    
             hero = Player( btVector3(10,0,5), 0xF00F, checkertexture );
             hero.object->rotateZ( M_PI );
             hero.object->debug = true;
             
-            hero.object->text.push_back("hero");
-            blocks[0].text.push_back("hello");
+            hero.object->add_text("hero");
+
         }
         else
         {   
@@ -159,7 +197,7 @@ MainMenu::reset()
     }
     else
     {
-        std::cout << "There are no level sets past this point.  But please contribute!" << std::endl; 
+        std::cout << "There are no level sets past this point.  Please contribute some!" << std::endl; 
         return GAMESTATEquit;
     }
 

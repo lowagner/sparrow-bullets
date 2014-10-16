@@ -1,6 +1,7 @@
 /*
 Check the LICENSE file included for copyright information.  
 */
+#include "splash.h"
 #include "play.h"
 #include <SDL_image.h>
 #include <math.h>
@@ -15,7 +16,7 @@ int GAMESTATEmenu = 1; // main menu
 int GAMESTATElovels = 2; // low levels
 
 // NOT IMPLEMENTED YET
-int GAMESTATEsplash = -1; // splash screen (first to see)
+int GAMESTATEsplash = -1; // splash screen (first to see), also win/lose screen
 
 GameChunk* gamechunk;  // pointer to the currently active game chunk
 SDL_Surface* screen;   // pointer to the screen.
@@ -43,8 +44,9 @@ void init()
     screen = spCreateDefaultWindow();
 
     // set gamestate and gamechunk to the right variables...
-    gamestate = GAMESTATEmenu;
-    gamechunk = new MainMenu(0,2); // NOTE:  change when there are more levelsets available.
+    gamestate = GAMESTATEsplash;
+    gamechunk = new Splash(0,2); // will default to level 0 of levelset 2
+                                 // NOTE:  change when there are more levelsets available.
 
     spUsePrecalculatedNormals(0);
     resize( screen->w, screen->h );
@@ -65,15 +67,19 @@ int update( Uint32 dt )
     else if (newgamestate != gamestate)
     {
         // we can choose a level and a levelset...
-        int level=1;
-        int levelset=GAMESTATEmenu;
-        if ( gamestate >= GAMESTATEmenu )
+        int level=gamechunk->level;
+        int levelset=gamechunk->levelset;
+
+        if ( newgamestate == GAMESTATEsplash )
         {
-            level = gamechunk->level;
-            levelset = gamechunk->levelset;
+            std::cout << " initiating splash"  << std::endl;
+            int wonvalue = -1;
+            if ( gamechunk->won )
+                wonvalue = 1;
+            delete gamechunk;
+            gamechunk = new Splash( level, levelset, wonvalue ); 
         }
-        
-        if ( newgamestate == GAMESTATEmenu )
+        else if ( newgamestate == GAMESTATEmenu )
         {
             std::cout << " initiating main menu" << std::endl;
             delete gamechunk;

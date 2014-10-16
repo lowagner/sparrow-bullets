@@ -86,9 +86,14 @@ Play::Play( int level_, int levelset_ ) // init play class
     cameratimeout = 2;
     camerafollowspeed = 0.4;
     cameraalignspeed = 0.4;
-    if ( file_exists( USERDATA("settings.txt") ) )
+
+    char filedirectory[256];
+    spCreateDirectoryChain( get_path(filedirectory,"") );
+    get_path(filedirectory,"settings.txt");
+
+    if ( file_exists( filedirectory ) )
     {
-        std::ifstream fin( USERDATA("settings.txt") );
+        std::ifstream fin( filedirectory );
 
         std::string name;
         float value;
@@ -188,8 +193,12 @@ Play::set_value( const char* name, float value )
 void
 Play::write_settings()
 {
+    char filedirectory[256];
+    spCreateDirectoryChain( get_path(filedirectory,"") );
+    get_path(filedirectory,"settings.txt");
+
     std::ofstream file;
-    file.open( USERDATA("settings.txt") );
+    file.open( filedirectory );
     file << "camerafollowspeed " << camerafollowspeed << "\n";
     file << "cameraalignspeed " << cameraalignspeed << "\n";
     file << "cameratimeout " << cameratimeout << "\n";
@@ -532,8 +541,8 @@ int Play::update( Uint32 dt )
                     pause=0; // unpause
                     if ( lives < 100000 )
                         lives -= 10; // penalize the player
-                    clock=999; // penalize the player
-                    level += 1; // increase level
+                    clock=1000.0f; // penalize the player
+                    won = true; // the player "won"...
                     return reset();
                     break;
                 case 3: // camerafollowspeed
@@ -813,7 +822,6 @@ int Play::update_level( btScalar fdt )
         winlevel -= fdt;
         if ( winlevel <= 0.f )
         {
-            level += 1;
             won = true;
             return 1;
         }
@@ -869,6 +877,21 @@ void Play::handle( SDL_Event* event )
 //        char buffer[5];
 //        printf("keydown event 0x%x = \"%s\" keysym=%i\n",lastKey,spFontGetUTF8FromUnicode(lastKey,buffer,5),event->key.keysym.sym);
 //    }
+}
+
+
+int Play::save_time_if_best()
+{
+    char filedir[64];
+    sprintf( filedir, "%i-%i.dat", gamestate, level );
+    float oldbest = loadtime( filedir );
+    if ( clock < oldbest )
+    {
+        savetime( filedir, (float) clock );
+        return 1;
+    }
+    else
+        return 0;
 }
 
 Play::~Play()

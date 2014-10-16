@@ -21,6 +21,35 @@ LowLevels::LowLevels( int level_, int levelset_ )
 int
 LowLevels::reset()
 {   
+    if ( won )
+    {
+        save_time_if_best();
+
+        if ( levelset == 0 )
+        {
+            level = 0;
+            levelset = gamestate;
+            return GAMESTATEsplash;
+        }
+        
+        // otherwise we are playing marathon mode.
+        level += 1;
+    }
+    else
+    {    // probably died and restarted the level
+        if ( levelset == 0 )
+        {
+            lives = 99999;
+        }
+        else if ( lives < 0 )
+        {   
+            // YOU LOST
+            level = 0;
+            levelset = gamestate;
+            return GAMESTATEsplash;
+        }
+    }
+
     sprintf( lvltext, "low lvl. %i", level );
     totalclock += clock;
 
@@ -37,13 +66,6 @@ LowLevels::reset()
     menu = 0;
     clock = 0;
     checkertexture = spLoadSurface("../data/check.png");
-
-    if ( won && levelset == 0 )
-    {   // if we play only one level
-        level = 0;
-        levelset = gamestate;
-        return GAMESTATEmenu;
-    }
 
     if ( level == 1 )
     {
@@ -257,9 +279,10 @@ LowLevels::reset()
             std::cout << " congratulations, you beated all levels! " << std::endl;
             std::cout << " total accumulated time: " << totalclock << std::endl;
             std::cout << " remaining lives: " << lives << std::endl;
+            // HERE we will have to save things, but our level set isn't complete yet.
             level = 0;
             levelset = gamestate;
-            return GAMESTATEmenu;
+            return GAMESTATEsplash;
         }
         else 
         {
