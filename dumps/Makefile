@@ -12,8 +12,8 @@ LEVELS_O = $(patsubst %,%.o, $(LEVELS))
 DYNAMIC = -lSDL_ttf -lSDL_mixer -lSDL_image -lSDL -lm
 #==global Flags. Even on the gp2x with 16 kb Cache, -O3 is much better then -Os
 #CFLAGS = -O3 -fsingle-precision-constant -fPIC -Wno-write-strings
-CFLAGS = -O3 -DNDEBUG -fsingle-precision-constant -fPIC -Wno-write-strings
-CDEBUGFLAGS = -O1 -g -fsingle-precision-constant -fPIC
+CFLAGS = -O3 -fsingle-precision-constant -fPIC -Wno-write-strings -Wno-format-zero-length
+CDEBUGFLAGS = -O1 -g -fsingle-precision-constant -fPIC -DNDEBUG 
 # Testtweaks: -fgcse-lm -fgcse-sm -fsched-spec-load -fmodulo-sched -funsafe-loop-optimizations -Wunsafe-loop-optimizations -fgcse-las -fgcse-after-reload -fvariable-expansion-in-unroller -ftracer -fbranch-target-load-optimize
 GENERAL_TWEAKS =  -ffast-math
 #==PC==

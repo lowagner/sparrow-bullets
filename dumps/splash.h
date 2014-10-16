@@ -21,7 +21,7 @@ protected:
     
 public:
 
-    Splash( int level_ = 1, int levelset_ = 1, int winintrolose_=0 );
+    Splash( int levelset_ = 1, int level_ = 1, int winintrolose_=0, char* message_ = "" );
 
     void handle( SDL_Event* event );
     int update( Uint32 dt );

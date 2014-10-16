@@ -6,8 +6,9 @@ Check the LICENSE file included for copyright information.
 #include <iostream>
 #include "util.h"
 
-MainMenu::MainMenu( int level_, int levelset_ ) 
+MainMenu::MainMenu( int levelset_, int level_, char* message_ ) 
 {
+    sprintf( message, "%s", message_ );
     won = false;
 
     gamestate = GAMESTATEmenu;

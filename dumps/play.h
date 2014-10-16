@@ -37,8 +37,8 @@ protected:
 
     spFontPointer font;
 
-    char lvltext[60]; // level name
-    char alerttext[60]; // if there are any alerts to be broadcast
+    char lvltext[64]; // level name
+    char alerttext[64]; // if there are any alerts to be broadcast
     btScalar alerttime; // how long left to broadcast
 
     Player hero;
@@ -75,7 +75,7 @@ protected:
     
 public:
 
-    Play( int level_ = 1, int levelset_ = 1 );
+    Play( int levelset_ = 1, int level_ = 1, char* message_ = "" );
 
     virtual int reset();
     virtual int update( Uint32 dt );
@@ -98,7 +98,7 @@ public:
 class MainMenu : public Play
 {
 public:
-    MainMenu( int level_ = 1, int levelset_ = 1 );
+    MainMenu( int levelset_ = 1, int level_ = 1, char* message_ = "" );
     int reset();
     int update_level( btScalar fdt );
 };
@@ -107,7 +107,7 @@ public:
 class LowLevels : public Play
 {
 public:
-    LowLevels( int level_ = 1, int levelset_ = 2 );
+    LowLevels( int levelset_ = 2, int level_ = 1, char* message_ = "" );
     int reset();
 };
 

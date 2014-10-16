@@ -45,7 +45,7 @@ void init()
 
     // set gamestate and gamechunk to the right variables...
     gamestate = GAMESTATEsplash;
-    gamechunk = new Splash(0,2); // will default to level 0 of levelset 2
+    gamechunk = new Splash(2,0); // will default to level 0 of levelset 2
                                  // NOTE:  change when there are more levelsets available.
 
     spUsePrecalculatedNormals(0);
@@ -69,6 +69,11 @@ int update( Uint32 dt )
         // we can choose a level and a levelset...
         int level=gamechunk->level;
         int levelset=gamechunk->levelset;
+        char message[64]; // is there a message from the previous gamestate?
+        if ( gamestate == GAMESTATEsplash )
+            sprintf( message, "" ); // don't let splash continue to harrass you
+        else
+            sprintf( message, "%s", gamechunk->message );
 
         if ( newgamestate == GAMESTATEsplash )
         {
@@ -77,19 +82,19 @@ int update( Uint32 dt )
             if ( gamechunk->won )
                 wonvalue = 1;
             delete gamechunk;
-            gamechunk = new Splash( level, levelset, wonvalue ); 
+            gamechunk = new Splash( levelset, level, wonvalue, message ); 
         }
         else if ( newgamestate == GAMESTATEmenu )
         {
             std::cout << " initiating main menu" << std::endl;
             delete gamechunk;
-            gamechunk = new MainMenu( level, levelset ); 
+            gamechunk = new MainMenu( levelset, level, message ); 
         }
         else if ( newgamestate == GAMESTATElovels )
         {
             std::cout << "initiating low levels at level " << level << std::endl;
             delete gamechunk;
-            gamechunk = new LowLevels( level, levelset ); 
+            gamechunk = new LowLevels( levelset, level, message ); 
         }
         else
         {

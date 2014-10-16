@@ -10,8 +10,10 @@ Check the LICENSE file included for copyright information.
 #include <fstream>
 #include "util.h"
 
-Play::Play( int level_, int levelset_ ) // init play class
+Play::Play( int levelset_, int level_, char* message_ ) // init play class
 {
+    sprintf( message, "%s", message_ );
+
     won = false;
     alive = true;
 
@@ -814,6 +816,8 @@ int Play::update_level( btScalar fdt )
             if ( alerttime <= 0.f )
             {
                 alerttime = 0.f;
+                std::cout << "clearing out old message = " << message << "\n";
+                sprintf( message, "" );
             }
         }
     } 
@@ -888,6 +892,7 @@ int Play::save_time_if_best()
     if ( clock < oldbest )
     {
         savetime( filedir, (float) clock );
+        std::cout << " NEW BEST TIME! for level " << filedir << ": " << clock << "\n";
         return 1;
     }
     else

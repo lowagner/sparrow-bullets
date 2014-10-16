@@ -5,8 +5,10 @@ Check the LICENSE file included for copyright information.
 #include <string>
 #include <iostream>
 
-LowLevels::LowLevels( int level_, int levelset_ )
+LowLevels::LowLevels( int levelset_, int level_, char* message_ )
 {
+    sprintf( message, "%s", message_ );
+
     level = level_;
     levelset = levelset_;
 
@@ -23,14 +25,20 @@ LowLevels::reset()
 {   
     if ( won )
     {
-        save_time_if_best();
+        int besttime = save_time_if_best();
 
         if ( levelset == 0 )
         {
             level = 0;
+            if ( besttime )
+                sprintf( message, "new best time!" );
+            else
+                sprintf( message, "not your best." );
             levelset = gamestate;
             return GAMESTATEsplash;
         }
+        if ( besttime )
+            sprintf( message, "new best time on last level" );
         
         // otherwise we are playing marathon mode.
         level += 1;
@@ -46,9 +54,12 @@ LowLevels::reset()
             // YOU LOST
             level = 0;
             levelset = gamestate;
+            sprintf( message, "you lost a low marathon." );
             return GAMESTATEsplash;
         }
     }
+    if ( message != "" )
+        set_alert( message );
 
     sprintf( lvltext, "low lvl. %i", level );
     totalclock += clock;
@@ -279,6 +290,7 @@ LowLevels::reset()
             std::cout << " congratulations, you beated all levels! " << std::endl;
             std::cout << " total accumulated time: " << totalclock << std::endl;
             std::cout << " remaining lives: " << lives << std::endl;
+            std::cout << "\n sorry, but once we finish low levels we will have marathon saving." << std::endl;
             // HERE we will have to save things, but our level set isn't complete yet.
             level = 0;
             levelset = gamestate;

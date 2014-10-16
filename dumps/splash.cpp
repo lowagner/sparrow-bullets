@@ -1,11 +1,32 @@
 #include "splash.h"
 #include <iostream>
 
-Splash::Splash( int level_, int levelset_, int winintrolose_ )
+Splash::Splash( int levelset_, int level_, int winintrolose_, char* message_ )
 {
     level = level_;
     levelset = levelset_;
     winintrolose = winintrolose_;
+    if ( message_ == "" )
+    {
+        if ( winintrolose == 1)
+        {
+            // 
+            sprintf( message, "you have done it!" );
+        }
+        else if ( winintrolose == -1 )
+        { 
+            // losing screen
+            sprintf( message, "you lost." );
+        }
+        else 
+        {
+            // intro splash screen
+            sprintf( message, "intro screen" );
+        }
+
+    }
+    else
+        sprintf( message, "%s", message_ );
     clock = 3.f;
     font = NULL;
     won = false;
@@ -22,21 +43,7 @@ void Splash::draw( SDL_Surface* screen )
     spSetZTest( 0 );
     spSetAlphaTest( 1 );
 
-    if ( winintrolose == 1)
-    {
-        // 
-        spFontDrawMiddle( screen->w /2, screen->h/2, 0, "you have done it!", font );
-    }
-    else if ( winintrolose == -1 )
-    { 
-        // losing screen
-        spFontDrawMiddle( screen->w /2, screen->h/2, 0, "you lost!", font );
-    }
-    else 
-    {
-        // intro splash screen
-        spFontDrawMiddle( screen->w /2, screen->h/2, 0, "the intro screen!", font );
-    }
+    spFontDrawMiddle( screen->w /2, screen->h/2, 0, message, font );
 
     spFontDrawMiddle( screen->w / 2, font->maxheight + 2, 0, "cube dump", font );
     
@@ -63,7 +70,10 @@ int Splash::update( Uint32 dt )
     if ( clock > 0.f )
         return GAMESTATEsplash; // always return your own value if you want to continue updating
     else
+    {
+        sprintf( message, "" ); // no message to communicate.
         return GAMESTATEmenu;  
+    }
 }
 
 

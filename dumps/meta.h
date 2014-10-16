@@ -17,6 +17,7 @@ class GameChunk
 public:
     int level; // one piece of information that the gamechunk has, that everyone can see
     int levelset;
+    char message[64];
     bool won;
 
     GameChunk() {};
