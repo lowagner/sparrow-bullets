@@ -56,23 +56,24 @@ BaseObject::write_text( SDL_Surface* screen, spFontPointer font )
     int X = (int) ( (screen->w/2  - 0.95*(spGetMatrix()[12] *2*screen->h/ (Z))) ); 
     int Y = (int) ( 0.95*(screen->h/2 + ( spGetMatrix()[13]  *2*screen->h/ (Z))) );
 
-    //std::cerr << " w, h screen = " << screen->w << ", " << screen->h << "; size = " << spGetSizeFactor() << "\n"; 
-
-    //std::cerr << " X, Y, Z screen = " << X << ", " << Y << ", " << Z << "\n"; 
-//                std::cerr << " X, Y, Z camera coord = " << spFixedToFloat(spGetMatrix()[12]) 
-//                                << ", " << spFixedToFloat(spGetMatrix()[13]) << ", " 
-//                                << spFixedToFloat(Z) << "\n"; 
-
-    spSetAlphaTest( 1 );
-    Y -= (font->maxheight)*(text.size()/2 ) - 8*(text.size()-1);
-    for ( int i=0; i<text.size(); i++ )
+    // the following IF statement is a kludge... for some reason texts on the far left show up
+    // on the far right.  if you can find a better algorithm please suggest.
+    // presently it just shows stuff close to the center of the screen.
+    if ( (abs(X - screen->w/2) < 10*font->maxheight) && (abs(Y - screen->h/2) < 8*font->maxheight) )
     {
-        spFontDrawMiddle( X,Y, 0, text[i], font );
-        Y += font->maxheight+2;
+        spSetAlphaTest( 1 );
+        Y -= (font->maxheight)*(text.size()/2 ) - 8*(text.size()-1);
+        for ( int i=0; i<text.size(); i++ )
+        {
+            spFontDrawMiddle( X,Y, 0, text[i].c_str(), font );
+            //std::cout << " X = " << X << "; matrix12 = " << spGetMatrix()[12] << "; width = " << screen->w << "; text = " << text[i] << "\n";
+            Y += font->maxheight+2;
+        }
+        spSetAlphaTest( 0 );  // this makes purple not invisible
     }
-    spSetAlphaTest( 0 );  // this makes purple not invisible
   }
 }
+
 void 
 BaseObject::set_alpha( short int selfa_ )
 {

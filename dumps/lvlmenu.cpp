@@ -144,7 +144,7 @@ MainMenu::reset()
             blocks.push_back( Cube( btVector3(3,4,8), 0x05FF, 12, numbertexture[12] ) );
           
             int i = 1;
-            std::cout << "LEVELSET " << levelset << " TIMES:\n";
+            std::cout << "LEVELSET " << levelset << " BEST TIMES:\n";
             while ( i <= 12 )
             {
                 char buffer[64];
@@ -152,7 +152,7 @@ MainMenu::reset()
                 float oldbest = loadtime( buffer );
                 if ( oldbest < 999.0f )
                 {
-                    sprintf( buffer, "%.3f", oldbest );
+                    sprintf( buffer, "%.2f", oldbest );
                     std::cout << " level " << i << ": " << oldbest << "\n";
                     blocks[i].add_text( buffer );
                     i += 1;

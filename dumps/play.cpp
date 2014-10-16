@@ -354,7 +354,7 @@ void Play::draw( SDL_Surface* screen )
             sprintf( buffer, "%s %d", wintext, int(ceil(winlevel)) );
             spFontDrawMiddle( screen->w / 2, screen->h / 2, 0, buffer, font );
 
-            if ( totalclock+clock < 1000.0f )
+            if ( totalclock+clock < 999.0f )
             {
                 sprintf( buffer, "accumulated time: %.2f", (totalclock+clock) );
                 spFontDrawMiddle( screen->w / 2, screen->h / 2 + font->maxheight + 2, 0, buffer, font );
