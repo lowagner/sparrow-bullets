@@ -44,7 +44,7 @@ protected:
     void reset_camera( Sint32* matrix );
     void write_text( SDL_Surface* screen, spFontPointer font );
     
-    std::vector<char*> text;
+    std::vector<std::string> text;
 
 public:
     void add_text( char* text_ );
