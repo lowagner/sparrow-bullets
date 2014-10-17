@@ -43,6 +43,12 @@ BaseObject::~BaseObject()
     text.clear();
 }
 
+btVector3 
+BaseObject::get_pos()
+{
+    return lastposition;
+}
+
 void 
 BaseObject::write_text( SDL_Surface* screen, spFontPointer font )
 {

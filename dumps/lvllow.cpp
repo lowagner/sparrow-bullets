@@ -5,6 +5,9 @@ Check the LICENSE file included for copyright information.
 #include <string>
 #include <iostream>
 
+#include <ctime>
+#include <cstdlib>
+
 LowLevels::LowLevels( int levelset_, int level_, char* message_ )
 {
     cameramovecooldown = 0.0f;
@@ -17,6 +20,7 @@ LowLevels::LowLevels( int levelset_, int level_, char* message_ )
 
     won = false;
     reset();
+    srand(time(0));
 }
 
 
@@ -62,6 +66,7 @@ LowLevels::reset()
     if ( message != "" )
     {
         set_alert( message );
+        sprintf( message, "" );
     }
 
     sprintf( lvltext, "low lvl. %i", level );
@@ -285,6 +290,97 @@ LowLevels::reset()
         //hero.object->rotateZ( M_PI/2 );
         hero.object->debug = true;
     }
+    else if ( level == 9 )
+    {
+        outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
+
+        // prepare to randomize the playing field!
+        btMatrix3x3 matrix;
+        for ( int i=0; i<3; i++ )
+            for ( int j=0; j<3; j++ )
+                matrix[i][j] = 0;
+
+        matrix[2][2] = 1; // keep z components the same        
+        if ( rand() % 2 )
+        {
+            if ( rand() % 2 )
+                matrix[0][0] = 1;
+            else
+                matrix[0][0] = -1;
+
+            if ( rand() % 2 )
+                matrix[1][1] = 1;
+            else
+                matrix[1][1] = -1;
+        }
+        else
+        {
+            if ( rand() % 2 )
+                matrix[0][1] = 1;
+            else
+                matrix[0][1] = -1;
+
+            if ( rand() % 2 )
+                matrix[1][0] = 1;
+            else
+                matrix[1][0] = -1;
+        }
+
+        // this guy includes the floor.  all static rectangular prisms.
+        boxes.push_back( Box( btVector3(10,10,1), btVector3(0,0,-5), 0x000F ) ); // half-sizes, pos, color
+        boxes.push_back( Box( (matrix*btVector3(4,4,1)).absolute(), matrix*btVector3(-1,-1,-3), 0x05FF ) ); // half-sizes, pos, color 
+        boxes.push_back( Box( (matrix*btVector3(6,1,4)).absolute(), matrix*btVector3(4,4,0), 0x05FF ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(1,1,3), matrix*btVector3(2,6,-1), 0x05FF ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(1,1,1), matrix*btVector3(2,8,-3), 0x05FF ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(1,1,1), matrix*btVector3(2,2,-1), 0x05FF ) ); // half-sizes, pos, color
+        boxes.push_back( Box( (matrix*btVector3(5,1,2)).absolute(), matrix*btVector3(2,-4,0), 0x05FF ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(2,2,1), matrix*btVector3(-3,-1,-1), 0x05FF ) ); // half-sizes, pos, color 
+        boxes.push_back( Box( (matrix*btVector3(4,1,1)).absolute(), matrix*btVector3(7,-2,-3), 0x05FF ) ); // half-sizes, pos, color 
+        boxes.push_back( Box( (matrix*btVector3(1,8,4)).absolute(), matrix*btVector3(-6,2,0), 0x05FF ) ); // half-sizes, pos, color
+
+        for ( int i=1; i<boxes.size(); i++ )
+            boxes[i].set_alpha(0);
+
+        blocks.push_back(  Cube( matrix*btVector3(6,6,12), 0xFA00, 0 )  );
+
+
+        btVector3 heropos = matrix*btVector3(-9,-9,19);
+        hero = Player( heropos, 0xF00F, checkertexture );
+        std::cout << " hero pos = " << heropos.x() << ", " << heropos.y() << "\n";
+        if ( heropos.getX() < 0 )
+        { // hero on back side
+            if ( heropos.getY() < 0 )
+            { // hero is on right side
+                if ( rand() % 2 )
+                    hero.object->rotateZ( M_PI/2 );
+
+            }
+            else
+            { // hero is on left side
+                if ( rand() % 2 )
+                    hero.object->rotateZ( -M_PI/2 );
+            }
+        }
+        else
+        { // hero is on front side
+            if ( heropos.getY() < 0 )
+            { // hero is on right side
+                if ( rand() % 2 )
+                    hero.object->rotateZ( M_PI );
+                else
+                    hero.object->rotateZ( M_PI/2 );
+            }
+            else
+            { // hero is on left side
+                if ( rand() % 2 )
+                    hero.object->rotateZ( M_PI );
+                else
+                    hero.object->rotateZ( -M_PI/2 );
+            }
+
+        }
+        hero.object->debug = true;
+    }
     else
     {
         if ( won ) 
@@ -297,6 +393,7 @@ LowLevels::reset()
             // HERE we will have to save things, but our level set isn't complete yet.
             level = 0;
             levelset = gamestate;
+            sprintf( message, "congrats! you won, but more levels to come!" );
             return GAMESTATEsplash;
         }
         else 

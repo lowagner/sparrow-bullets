@@ -142,6 +142,7 @@ Cube::Cube( btVector3 pos, Uint16 color_,
             btScalar mass_ )
 {    
     mass = mass_;
+    lastposition = pos;
     //std::cout << " Cube mass = " << mass << std::endl;
     id = id_;
     fliptexture = fliptexture_;
@@ -315,6 +316,7 @@ Box::Box( btVector3 size_,
     lastpor[12] = spFloatToFixed( pos.getX() );
     lastpor[13] = spFloatToFixed( pos.getY() );
     lastpor[14] = spFloatToFixed( pos.getZ() );
+    lastposition = pos;
 
     size = size_;
     sizex = spFloatToFixed(size.x()); 
@@ -447,6 +449,7 @@ Ramp::Ramp( btVector3 size_,
             int id_,
             btScalar mass_ )
 {
+    lastposition = pos;
     mass = mass_;
     id = id_;
     debug = false;

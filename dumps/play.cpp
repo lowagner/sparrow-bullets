@@ -448,7 +448,7 @@ void Play::draw( SDL_Surface* screen )
             blocks[i].draw( screen, matrix, NULL, 200 ); 
             // draw blocks at partial transparency.  max alpha = 255 (fully opaque), 0 = fully transparent
         }
-
+        
         if ( alive )
             hero.object->draw( screen, matrix, NULL );
     }

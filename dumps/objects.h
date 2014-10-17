@@ -56,6 +56,8 @@ public:
 
     void set_alpha( short int selfa_ );
 
+    btVector3 get_pos();
+
     virtual void update( float dt );
 
     virtual void add_physics( Physics& new_physics, short int dynamics_=1 );

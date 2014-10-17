@@ -50,6 +50,7 @@ protected:
 
     std::vector<Cube> blocks; // dynamic blocks
     std::vector<Box> boxes; // static boxes
+
     bool killboxfromblockid;
     std::vector<Ramp> ramps; // static ramps
 
