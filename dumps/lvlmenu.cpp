@@ -128,6 +128,7 @@ MainMenu::reset()
 
             blocks.push_back( Cube( btVector3(7,0,5), 0x05FF, 0, numbertexture[0] ) ); 
             blocks[0].add_text("MARATHON");
+            blocks[0].add_text("unlock new levels here");
 
             blocks.push_back( Cube( btVector3(2,-7,5), 0x35FF, 1, numbertexture[1] ) );
             blocks.push_back( Cube( btVector3(0,-7,5), 0x343A, 2, numbertexture[2] ) );

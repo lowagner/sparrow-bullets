@@ -59,7 +59,9 @@ LowLevels::reset()
         }
     }
     if ( message != "" )
+    {
         set_alert( message );
+    }
 
     sprintf( lvltext, "low lvl. %i", level );
     totalclock += clock;

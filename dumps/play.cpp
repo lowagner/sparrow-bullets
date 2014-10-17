@@ -816,8 +816,6 @@ int Play::update_level( btScalar fdt )
             if ( alerttime <= 0.f )
             {
                 alerttime = 0.f;
-                std::cout << "clearing out old message = " << message << "\n";
-                sprintf( message, "" );
             }
         }
     } 
