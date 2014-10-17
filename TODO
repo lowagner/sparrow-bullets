@@ -2,9 +2,19 @@ ROADMAP FOR DUMPS
 
 DOWN IN THE DUMPS.
 
+Low levels:
+Level 9:  invisible wall maze, randomized.  can be mirrored in X or Y direction, or rotated by 90, 180, or 270
+Level 10:  invisible blocks.
+Level 11.  Moving boxes
+Level 12.  Moving boxes, small and huge blocks you have to push off, also another stairway.
+
+Menu 1,0:  Make an info (question mark) texture for the info box.  Perhaps try to allow "boxes" vector to be any type of
+    object, as a pointer type of thing, so that you can use a cube with a texture.
+
+
 BUGS:  
     FORCE_ACTIVATION doesn't always work.  when removing blocks, need to get a little
-    wind on some blocks which are off their CM
+    wind on some blocks which are off their CM  (Level 7).
 
     UNKNOWN CAUSE:
     FPS drops to 20 or so, when it usually is around 40 (on my machine at full screen)
@@ -14,50 +24,27 @@ BUGS:
     visual bugs:
         when zooming close enough to player, some random stuff starts jittering around the screen.
         probably boxes which are too close to draw???
+        
+        kludge fix:  don't let camera zoom in too close.  also put a limit on how far.
+            don't let inclination of camera go upside down, either.
+            can make hero somewhat translucent when camera is close.
 
 SAVING AND LEVELS
 
 get some statistics going, files saving:
-    level j:  
-        SPEEDSTAT:  best time         
     
     marathon, two statistics:
         SPEEDSTAT:  best time, lives lost
         SAFESTAT: fewest lives lost, time
-    
-    make it possible to choose the different levels once you've beaten them,
-        play for best time (speedstat)
-    or play a full round (marathon) for glory.
         
-    you can only unlock a level by beating it in marathon mode with >= 0 lives.
-        only show unlocked levels in the level select screen
-
-    in marathon:
-        lose once lives goes less than 0
-        quickest beating a level in marathon counts for that level's SPEEDSTAT. 
-
     C4A compo server action.
-
-lose/win screen:
-    make the splash screen multipurpose.
-    make splash screen check level and levelset of disappearing game chunk.
-    grab levelset:
-        set splash screen levelset to levelset
-        pass on to lvlmenu to reload that level set when done with splash screen
-    grab level:
-        if level > 0:
-            show win screen
-        else if level < 0 :
-            show lose screen
-        else:
-            show splash screen
-    after splash screen finished,
-        set splash screen level to 0, so that lvlmenu loads up the level set 
 
 level upgrades:
     allow blocks to be different sized cubes
     have physics have a set of cube sizes which it has already included as collision shapes
     check if new cube has different dimensions, and add to colshapes if necessary.
+
+    moving boxes, for level 11 and 12.
     
 fancy new gimmicks for new levels
     get "addboxes" from blocks id also in there.  tossing off one box can make one box appear, etc.
@@ -73,6 +60,12 @@ better first menu level... -- colors and what not.
 need to figure out how to get contact call backs talking to player object.
     sum over all contacts processed, to give a final "intensity" to play a sound file at.
 
+sounds:
+    death sound
+    reset sound
+    lose screen sound
+    win screen sound
+
 music...?
     different themes for different levels, level sets.
     idea:
@@ -81,7 +74,11 @@ music...?
             extra intensity for when you're falling, on your face, etc., hit something, pushing forward, etc.
 
         otherwise:
-            data/low/music*.ogg -- music files for the "low" level set.
+            data/1/music1.ogg -- music for the main menu
+            data/2/music*.ogg -- music files for the 2nd level set.
+            
+            let music start with initialization of Play class, not to be reset when reset() happens.
+            that way there can be continuity between levels
 
 
 LONG TERM STUFF

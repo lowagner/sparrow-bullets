@@ -12,6 +12,7 @@ Check the LICENSE file included for copyright information.
 
 Play::Play( int levelset_, int level_, char* message_ ) // init play class
 {
+    cameramovecooldown = 0.0f;
     sprintf( message, "%s", message_ );
 
     won = false;
@@ -54,7 +55,7 @@ Play::Play( int levelset_, int level_, char* message_ ) // init play class
         camerafollowspeedvalues.push_back(4.1f);
         camerafollowspeedvalues.push_back(5.9f);
         menuitemvalues.push_back( camerafollowspeedvalues );
-            menuitemvalueindices.push_back( 1 );
+            menuitemvalueindices.push_back( 2 );
     }
     {
         std::vector<float> cameraalignspeedvalues;
@@ -66,7 +67,7 @@ Play::Play( int levelset_, int level_, char* message_ ) // init play class
         cameraalignspeedvalues.push_back(4.1f);
         cameraalignspeedvalues.push_back(5.9f);
         menuitemvalues.push_back( cameraalignspeedvalues );
-            menuitemvalueindices.push_back( 1 );
+            menuitemvalueindices.push_back( 2 );
     }
     {
         std::vector<float> cameratimeoutvalues;

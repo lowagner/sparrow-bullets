@@ -8,6 +8,8 @@ Check the LICENSE file included for copyright information.
 
 MainMenu::MainMenu( int levelset_, int level_, char* message_ ) 
 {
+    cameramovecooldown = 0.0f;
+
     sprintf( message, "%s", message_ );
     won = false;
 

@@ -7,6 +7,7 @@ Check the LICENSE file included for copyright information.
 
 LowLevels::LowLevels( int levelset_, int level_, char* message_ )
 {
+    cameramovecooldown = 0.0f;
     sprintf( message, "%s", message_ );
 
     level = level_;
