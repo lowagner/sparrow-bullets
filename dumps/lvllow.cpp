@@ -346,7 +346,6 @@ LowLevels::reset()
 
         btVector3 heropos = matrix*btVector3(-9,-9,19);
         hero = Player( heropos, 0xF00F, checkertexture );
-        std::cout << " hero pos = " << heropos.x() << ", " << heropos.y() << "\n";
         if ( heropos.getX() < 0 )
         { // hero on back side
             if ( heropos.getY() < 0 )
