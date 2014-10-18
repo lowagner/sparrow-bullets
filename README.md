@@ -38,13 +38,21 @@ respective directories.  The first contender is `dumps`, in which you play
 as a red-checkered cube dumptruck trying to clean the world of all its
 cubey messes!  Compile with `make` and run with `./dump`.
 
-Keyboard controls:
+On a PC, the keyboard controls:
 - WASD control the camera
 - E jumps
 - Q resets play
 - [Enter] opens gameplay menu 
 - [Backspace] pauses/unpauses
 - Arrow keys move the checkered dumptruck, RELATIVE motion!
+
+On an open-source handheld (e.g. Pandora):
+- Face buttons control the camera
+- Right shoulder button jumps
+- Left shoulder button resets play
+- Start opens menu
+- Select pauses
+- D-pad moves the dumptruck
 
 If you fall on your face or side, the arrow keys may do something which is
 unexpected (for you), but I contend that it makes sense (in a relative way),
