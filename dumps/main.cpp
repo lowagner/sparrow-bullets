@@ -45,8 +45,8 @@ void init()
 
     // set gamestate and gamechunk to the right variables...
     gamestate = GAMESTATEsplash;
-    gamechunk = //new LowLevels(2,9); 
-                new Splash(2,0); // will default to level 0 of levelset 2
+    gamechunk = new LowLevels(2,11); 
+                //new Splash(2,0); // will default to level 0 of levelset 2
                                  // NOTE:  change when there are more levelsets available.
 
     spUsePrecalculatedNormals(0);
@@ -124,7 +124,7 @@ void exit() // destructor
 int main( int argc, char **argv )
 {
     init();
-    spLoop( draw, update, 10, resize, handle ); 
+    spLoop( draw, update, 20, resize, handle ); 
                         // 20 means max FPS is 50
                         // 10 means max FPS is 100
     exit();

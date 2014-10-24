@@ -80,8 +80,8 @@ MainMenu::reset()
             outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
 
             // this guy includes the floor.  all static rectangular prisms.
-            boxes.push_back( Box( btVector3(5,5,1), btVector3(0,0,-3), 0x05FF ) ); // half-sizes, pos, color
-            boxes.push_back( Box( btVector3(1,1,1), btVector3(0,-7,1), 0x05FF ) ); // half-sizes, pos, color
+            boxes.push_back( Box( btVector3(5,5,1), btVector3(0,0,-3), 0xFF59 ) ); // half-sizes, pos, color
+            boxes.push_back( Box( btVector3(1,1,1), btVector3(0,-7,1), 0x0000 ) ); // half-sizes, pos, color
             boxes[1].add_text( "push a lvl cube off" );
             boxes[1].add_text( "to play that level" );
 
@@ -124,7 +124,7 @@ MainMenu::reset()
 
             // this guy includes the floor.  all static rectangular prisms.
             boxes.push_back( Box( btVector3(4,4,1), btVector3(7,0,-3), 0x35B7 ) ); 
-            boxes.push_back( Box( btVector3(3,3,1), btVector3(0,-5,-4), 0x1131 ) ); 
+            boxes.push_back( Box( btVector3(3,3,1), btVector3(0,-5,-4), 0x1231 ) ); 
             boxes.push_back( Box( btVector3(5,5,1), btVector3(-6,4,-1), 0x0007 ) ); 
             boxes.push_back( Box( btVector3(2,2,1), btVector3(2,4,3), 0x0000 ) ); 
 
@@ -143,7 +143,8 @@ MainMenu::reset()
             blocks.push_back( Cube( btVector3(-8,8,5), 0xFFFF, 8, numbertexture[8] ) );
             blocks.push_back( Cube( btVector3(-4,8,5), 0x000F, 9, numbertexture[9] ) );
             blocks[9].set_alpha(100); // out of 255
-            blocks.push_back( Cube( btVector3(-2,8,5), 0x05FF, 10, numbertexture[10] ) );
+            blocks.push_back( Cube( btVector3(-2,8,5), 0x343A, 10, numbertexture[10] ) );
+            blocks[10].set_alpha(80); // out of 255
             blocks.push_back( Cube( btVector3(-2,6,5), 0x05FF, 11, numbertexture[11] ) );
 
             blocks.push_back( Cube( btVector3(3,4,8), 0x05FF, 12, numbertexture[12] ) );

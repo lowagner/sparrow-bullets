@@ -43,6 +43,12 @@ BaseObject::~BaseObject()
     text.clear();
 }
 
+
+void BaseObject::set_velocity( btVector3 vel)
+{
+    lastvelocity = vel;
+}
+
 btVector3 
 BaseObject::get_pos()
 {
@@ -117,7 +123,6 @@ void
 BaseObject::update_transform( btScalar dt )
 {
     // kinematic object updating its transform and the por
-
     lastposition += dt * lastvelocity;
     transform.setOrigin( lastposition );
 
@@ -144,8 +149,11 @@ BaseObject::update_transform( btScalar dt )
 
     // interface with the physics
     body->getMotionState()->setWorldTransform( transform );
-    body->setCenterOfMassTransform( transform );
-    //body->setLinearVelocity( lastvelocity ); // maybe not necessary, unless things seem jittery
+    //body->setCenterOfMassTransform( transform );
+    body->setWorldTransform( transform );
+
+    // check this out for timer
+    body->setLinearVelocity( lastvelocity ); 
 }
 
 void
@@ -210,6 +218,7 @@ BaseObject::fix_por()
 void
 BaseObject::locate_and_move( btScalar dt )
 {
+    //std::cout << " hillo id = " << id <<"; dy = " << dynamics;
     if (physics)
     {
         switch ( dynamics ) 
@@ -236,6 +245,37 @@ BaseObject::locate_and_move( btScalar dt )
             lastposition = transform.getOrigin();
             lastvelocity = body->getLinearVelocity();
             lastomega = body->getAngularVelocity();
+
+
+//            if ( onground && ray.hasHit() )
+//            {
+//                // check if the ground is moving.
+//                // we'll need to help the object along
+//                const btRigidBody* ground(btRigidBody::upcast(ray.getHitter()) ); // if you're on the ground
+//
+//                btVector3 groundvelocity = ground->getLinearVelocity();
+//                if ( groundvelocity.length2() > 0.1 )
+//                {
+//                    activate();
+//                    std::cout << " ground vel = " << groundvelocity.x() << ", "
+//                                                  << groundvelocity.y() << ", "
+//                                                  << groundvelocity.z() << "\n";
+//                    // needs help!
+//                    float friction = 5;
+//                    btVector3 forcedir = groundvelocity; //groundvelocity.dot( groundvelocity - lastvelocity ) * groundvelocity / groundvelocity.length();
+//                    forcedir *= dt*friction;
+//                    std::cout << " force = " << forcedir.x() << ", "
+//                                                  << forcedir.y() << ", "
+//                                                  << forcedir.z() << "\n";
+//                    
+//                    body->applyCentralImpulse( forcedir );
+//                }
+//
+//            }
+//            else
+//                activate();
+
+
 //            btRigidBody* rbody = dynamic_cast<btRigidBody*> body;
 //            if ( rbody )
 //            {
@@ -560,7 +600,8 @@ BaseObject::remove_physics()
 
 void
 BaseObject::update( float dt )
-{}
+{
+}
 
 void
 BaseObject::reset_camera( Sint32* matrix )
@@ -611,7 +652,6 @@ void
 Player::update( float dt )
 {
     object->update( dt );
-
     check_surroundings();
 }
 
@@ -880,18 +920,14 @@ Player::check_surroundings()
     object->physics->dworld->rayTest( rayfrom, rayto, ray ); 
 
     canjump = ( ray.hasHit() );
-    
-    
 
-    // SECOND
-    // check if we're on the ground.
+    // finally, check if you're on ground
     // ray cast downwards in world-coords
-
     rayto = rayfrom - 1.2*btVector3(0,0,object->size.z());
 
     object->physics->dworld->rayTest( rayfrom, rayto, ray ); 
-
-    onground = ( ray.hasHit() );
+    
+    onground = ( ray.hasHit() );    
 }
 
 bool

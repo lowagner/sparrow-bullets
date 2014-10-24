@@ -11,11 +11,11 @@ protected:
     btCollisionObject* me;
 
 public:
-    ClosestNotMe(btCollisionObject* me)
+    ClosestNotMe(btCollisionObject* me_)
     :
         btCollisionWorld::ClosestRayResultCallback(btVector3(0.0, 0.0, 0.0), btVector3(0.0, 0.0, 0.0))
     {
-        me = me;
+        me = me_;
     }
 
     virtual btScalar addSingleResult(btCollisionWorld::LocalRayResult& rayResult,bool normalInWorldSpace)
@@ -24,6 +24,11 @@ public:
             return 1.0;
 
         return ClosestRayResultCallback::addSingleResult( rayResult, normalInWorldSpace );
+    }
+
+    const btCollisionObject* getHitter()
+    {
+        return m_collisionObject;
     }
 };
 

@@ -328,20 +328,22 @@ LowLevels::reset()
 
         // this guy includes the floor.  all static rectangular prisms.
         boxes.push_back( Box( btVector3(10,10,1), btVector3(0,0,-5), 0x000F ) ); // half-sizes, pos, color
-        boxes.push_back( Box( (matrix*btVector3(4,4,1)).absolute(), matrix*btVector3(-1,-1,-3), 0x05FF ) ); // half-sizes, pos, color 
+        boxes.push_back( Box( (matrix*btVector3(5,4,1)).absolute(), matrix*btVector3(0,-1,-3), 0x05FF ) ); // half-sizes, pos, color 
         boxes.push_back( Box( (matrix*btVector3(6,1,4)).absolute(), matrix*btVector3(4,4,0), 0x05FF ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(1,1,3), matrix*btVector3(2,6,-1), 0x05FF ) ); // half-sizes, pos, color
+        boxes.push_back( Box( (matrix*btVector3(1,1,3)).absolute(), matrix*btVector3(2,6,-1), 0x05FF ) ); // half-sizes, pos, color
         boxes.push_back( Box( btVector3(1,1,1), matrix*btVector3(2,8,-3), 0x05FF ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(1,1,1), matrix*btVector3(2,2,-1), 0x05FF ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(1,1,1), matrix*btVector3(4,2,-1), 0x05FF ) ); // half-sizes, pos, color
         boxes.push_back( Box( (matrix*btVector3(5,1,2)).absolute(), matrix*btVector3(2,-4,0), 0x05FF ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(2,2,1), matrix*btVector3(-3,-1,-1), 0x05FF ) ); // half-sizes, pos, color 
-        boxes.push_back( Box( (matrix*btVector3(4,1,1)).absolute(), matrix*btVector3(7,-2,-3), 0x05FF ) ); // half-sizes, pos, color 
+        boxes.push_back( Box( (matrix*btVector3(2,1,1)).absolute(), matrix*btVector3(-3,-2,-1), 0x05FF ) ); // half-sizes, pos, color 
+        boxes.push_back( Box( (matrix*btVector3(4,1,1)).absolute(), matrix*btVector3(9,-2,-3), 0x05FF ) ); // half-sizes, pos, color 
+        boxes.push_back( Box( (matrix*btVector3(1,6,1)).absolute(), matrix*btVector3(11,5,-3), 0x05FF ) ); // half-sizes, pos, color 
+        boxes.push_back( Box( btVector3(1,1,1), matrix*btVector3(11,5,-1), 0x05FF ) ); // half-sizes, pos, color 
         boxes.push_back( Box( (matrix*btVector3(1,8,4)).absolute(), matrix*btVector3(-6,2,0), 0x05FF ) ); // half-sizes, pos, color
 
         for ( int i=1; i<boxes.size(); i++ )
             boxes[i].set_alpha(0);
 
-        blocks.push_back(  Cube( matrix*btVector3(6,6,12), 0xFA00, 0 )  );
+        blocks.push_back(  Cube( matrix*btVector3(7,8,12), 0xFA00, 0 )  );
 
 
         btVector3 heropos = matrix*btVector3(-9,-9,19);
@@ -379,6 +381,61 @@ LowLevels::reset()
 
         }
         hero.object->debug = true;
+    }
+    else if ( level == 10 )
+    {
+        outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
+
+        // this guy includes the floor.  all static rectangular prisms.
+        boxes.push_back( Box( btVector3(7,7,1), btVector3(0,0,-5), 0x05FF ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(4,4,1), btVector3(7,7,-3), 0x055F ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(4,4,1), btVector3(-7,7,-3), 0x055F ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(4,4,1), btVector3(7,-7,-3), 0x055F ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(4,4,1), btVector3(-7,-7,-3), 0x055F ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(3,3,1), btVector3(0,0,1), 0x05FF ) ); // half-sizes, pos, color
+
+        hero = Player( btVector3(0,4,5), 0xF00F, checkertexture );
+        hero.object->rotateZ( M_PI/2 );
+        hero.object->debug = true;
+       
+        // add some blocks pieces
+        int xy = 1;
+        if ( rand() % 2 )
+            xy = -1;
+        for ( int i=0; i<7; i++ )
+        {
+            int xyreverse = 1;
+            if ( i > 1 && i < 5 )
+                xyreverse = -1;
+            blocks.push_back(  Cube( btVector3(2*i-6,xyreverse*xy*(2*i-6),10), 0xFF0F )  );
+            blocks[i].set_alpha(0);
+        }
+    }
+    else if ( level == 11 )
+    {
+        outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
+
+        // this guy includes the floor.  all static rectangular prisms.
+        boxes.push_back( Box( btVector3(7,7,1), btVector3(0,0,-5), 0xF00F, 100 ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(4,4,1), btVector3(7,5,-3), 0xF50F, 101 ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(4,4,1), btVector3(3,7,-1), 0x0F0F, 102 ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(4,4,1), btVector3(1,3,1), 0x03FF, 103 ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(4,4,1), btVector3(7,-1,3), 0x00FF, 104 ) ); // half-sizes, pos, color
+
+        boxes[3].set_velocity( btVector3(1,0,0) );
+
+
+        hero = Player( btVector3(0,4,5), 0xF00F, checkertexture );
+        hero.object->rotateZ( -M_PI/2 );
+        hero.object->debug = true;
+        hero.object->id = 1337;
+       
+        // add some blocks pieces
+        for ( int i=0; i<6; i++ )
+        {
+            blocks.push_back(  Cube( btVector3(2*i-4,2*i-6,10+2*i), 0xFFFF, i )  );
+        }
+        //blocks[4].impulse( btVector3(0,10,0) );
     }
     else
     {

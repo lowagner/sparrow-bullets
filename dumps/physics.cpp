@@ -246,64 +246,6 @@ Physics::update( float dt )
     // running at the same physicsy time, even if different FPS.
 }
 
-
-//	{
-//		//create a few dynamic rigidbodies
-//		// Re-using the same collision is better for memory usage and performance
-//        float SCALING = 1.0;
-//        int ARRAY_SIZE_X = 5;
-//        int ARRAY_SIZE_Y = 5;
-//        int ARRAY_SIZE_Z = 2;
-//        float START_POS_X = 0.3;
-//        float START_POS_Y = 0.3;
-//        float START_POS_Z = 0.3;
-//
-//		btBoxShape* colShape = new btBoxShape(btVector3(SCALING*1,SCALING*1,SCALING*1));
-//		//btCollisionShape* colShape = new btSphereShape(btScalar(1.));
-//		colshapes.push_back(colShape);
-//
-//		/// Create Dynamic Objects
-//		btTransform startTransform;
-//		startTransform.setIdentity();
-//
-//		btScalar	mass(1.f);
-//
-//		//rigidbody is dynamic if and only if mass is non zero, otherwise static
-//		bool isDynamic = (mass != 0.f);
-//
-//		btVector3 linertia(0,0,0);
-//		if (isDynamic)
-//			colShape->calculateLocalInertia(mass,linertia);
-//
-//		float start_x = START_POS_X - ARRAY_SIZE_X/2;
-//		float start_y = START_POS_Y;
-//		float start_z = START_POS_Z - ARRAY_SIZE_Z/2;
-//
-//		for (int k=0;k<ARRAY_SIZE_Y;k++)
-//		{
-//			for (int i=0;i<ARRAY_SIZE_X;i++)
-//			{
-//				for(int j = 0;j<ARRAY_SIZE_Z;j++)
-//				{
-//					startTransform.setOrigin(SCALING*btVector3(
-//										btScalar(2.0*i + start_x),
-//										btScalar(20+2.0*k + start_y),
-//										btScalar(2.0*j + start_z)));
-//
-//			
-//					//using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
-//					btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
-//					btRigidBody::btRigidBodyConstructionInfo rbInfo(mass,myMotionState,colShape,linertia);
-//					btRigidBody* body = new btRigidBody(rbInfo);
-//					
-//
-//					dworld->addRigidBody(body);
-//				}
-//			}
-//		}
-//	}
-
-
 void
 Physics::deinit()
 {

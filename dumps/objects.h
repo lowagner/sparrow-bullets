@@ -31,6 +31,7 @@ protected:
     Physics* physics;
 
     btRigidBody* body;
+
     btScalar mass;
     btVector3 size;
 
@@ -55,6 +56,8 @@ public:
     BaseObject();
 
     void set_alpha( short int selfa_ );
+
+    void set_velocity( btVector3 vel );
 
     btVector3 get_pos();
 
@@ -98,6 +101,7 @@ class Player
 protected:
     bool canjump, onground;
     int topsideup, facesideup;
+    
 
     float maxwalkspeed2, walkacceleration;
     float maxrotspeed2, rotacceleration, flyingrotacceleration;
@@ -140,5 +144,6 @@ public:
     Player( const Player& other ); // copy constructor
     Player& operator = ( Player other ); // Copy Assignment Operator
 };
+
 
 #endif

@@ -3,13 +3,11 @@ ROADMAP FOR DUMPS
 DOWN IN THE DUMPS.
 
 Low levels:
-Level 9:  invisible wall maze, randomized.  can be mirrored in X or Y direction, or rotated by 90, 180, or 270
-Level 10:  invisible blocks.
 Level 11.  Moving boxes
 Level 12.  Moving boxes, small and huge blocks you have to push off, also another stairway.
 
-Menu 1,0:  Make an info (question mark) texture for the info box.  Perhaps try to allow "boxes" vector to be any type of
-    object, as a pointer type of thing, so that you can use a cube with a texture.
+CHECK TIMER ON BULLET PHYSICS>
+    we want to make sure dt flows nicely, and that it approximately gets the right velocity.
 
 
 BUGS:  
@@ -45,6 +43,7 @@ level upgrades:
     check if new cube has different dimensions, and add to colshapes if necessary.
 
     moving boxes, for level 11 and 12.
+    if on ground, check if the ground has any velocity, and friction yourself to it
     
 fancy new gimmicks for new levels
     get "addboxes" from blocks id also in there.  tossing off one box can make one box appear, etc.

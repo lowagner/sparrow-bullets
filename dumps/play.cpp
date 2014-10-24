@@ -430,7 +430,7 @@ void Play::draw( SDL_Surface* screen )
     Sint32 matrix[16]; //pointer to array of 16 Sint32's.
     memcpy(matrix,spGetMatrix(),16*sizeof(Sint32)); //need to reload this after every draw.
 
-    if ( alerttime > 0.f )
+    if ( (alerttime > 0.f) || menu )
     {
         // don't draw text if alert is showing
         for (int i=0; i<boxes.size(); i++)
@@ -750,6 +750,14 @@ int Play::update_level( btScalar fdt )
         // if we have not won the level yet...
         // update level time
         clock += fdt;
+
+        // update boxes
+        for ( int i=0; i<boxes.size(); i++ )
+            boxes[i].update( fdt );
+        // update ramps
+        for ( int i=0; i<ramps.size(); i++ )
+            ramps[i].update( fdt );
+
         // update blocks
         int i=0;
         int blocksize = blocks.size();
