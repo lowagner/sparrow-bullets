@@ -53,9 +53,17 @@ Physics::Physics()
 }
 
 btRigidBody*
-Physics::add_cube( short int& dynamics, btTransform transform, btVector3 velocity, btVector3 omega, btScalar mass )
+Physics::add_cube( short int& dynamics, btTransform transform, btVector3 velocity, btVector3 omega, 
+                   btScalar mass, btScalar sidelength )
 {
-    return add_body( dynamics, cubeshape, transform, velocity, omega, mass );
+    if ( sidelength == 1.0f ) 
+        return add_body( dynamics, cubeshape, transform, velocity, omega, mass );
+    else
+    {
+        btBoxShape* thiscubeshape = new btBoxShape( btVector3(sidelength,sidelength,sidelength) );
+        colshapes.push_back( thiscubeshape );
+        return add_body( dynamics, thiscubeshape, transform, velocity, omega, mass );
+    }
 }
 
 btRigidBody*

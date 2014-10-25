@@ -88,7 +88,7 @@ public:
     add_cube( short int& dynamics,
               btTransform transform, 
               btVector3 velocity = btVector3(), 
-              btVector3 omega = btVector3(), btScalar mass_=1 );
+              btVector3 omega = btVector3(), btScalar mass_=1, btScalar sidelength=1 );
 
     btRigidBody*
     add_box( short int& dynamics,

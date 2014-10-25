@@ -19,6 +19,9 @@ BaseObject::BaseObject()
     lastvelocity = btVector3(); // linear velocity
     lastomega = btVector3(); //angular velocity
     size = btVector3(1,1,1); // size
+    cyclepositions.clear();
+    objecttime = 0;
+    cyclepositionindex = 0;
 }
 
 BaseObject::~BaseObject()
@@ -41,12 +44,26 @@ BaseObject::~BaseObject()
     // don't put any virtual methods in it.
 //    std::cout << " finished calling base object " << id << " destructor " << std::endl;
     text.clear();
+    cyclepositions.clear();
 }
 
 
 void BaseObject::set_velocity( btVector3 vel)
 {
     lastvelocity = vel;
+}
+
+void BaseObject::push_cycle( btVector3 position, btScalar dt )
+{
+    if ( cyclepositions.size() )
+    {
+        cyclepositions.push_back( btVector4( position.x(), position.y(), position.z(),
+                                             cyclepositions[-1].w() + dt ) );
+    }
+    else
+    {
+        cyclepositions.push_back( btVector4( position.x(), position.y(), position.z(), 0 ) );
+    }
 }
 
 btVector3 
@@ -122,8 +139,60 @@ BaseObject::update_por( btScalar dt )
 void
 BaseObject::update_transform( btScalar dt )
 {
-    // kinematic object updating its transform and the por
-    lastposition += dt * lastvelocity;
+    // dynamics == 2 updating.
+    // i.e. kinematic object updating its transform and the por
+
+    if ( cyclepositions.size() > 1 )
+    {
+        objecttime += dt;
+        btScalar deltat = 1; // how fast to get from one pos to another
+        float fractiongreater = 0; // how close you are to further position than original
+        btVector3 positionlesser = btVector3( cyclepositions[cyclepositionindex].x(), // original position
+                                              cyclepositions[cyclepositionindex].y(), 
+                                              cyclepositions[cyclepositionindex].z() );
+;
+        btVector3 positiongreater = btVector3( cyclepositions[cyclepositionindex+1].x(), 
+                                               cyclepositions[cyclepositionindex+1].y(), 
+                                               cyclepositions[cyclepositionindex+1].z() );
+        
+        if ( objecttime < cyclepositions[cyclepositionindex+1].w() )
+        {   
+            // not switching just yet
+            deltat = ( cyclepositions[cyclepositionindex+1].w() - 
+                       cyclepositions[ cyclepositionindex ].w() );
+            fractiongreater = ( objecttime - cyclepositions[cyclepositionindex].w() ) / deltat;
+        }
+        else
+        {   // need to switch!
+            cyclepositionindex += 1;
+            if ( cyclepositionindex == cyclepositions.size() - 1 )
+            {
+                cyclepositionindex = 0;
+                positionlesser = btVector3( cyclepositions[cyclepositionindex].x(), 
+                                            cyclepositions[cyclepositionindex].y(), 
+                                            cyclepositions[cyclepositionindex].z() );
+                objecttime -= cyclepositions[cyclepositions.size()-1].w();
+            }
+            else
+            {
+                positionlesser = positiongreater;
+            }
+            positiongreater = btVector3( cyclepositions[cyclepositionindex+1].x(), 
+                                         cyclepositions[cyclepositionindex+1].y(), 
+                                         cyclepositions[cyclepositionindex+1].z() );
+            deltat = ( cyclepositions[cyclepositionindex+1].w() - 
+                       cyclepositions[ cyclepositionindex ].w() );
+            fractiongreater = ( objecttime - cyclepositions[cyclepositionindex].w() ) / deltat;
+        }
+
+        lastposition = ( positionlesser  * (1 - fractiongreater)
+                       + positiongreater  * (fractiongreater) );
+        lastvelocity = (positiongreater - positionlesser) / deltat; 
+    }
+    else
+    {
+        lastposition += dt * lastvelocity;
+    }
     transform.setOrigin( lastposition );
 
     btScalar omegalength = lastomega.length2();
@@ -742,6 +811,7 @@ Player::walk( float dt, int dir )
         }
         else 
         {
+            std::cout << " couldn't walk becuase of  " << canjump <<"jump or " << topsideup << "\n";
         // on ground, but in a bad spot
             //std::cerr << " player landed badly, can't walk " << std::endl;
             if ( facesideup==0 && topsideup == 0 )
@@ -884,7 +954,7 @@ Player::check_surroundings()
 
     btTransform cubeform;
     btVector3 down = -get_up();
-    down *= object->size.z()*1.1;
+    down *= object->size.z()*1.2;
    
     // in the meantime, check if our head is rightside up
     float result = -down.z(); //dot( btVector3(0,0,-1) );

@@ -745,18 +745,18 @@ int Play::update_hero( btScalar fdt )
 int Play::update_level( btScalar fdt )
 {
 
+    // update boxes
+    for ( int i=0; i<boxes.size(); i++ )
+        boxes[i].update( fdt );
+    // update ramps
+    for ( int i=0; i<ramps.size(); i++ )
+        ramps[i].update( fdt );
+
     if ( winlevel == 0.f )
     {
         // if we have not won the level yet...
         // update level time
         clock += fdt;
-
-        // update boxes
-        for ( int i=0; i<boxes.size(); i++ )
-            boxes[i].update( fdt );
-        // update ramps
-        for ( int i=0; i<ramps.size(); i++ )
-            ramps[i].update( fdt );
 
         // update blocks
         int i=0;

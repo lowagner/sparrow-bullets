@@ -422,7 +422,17 @@ LowLevels::reset()
         boxes.push_back( Box( btVector3(4,4,1), btVector3(1,3,1), 0x03FF, 103 ) ); // half-sizes, pos, color
         boxes.push_back( Box( btVector3(4,4,1), btVector3(7,-1,3), 0x00FF, 104 ) ); // half-sizes, pos, color
 
-        boxes[3].set_velocity( btVector3(1,0,0) );
+        boxes[4].push_cycle( btVector3(5,-5,-20) );
+        boxes[4].push_cycle( btVector3(5,-5,20), 12 );
+
+        boxes[3].push_cycle( btVector3(5,5,-20) );
+        boxes[3].push_cycle( btVector3(5,5,20), 8.1 );
+        
+        boxes[2].push_cycle( btVector3(-5,-5,-20) );
+        boxes[2].push_cycle( btVector3(-5,-5,20), 9.5 );
+        
+        boxes[1].push_cycle( btVector3(-5,5,-20) );
+        boxes[1].push_cycle( btVector3(-5,5,20), 10.0 );
 
 
         hero = Player( btVector3(0,4,5), 0xF00F, checkertexture );

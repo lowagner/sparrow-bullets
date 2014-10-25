@@ -28,6 +28,10 @@ protected:
     btVector3 lastvelocity; // linear velocity
     btVector3 lastomega; //angular velocity
 
+    std::vector<btVector4> cyclepositions; 
+    btScalar objecttime;
+    short int cyclepositionindex;
+
     Physics* physics;
 
     btRigidBody* body;
@@ -58,6 +62,8 @@ public:
     void set_alpha( short int selfa_ );
 
     void set_velocity( btVector3 vel );
+
+    void push_cycle( btVector3 position, btScalar dt = 2 );
 
     btVector3 get_pos();
 

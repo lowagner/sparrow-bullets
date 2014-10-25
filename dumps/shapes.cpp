@@ -139,8 +139,12 @@ Cube::Cube( btVector3 pos, Uint16 color_,
             int id_,
             SDL_Surface* texture_, 
             bool fliptexture_,
-            btScalar mass_ )
+            btScalar mass_,
+            Sint32 sidelength_ )
 {    
+    sidelength = sidelength_;
+    float side = spFixedToFloat(sidelength_);
+    size = btVector3( side, side, side );
     mass = mass_;
     lastposition = pos;
     //std::cout << " Cube mass = " << mass << std::endl;
@@ -179,8 +183,11 @@ Cube::add_physics( Physics& new_physics, short int dynamics_ )
     // we haven't been keeping up with the transforms
     // get the transform from the por
     fix_transform();
+    // add dynamics if the cyclepositions are there
+    if ( cyclepositions.size() && abs(dynamics) != 2 )
+        dynamics = 2;
     // add physics
-    body = physics->add_cube( dynamics, transform, lastvelocity, lastomega, mass );
+    body = physics->add_cube( dynamics, transform, lastvelocity, lastomega, mass, size.x() );
     //init_physics_por();
     //std::cerr << " dynamics Cube is " << dynamics << std::endl;
 }
@@ -210,12 +217,12 @@ Cube::draw( SDL_Surface* screen, Sint32* matrix, spFontPointer font, int alpha_ 
             if (texture)
             {
                 if ( fliptexture )
-                    draw_flip_textured_cube( texture, SP_ONE, color );
+                    draw_flip_textured_cube( texture, sidelength, color );
                 else
-                    draw_textured_cube( texture, SP_ONE, color );
+                    draw_textured_cube( texture, sidelength, color );
             }
             else
-                draw_box( SP_ONE, SP_ONE, SP_ONE, color );
+                draw_box( sidelength, sidelength, sidelength, color );
 
             if ( debug )
             {
@@ -255,6 +262,11 @@ Cube::Cube( const Cube& other ) // copy constructor
 {
     //std::cout << " calling cube copy constructor from " << other.id << " to " << id << std::endl;
     text = other.text;
+    size = other.size;
+    cyclepositions = other.cyclepositions;
+    cyclepositionindex = other.cyclepositionindex;
+    objecttime = other.objecttime;
+    sidelength = other.sidelength;
     dynamics = other.dynamics;
     mass = other.mass;
     id = other.id;
@@ -279,6 +291,11 @@ Cube&
 Cube::operator = ( Cube other ) // Copy Assignment Operator
 {
     text = other.text;
+    size = other.size;
+    cyclepositions = other.cyclepositions;
+    cyclepositionindex = other.cyclepositionindex;
+    objecttime = other.objecttime;
+    sidelength = other.sidelength;
     dynamics = other.dynamics;
     mass = other.mass;
     id = other.id;
@@ -345,6 +362,9 @@ Box::add_physics( Physics& new_physics, short int dynamics_ )
     // we haven't been keeping up with the transforms
     // get the transform from the por
     fix_transform();
+    // add dynamics if the cyclepositions are there
+    if ( cyclepositions.size() && abs(dynamics) != 2 )
+        dynamics = 2;
     // add physics
     body = physics->add_box( dynamics, size, transform, lastvelocity, lastomega, mass );
     //std::cerr << " dynamics Box is " << dynamics << std::endl;
@@ -391,6 +411,9 @@ Box::Box( const Box& other ) // copy constructor
     text = other.text;
     dynamics = other.dynamics;
     //std::cout << " calling box copy constructor " << std::endl;
+    cyclepositions = other.cyclepositions;
+    cyclepositionindex = other.cyclepositionindex;
+    objecttime = other.objecttime;
     mass = other.mass;
     id = other.id;
     debug = other.debug;
@@ -417,6 +440,9 @@ Box::operator = ( Box other ) // Copy Assignment Operator
 {
     text = other.text;
     //std::cout << " calling box copy assignment " << std::endl;
+    cyclepositions = other.cyclepositions;
+    cyclepositionindex = other.cyclepositionindex;
+    objecttime = other.objecttime;
     dynamics = other.dynamics;
     physics = other.physics;
     mass = other.mass;
@@ -488,6 +514,9 @@ Ramp::add_physics( Physics& new_physics, short int dynamics_ )
     // we haven't been keeping up with the transforms
     // get the transform from the por
     fix_transform();
+    // add dynamics if the cyclepositions are there
+    if ( cyclepositions.size() && abs(dynamics) != 2 )
+        dynamics = 2;
     // add physics
     body = physics->add_ramp( dynamics, size, transform, lastvelocity, lastomega, mass );
     //std::cerr << " dynamics Ramp is " << dynamics << std::endl;
@@ -531,6 +560,9 @@ Ramp::Ramp( const Ramp& other ) // copy constructor
 {
     text = other.text;
     //std::cout << " calling ramp copy constructor " << std::endl;
+    cyclepositions = other.cyclepositions;
+    cyclepositionindex = other.cyclepositionindex;
+    objecttime = other.objecttime;
     dynamics = other.dynamics;
     mass = other.mass;
     id = other.id;
@@ -558,6 +590,9 @@ Ramp::operator = ( Ramp other ) // Copy Assignment Operator
 {
     text = other.text;
     //std::cout << " calling ramp copy assignment " << std::endl;
+    cyclepositions = other.cyclepositions;
+    cyclepositionindex = other.cyclepositionindex;
+    objecttime = other.objecttime;
     dynamics = other.dynamics;
     mass = other.mass;
     physics = other.physics;

@@ -20,13 +20,14 @@ class Cube : public BaseObject
     friend class Player;
 protected:
     SDL_Surface* texture;
+    Sint32 sidelength;
 
 public:
     bool fliptexture;
 
     Cube( btVector3 pos=btVector3(), Uint16 color_=0xFFFF, 
           int id_ = -1, SDL_Surface* texture_ = NULL, 
-          bool fliptexture_=false, btScalar mass_ = btScalar(1) );
+          bool fliptexture_=false, btScalar mass_ = btScalar(1), Sint32 sidelength_=SP_ONE );
 
     void update( float dt );
 
