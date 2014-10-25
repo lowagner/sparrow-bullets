@@ -421,6 +421,11 @@ LowLevels::reset()
         boxes.push_back( Box( btVector3(4,4,1), btVector3(3,7,-1), 0x0F0F, 102 ) ); // half-sizes, pos, color
         boxes.push_back( Box( btVector3(4,4,1), btVector3(1,3,1), 0x03FF, 103 ) ); // half-sizes, pos, color
         boxes.push_back( Box( btVector3(4,4,1), btVector3(7,-1,3), 0x00FF, 104 ) ); // half-sizes, pos, color
+        
+        boxes.push_back( Box( btVector3(2,3,1), btVector3(11,0,10), 0x1230, 105 ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(2,3,1), btVector3(-11,0,10), 0x1230, 106 ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(3,2,1), btVector3(0,11,10), 0x1230, 107 ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(3,2,1), btVector3(0,-11,10), 0x1230, 108 ) ); // half-sizes, pos, color
 
         boxes[4].push_cycle( btVector3(5,-5,-20) );
         boxes[4].push_cycle( btVector3(5,-5,20), 12 );
@@ -445,7 +450,10 @@ LowLevels::reset()
         {
             blocks.push_back(  Cube( btVector3(2*i-4,2*i-6,10+2*i), 0xFFFF, i )  );
         }
-        //blocks[4].impulse( btVector3(0,10,0) );
+        blocks[4].impulse( btVector3(0,10,0) );
+            
+        blocks.push_back(  Cube( btVector3(0,11,12), 0x0000, 6 )  );
+        blocks.push_back(  Cube( btVector3(0,-11,12), 0x0000, 7 )  );
     }
     else
     {

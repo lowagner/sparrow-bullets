@@ -22,6 +22,8 @@ protected:
                          //  3 is fully in the physics world, dynamics fully described by the world
                          // -1 is a ghost in the physics world, not moving
                          // -2 is a ghost in the physics world, moving
+    
+    bool onground;
 
     btTransform transform; // the position and orientation to interface with Bullet 
     btVector3 lastposition; // position
@@ -105,7 +107,7 @@ public:
 class Player 
 { 
 protected:
-    bool canjump, onground;
+    bool canjump;
     int topsideup, facesideup;
     
 

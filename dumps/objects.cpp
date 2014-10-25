@@ -316,34 +316,44 @@ BaseObject::locate_and_move( btScalar dt )
             lastomega = body->getAngularVelocity();
 
 
-//            if ( onground && ray.hasHit() )
-//            {
-//                // check if the ground is moving.
-//                // we'll need to help the object along
-//                const btRigidBody* ground(btRigidBody::upcast(ray.getHitter()) ); // if you're on the ground
-//
-//                btVector3 groundvelocity = ground->getLinearVelocity();
-//                if ( groundvelocity.length2() > 0.1 )
-//                {
-//                    activate();
+            btVector3 rayfrom( lastposition );
+            // finally, check if you're on ground
+            // ray cast downwards in world-coords
+            btVector3 rayto = rayfrom - 1.2*btVector3(0,0,size.z());
+            ClosestNotMe ray(body);
+
+            physics->dworld->rayTest( rayfrom, rayto, ray );
+    
+            // this is a hack to make it possible to 
+            if ( onground && ray.hasHit() )
+            {
+                // check if the ground is moving.
+                // we'll need to help the object along
+                const btRigidBody* ground(btRigidBody::upcast(ray.getHitter()) ); // if you're on the ground
+
+                btVector3 groundvelocity = ground->getLinearVelocity();
+                if ( fabs(groundvelocity.z()) > 0.1 )
+                {
+                    activate();
 //                    std::cout << " ground vel = " << groundvelocity.x() << ", "
 //                                                  << groundvelocity.y() << ", "
 //                                                  << groundvelocity.z() << "\n";
-//                    // needs help!
-//                    float friction = 5;
-//                    btVector3 forcedir = groundvelocity; //groundvelocity.dot( groundvelocity - lastvelocity ) * groundvelocity / groundvelocity.length();
-//                    forcedir *= dt*friction;
+                    btVector3 forcedir = btVector3(0,0,groundvelocity.z()); //groundvelocity.dot( groundvelocity - lastvelocity ) * groundvelocity / groundvelocity.length();
+                    forcedir *= dt*21;  // completely arbitrary but seems to work nicely
+                    
 //                    std::cout << " force = " << forcedir.x() << ", "
 //                                                  << forcedir.y() << ", "
 //                                                  << forcedir.z() << "\n";
-//                    
-//                    body->applyCentralImpulse( forcedir );
-//                }
-//
-//            }
-//            else
-//                activate();
+                    
+                    body->applyCentralImpulse( forcedir );
+                }
 
+            }
+            else
+                activate();
+
+            
+            onground = ( ray.hasHit() );    
 
 //            btRigidBody* rbody = dynamic_cast<btRigidBody*> body;
 //            if ( rbody )
@@ -713,7 +723,7 @@ Player::init()
     kickrotimpulse = 20;
     kickupimpulse = 0.5;
     canjump = false;
-    onground = false;
+    object->onground = false;
     jumpimpulse = 15;
 }
 
@@ -790,7 +800,7 @@ Player::draw_debug()
 int
 Player::walk( float dt, int dir )
 {
-    if ( onground )
+    if ( object->onground )
     {  
         if (canjump && (topsideup==1))
         {
@@ -811,8 +821,8 @@ Player::walk( float dt, int dir )
         }
         else 
         {
-            std::cout << " couldn't walk becuase of  " << canjump <<"jump or " << topsideup << "\n";
-        // on ground, but in a bad spot
+            //std::cout << " couldn't walk becuase of  " << canjump <<"jump or " << topsideup << "\n";
+            // on ground, but in a bad spot
             //std::cerr << " player landed badly, can't walk " << std::endl;
             if ( facesideup==0 && topsideup == 0 )
             {
@@ -850,7 +860,7 @@ Player::walk( float dt, int dir )
                     object->body->forceActivationState(1);
                     object->body->applyTorqueImpulse( -kickrotimpulse*axis*dir ); 
                     object->body->applyCentralImpulse( btVector3(0,0,kickupimpulse) );
-                    onground = false;
+                    object->onground = false;
                     return 0; // return if we should stop input from the button
                 }
 
@@ -877,7 +887,7 @@ Player::walk( float dt, int dir )
 int
 Player::turn( float dt, int dir )
 {
-    if ( onground && ( (topsideup == 0 ) || ( facesideup ) ) )
+    if ( object->onground && ( (topsideup == 0 ) || ( facesideup ) ) )
     {   // very bad landing.  player's head isn't up (or down), or he can't jump
         //std::cerr << " player landed badly, can't turn " << std::endl;
         if ( facesideup == 0 )
@@ -890,7 +900,7 @@ Player::turn( float dt, int dir )
                 object->body->forceActivationState(1);
                 object->body->applyTorqueImpulse( kickrotimpulse*axis*dir ); 
                 object->body->applyCentralImpulse( btVector3(0,0,kickupimpulse) );
-                onground = false;
+                object->onground = false;
                 return 0; // return if we should stop input from the button
             }
         }
@@ -991,19 +1001,19 @@ Player::check_surroundings()
 
     canjump = ( ray.hasHit() );
 
-    // finally, check if you're on ground
-    // ray cast downwards in world-coords
-    rayto = rayfrom - 1.2*btVector3(0,0,object->size.z());
-
-    object->physics->dworld->rayTest( rayfrom, rayto, ray ); 
-    
-    onground = ( ray.hasHit() );    
+//    // finally, check if you're on ground
+//    // ray cast downwards in world-coords
+//    rayto = rayfrom - 1.2*btVector3(0,0,object->size.z());
+//
+//    object->physics->dworld->rayTest( rayfrom, rayto, ray ); 
+//    
+//    object->onground = ( ray.hasHit() );    
 }
 
 bool
 Player::on_ground()
 {
-    return onground;
+    return object->onground;
 }
 
 int
@@ -1025,7 +1035,7 @@ Player::jump()
     if ( canjump && (object->dynamics == 3) )
     {
         canjump = false;
-        onground = false;
+        object->onground = false;
 
         object->body->forceActivationState(1);
 

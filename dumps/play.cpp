@@ -615,15 +615,15 @@ int Play::update( Uint32 dt )
     {
         // key S on a QWERTY
         //spGetInput()->button[SP_BUTTON_x] = 0; // can only allow input once if desired
-        cameradistance -= 1000*dt;
-        cameraincline += 50*dt;
+        cameradistance -= 2000*dt;
+        cameraincline +=10*dt * abs(cameraincline)/5000;
     }
     else if ( spGetInput()->button[SP_BUTTON_Y] )
     {
         // key W on a QWERTY
         //spGetInput()->button[SP_BUTTON_Y] = 0;
-        cameradistance += 1000*dt;
-        cameraincline -= 50*dt;
+        cameradistance += 2000*dt;
+        cameraincline -= 10*dt * abs(cameraincline)/5000;
     }
 
     if ( spGetInput()->button[SP_BUTTON_L] )
