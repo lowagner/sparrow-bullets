@@ -77,7 +77,7 @@ LowLevels::reset()
 //    current_t = time(0);
 
     killboxfromblockid = false;
-
+    addboxfromblockid = false;
 
     // then rebirth it all...
     winlevel = 0.f; // you haven't won yet!
@@ -85,6 +85,7 @@ LowLevels::reset()
     menu = 0;
     clock = 0;
     checkertexture = spLoadSurface("../data/check.png");
+    physics.init();
 
     if ( level == 1 )
     {
@@ -112,6 +113,7 @@ LowLevels::reset()
         blocks[3].impulse( btVector3(10,15,0) );
         blocks[2].impulse( btVector3(-10,-10,0) );
         blocks[1].impulse( btVector3(-5,-10,0) );
+        standard_physics_init();
     }
     else if ( level == 2 )
     {
@@ -140,6 +142,7 @@ LowLevels::reset()
             blocks.push_back(  Cube( btVector3(2*i-4,2*i-4,10+2*i), 0xFF0F )  );
         }
         blocks[4].impulse( btVector3(0,10,0) );
+        standard_physics_init();
     }
     else if ( level == 3 )
     {
@@ -162,6 +165,7 @@ LowLevels::reset()
             blocks.push_back(  Cube( btVector3(2*i-4,2*i-6,10+2*i), 0xFFFF )  );
         }
         //blocks[4].impulse( btVector3(0,10,0) );
+        standard_physics_init();
     }
     else if ( level == 4 )
     {
@@ -186,6 +190,7 @@ LowLevels::reset()
 
         // add some blocks pieces
         blocks[4].impulse( btVector3(23,0,40) );
+        standard_physics_init();
     }
     else if ( level == 5 )
     {
@@ -216,6 +221,7 @@ LowLevels::reset()
         blocks[3].impulse( btVector3(10,15,0) );
         blocks[2].impulse( btVector3(10,-7,0) );
         blocks[0].impulse( btVector3(-10,10,0) );
+        standard_physics_init();
     }
     else if ( level == 6 )
     {
@@ -237,6 +243,7 @@ LowLevels::reset()
         blocks[0].rotate( btVector3(1,0,0), M_PI/4 );
         
         blocks.push_back( Cube( btVector3(15,-2,2), 0xF000 ) );
+        standard_physics_init();
     }
     else if ( level == 7 )
     {
@@ -263,6 +270,7 @@ LowLevels::reset()
         hero.object->rotateZ( M_PI/2 );
         hero.object->debug = true;
        
+        standard_physics_init();
     }
     else if ( level == 8 )
     {
@@ -289,6 +297,7 @@ LowLevels::reset()
         hero = Player( btVector3(-9,-6,12), 0xF00F, checkertexture );
         //hero.object->rotateZ( M_PI/2 );
         hero.object->debug = true;
+        standard_physics_init();
     }
     else if ( level == 9 )
     {
@@ -381,6 +390,7 @@ LowLevels::reset()
 
         }
         hero.object->debug = true;
+        standard_physics_init();
     }
     else if ( level == 10 )
     {
@@ -410,6 +420,7 @@ LowLevels::reset()
             blocks.push_back(  Cube( btVector3(2*i-6,xyreverse*xy*(2*i-6),10), 0xFF0F )  );
             blocks[i].set_alpha(0);
         }
+        standard_physics_init();
     }
     else if ( level == 11 )
     {
@@ -417,27 +428,42 @@ LowLevels::reset()
 
         // this guy includes the floor.  all static rectangular prisms.
         boxes.push_back( Box( btVector3(7,7,1), btVector3(0,0,-5), 0xF00F, 100 ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(7,5,-3), 0xF50F, 101 ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(3,7,-1), 0x0F0F, 102 ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(1,3,1), 0x03FF, 103 ) ); // half-sizes, pos, color
-        boxes.push_back( Box( btVector3(4,4,1), btVector3(7,-1,3), 0x00FF, 104 ) ); // half-sizes, pos, color
-        
+        boxes.push_back( Box( btVector3(4,4,2), btVector3(3,7,-1), 0x0F0F, 102 ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(3,5,1), btVector3(7,-1,3), 0x00FF, 104 ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(2,2,1), btVector3(7,5,-3), 0xF50F, 101 ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(3,2,1), btVector3(1,3,1), 0x03FF, 103 ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(2,2,1), btVector3(1,3,-1), 0x03FF, 103 ) ); // half-sizes, pos, color
+       
+        // guys on top level
         boxes.push_back( Box( btVector3(2,3,1), btVector3(11,0,10), 0x1230, 105 ) ); // half-sizes, pos, color
         boxes.push_back( Box( btVector3(2,3,1), btVector3(-11,0,10), 0x1230, 106 ) ); // half-sizes, pos, color
         boxes.push_back( Box( btVector3(3,2,1), btVector3(0,11,10), 0x1230, 107 ) ); // half-sizes, pos, color
         boxes.push_back( Box( btVector3(3,2,1), btVector3(0,-11,10), 0x1230, 108 ) ); // half-sizes, pos, color
+        // push button appear
+        boxes.push_back( Box( btVector3(1,5,1), btVector3(4,7,10), 0xF00F, 1111 ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(1,5,1), btVector3(4,-7,10), 0xF00F, 1111 ) ); // half-sizes, pos, color
 
-        boxes[4].push_cycle( btVector3(5,-5,-20) );
-        boxes[4].push_cycle( btVector3(5,-5,20), 12 );
 
-        boxes[3].push_cycle( btVector3(5,5,-20) );
-        boxes[3].push_cycle( btVector3(5,5,20), 8.1 );
+
+        boxes[1].push_cycle( btVector3(-5,5,0) ); // big green block
+        boxes[1].push_cycle( btVector3(-5,5,4), 10.0 );
+        boxes[1].push_cycle( btVector3(-5,5,0), 10.0 );
         
-        boxes[2].push_cycle( btVector3(-5,-5,-20) );
-        boxes[2].push_cycle( btVector3(-5,-5,20), 9.5 );
+        boxes[2].push_cycle( btVector3(-5,-4,2) ); // blue block
+        boxes[2].push_cycle( btVector3(-5,-4,5), 9.5 );
+
+        boxes[3].push_cycle( btVector3(-11,-5,10) ); // orange block
+        boxes[3].push_cycle( btVector3(-11,-11,10), 3 );
+        boxes[3].push_cycle( btVector3(-5,-11,10), 3 );
+        boxes[3].push_cycle( btVector3(-11,-11,10), 3 );
+        boxes[3].push_cycle( btVector3(-11,-5,10), 3 );
+
+        boxes[4].push_cycle( btVector3(6,0,7) ); // blue block
+        boxes[4].push_cycle( btVector3(6,0,11), 4 );
+
         
-        boxes[1].push_cycle( btVector3(-5,5,-20) );
-        boxes[1].push_cycle( btVector3(-5,5,20), 10.0 );
+        
+        addboxfromblockid = true;
 
 
         hero = Player( btVector3(0,4,5), 0xF00F, checkertexture );
@@ -446,14 +472,23 @@ LowLevels::reset()
         hero.object->id = 1337;
        
         // add some blocks pieces
-        for ( int i=0; i<6; i++ )
+        for ( int i=0; i<3; i++ )
         {
             blocks.push_back(  Cube( btVector3(2*i-4,2*i-6,10+2*i), 0xFFFF, i )  );
         }
-        blocks[4].impulse( btVector3(0,10,0) );
+        blocks.push_back( Cube( btVector3(0,0,-2), 0xF00F, 1111 ) );
+
+        blocks.push_back(  Cube( btVector3(-5,5,12), 0x0000, 3, NULL, false, 2, 2*SP_ONE )  );
             
         blocks.push_back(  Cube( btVector3(0,11,12), 0x0000, 6 )  );
         blocks.push_back(  Cube( btVector3(0,-11,12), 0x0000, 7 )  );
+        blocks.push_back(  Cube( btVector3(11,0,12), 0x0000, 7 )  );
+
+        for ( int i=0; i<blocks.size(); i++ )
+            blocks[i].add_physics( physics );
+        
+        for ( int i=0; i<boxes.size()-2; i++ ) // -2 is INTENTIONAL
+            boxes[i].add_physics( physics );
     }
     else
     {
@@ -480,17 +515,7 @@ LowLevels::reset()
     won = false;
     alive = true;
     // now add physics to everybody 
-    physics.init();
-    hero.object->add_physics( physics );
-    
-    for ( int i=0; i<blocks.size(); i++ )
-        blocks[i].add_physics( physics );
-    
-    for ( int i=0; i<boxes.size(); i++ )
-        boxes[i].add_physics( physics );
-
-    for ( int i=0; i<ramps.size(); i++ )
-        ramps[i].add_physics( physics );
+    hero.object->add_physics( physics ); 
     
     spDrawInExtraThread(0);
     //spDrawInExtraThread(1);

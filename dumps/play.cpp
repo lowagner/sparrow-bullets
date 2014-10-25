@@ -178,6 +178,19 @@ Play::set_alert( const char* alert, btScalar deltat )
     sprintf( alerttext, "%s", alert );
 }
 
+void
+Play::standard_physics_init()
+{
+    for ( int i=0; i<blocks.size(); i++ )
+        blocks[i].add_physics( physics );
+    
+    for ( int i=0; i<boxes.size(); i++ )
+        boxes[i].add_physics( physics );
+
+    for ( int i=0; i<ramps.size(); i++ )
+        ramps[i].add_physics( physics );
+}
+
 int
 Play::set_value( const char* name, float value )
 {
@@ -424,7 +437,7 @@ void Play::draw( SDL_Surface* screen )
     if ( camerafollowspeed > 0.f )
         spTranslate( spFloatToFixed( -cameracenter.x() ), 
                      spFloatToFixed( -cameracenter.y() ), 
-                     spFloatToFixed( -cameracenter.z() ) - SP_ONE  );
+                     spFloatToFixed( -cameracenter.z() ) + cameradistance/8  ); // previous -SP_ONE
    
     // grab the camera matrix for later usage.
     Sint32 matrix[16]; //pointer to array of 16 Sint32's.
@@ -615,15 +628,17 @@ int Play::update( Uint32 dt )
     {
         // key S on a QWERTY
         //spGetInput()->button[SP_BUTTON_x] = 0; // can only allow input once if desired
-        cameradistance -= 2000*dt;
-        cameraincline +=10*dt * abs(cameraincline)/5000;
+        cameradistance -= 1000*dt;
+        cameraincline +=dt * (1+abs(cameraincline)/1000 * abs(SP_PI+cameraincline)/50000);
+        //std::cout << " cameradistance/SP_ONE =  " << (cameradistance/SP_ONE) << "\n";
     }
     else if ( spGetInput()->button[SP_BUTTON_Y] )
     {
         // key W on a QWERTY
         //spGetInput()->button[SP_BUTTON_Y] = 0;
-        cameradistance += 2000*dt;
-        cameraincline -= 10*dt * abs(cameraincline)/5000;
+        cameradistance += 1000*dt ;
+        cameraincline -= dt *(1+ abs(cameraincline)/1000* abs(SP_PI+cameraincline)/50000);
+        //std::cout << " cameradistance/SP_ONE =  " << (cameradistance/SP_ONE) << "\n";
     }
 
     if ( spGetInput()->button[SP_BUTTON_L] )
@@ -795,6 +810,21 @@ int Play::update_level( btScalar fdt )
                             j++;
                         }
                     }
+                }
+                else if ( addboxfromblockid )
+                {
+                    int blockid = blocks[i].id;
+                    int j=0;
+                    int boxsize = boxes.size();
+                    while ( j < boxsize )
+                    {
+                        if ( boxes[j].id == blockid )
+                        {
+                            boxes[j].add_physics( physics );  // add this guy to physics world
+                        }
+                        j++;
+                    }
+                    
                 }
                 blocks.erase(blocks.begin() + i);
                 blocksize --;

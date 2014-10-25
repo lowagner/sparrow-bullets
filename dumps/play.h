@@ -51,7 +51,7 @@ protected:
     std::vector<Cube> blocks; // dynamic blocks
     std::vector<Box> boxes; // static boxes
 
-    bool killboxfromblockid;
+    bool killboxfromblockid, addboxfromblockid;
     std::vector<Ramp> ramps; // static ramps
 
     int pause;
@@ -86,6 +86,7 @@ public:
 
     void draw( SDL_Surface* screen );
     void resize( Uint16 w, Uint16 h );
+    void standard_physics_init();
     int set_value( const char* name, float value);
     void write_settings();
     void deinit();

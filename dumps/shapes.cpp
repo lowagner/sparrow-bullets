@@ -169,6 +169,7 @@ Cube::Cube( btVector3 pos, Uint16 color_,
 void
 Cube::add_physics( Physics& new_physics, short int dynamics_ )
 {
+    selfa = 255;
     if (physics)
     {
         // do we want to readd it by destroying it first?
@@ -348,6 +349,7 @@ Box::Box( btVector3 size_,
 void
 Box::add_physics( Physics& new_physics, short int dynamics_ )
 {
+    selfa = 255;
     if (physics)
     {
         // do we want to readd it by destroying it first?
@@ -499,6 +501,7 @@ Ramp::Ramp( btVector3 size_,
 void
 Ramp::add_physics( Physics& new_physics, short int dynamics_ )
 {
+    selfa = 255;
     if (physics)
     {
         // do we want to readd it by destroying it first?

@@ -8,7 +8,7 @@ Check the LICENSE file included for copyright information.
 BaseObject::BaseObject()
 {
 //    std::cout << " calling base object constructor " << id << std::endl;
-    selfa = 256;
+    selfa = 128;
     text.clear();
     debug = false;
     physics = NULL;
@@ -58,7 +58,7 @@ void BaseObject::push_cycle( btVector3 position, btScalar dt )
     if ( cyclepositions.size() )
     {
         cyclepositions.push_back( btVector4( position.x(), position.y(), position.z(),
-                                             cyclepositions[-1].w() + dt ) );
+                                             cyclepositions[cyclepositions.size()-1].w() + dt ) );
     }
     else
     {

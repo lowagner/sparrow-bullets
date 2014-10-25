@@ -53,6 +53,7 @@ MainMenu::reset()
 //    current_t = time(0);
 
     killboxfromblockid = false;
+    addboxfromblockid = false;
 
 
     // then rebirth it all...
