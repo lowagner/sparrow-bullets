@@ -349,9 +349,6 @@ LowLevels::reset()
         boxes.push_back( Box( btVector3(1,1,1), matrix*btVector3(11,5,-1), 0x05FF ) ); // half-sizes, pos, color 
         boxes.push_back( Box( (matrix*btVector3(1,8,4)).absolute(), matrix*btVector3(-6,2,0), 0x05FF ) ); // half-sizes, pos, color
 
-        for ( int i=1; i<boxes.size(); i++ )
-            boxes[i].set_alpha(0);
-
         blocks.push_back(  Cube( matrix*btVector3(7,8,12), 0xFA00, 0 )  );
 
 
@@ -391,6 +388,9 @@ LowLevels::reset()
         }
         hero.object->debug = true;
         standard_physics_init();
+        for ( int i=1; i<boxes.size(); i++ )
+            boxes[i].set_alpha(0);
+
     }
     else if ( level == 10 )
     {
@@ -418,9 +418,10 @@ LowLevels::reset()
             if ( i > 1 && i < 5 )
                 xyreverse = -1;
             blocks.push_back(  Cube( btVector3(2*i-6,xyreverse*xy*(2*i-6),10), 0xFF0F )  );
-            blocks[i].set_alpha(0);
         }
         standard_physics_init();
+        for ( int i=0; i<blocks.size(); i++ )
+            blocks[i].set_alpha(0);
     }
     else if ( level == 11 )
     {
