@@ -45,7 +45,7 @@ void init()
 
     // set gamestate and gamechunk to the right variables...
     gamestate = GAMESTATEsplash;
-    gamechunk = //new LowLevels(2,5); 
+    gamechunk = //new LowLevels(2,6); 
                 new Splash(2,0); // will default to level 0 of levelset 2
                                  // NOTE:  change when there are more levelsets available.
 

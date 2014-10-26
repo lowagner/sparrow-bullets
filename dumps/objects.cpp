@@ -800,71 +800,70 @@ Player::draw_debug()
 int
 Player::walk( float dt, int dir )
 {
-    if ( object->onground )
+if (object->dynamics == 3)
+{
+    if ( canjump )
     {  
-        if (canjump && (topsideup==1))
+        // get the cube-x direction in world coordinates
+        float multiplier = get_up().dot( btVector3(0,0,1));
+        if ( multiplier > 0 )
         {
-            if (object->dynamics == 3)
+            float veldiff2 = maxwalkspeed2- (object->lastvelocity.length2());
+            if ( veldiff2 > 0 )
             {
-                // get the cube-x direction in world coordinates
                 btVector3 forward = get_forward();
+                object->body->forceActivationState(1);
+                object->body->applyCentralImpulse( walkacceleration*veldiff2*forward*multiplier*dt*(-dir) );
+            }
+    //        else
+    //            std::cerr << "moving too fast, can't walk properly" << std::endl;
+        }
+    }
+    else if ( object->onground )
+    {
+        //std::cout << " couldn't walk becuase of  " << canjump <<"jump or " << topsideup << "\n";
+        // on ground, but in a bad spot
+        //std::cerr << " player landed badly, can't walk " << std::endl;
+        if ( facesideup==0 && topsideup == 0 )
+        {
+            //  trouble maker.  one of your sides is pointing up
+            btVector3 forward = get_forward();
+            
+            // do the "woobwoobwoobwoob" move, move forward ...
+            float veldiff2 = 0.5*maxwalkspeed2- (object->lastvelocity.length2());
+            if ( veldiff2 > 0 )
+            {
+                object->body->forceActivationState(1);
+                object->body->applyCentralImpulse( -sidewalkacceleration*veldiff2*forward*dt*dir );
+            }
 
-                float veldiff2 = maxwalkspeed2- (object->lastvelocity.length2());
-                if ( veldiff2 > 0 )
-                {
-                    object->body->forceActivationState(1);
-                    object->body->applyCentralImpulse( -walkacceleration*veldiff2*forward*dt*dir );
-                }
-        //        else
-        //            std::cerr << "moving too fast, can't walk properly" << std::endl;
+            // do the "woobwoobwoobwoob" move, ... and spin around
+            float omegadiff2 = 0.5*maxrotspeed2- (object->lastomega.length2()); 
+            if ( omegadiff2 > 0 )
+            {
+                float multiplier = get_side().z();
+                if ( multiplier > 0 )
+                    multiplier = 1;
+                else
+                    multiplier = -1;
+
+                object->body->applyTorqueImpulse( multiplier*siderotacceleration*omegadiff2*btVector3(0,0,1)*dir ); 
             }
         }
-        else 
+        else
         {
-            //std::cout << " couldn't walk becuase of  " << canjump <<"jump or " << topsideup << "\n";
-            // on ground, but in a bad spot
-            //std::cerr << " player landed badly, can't walk " << std::endl;
-            if ( facesideup==0 && topsideup == 0 )
+            // either you're on your head or you're on your face or you're on your back
+            btVector3 axis = get_side();
+            float omegadiff2 = maxrotspeed2- (object->lastomega.length2());
+            if ( omegadiff2 > 0 )
             {
-                //  trouble maker.  one of your sides is pointing up
-                btVector3 forward = get_forward();
-                
-                // do the "woobwoobwoobwoob" move, move forward ...
-                float veldiff2 = 0.5*maxwalkspeed2- (object->lastvelocity.length2());
-                if ( veldiff2 > 0 )
-                {
-                    object->body->forceActivationState(1);
-                    object->body->applyCentralImpulse( -sidewalkacceleration*veldiff2*forward*dt*dir );
-                }
-
-                // do the "woobwoobwoobwoob" move, ... and spin around
-                float omegadiff2 = 0.5*maxrotspeed2- (object->lastomega.length2()); 
-                if ( omegadiff2 > 0 )
-                {
-                    float multiplier = get_side().z();
-                    if ( multiplier > 0 )
-                        multiplier = 1;
-                    else
-                        multiplier = -1;
-
-                    object->body->applyTorqueImpulse( multiplier*siderotacceleration*omegadiff2*btVector3(0,0,1)*dir ); 
-                }
+                object->body->forceActivationState(1);
+                object->body->applyTorqueImpulse( -kickrotimpulse*axis*dir ); 
+                object->body->applyCentralImpulse( btVector3(0,0,kickupimpulse) );
+                object->onground = false;
+                return 0; // return if we should stop input from the button
             }
-            else
-            {
-                // either you're on your head or you're on your face or you're on your back
-                btVector3 axis = get_side();
-                float omegadiff2 = maxrotspeed2- (object->lastomega.length2());
-                if ( omegadiff2 > 0 )
-                {
-                    object->body->forceActivationState(1);
-                    object->body->applyTorqueImpulse( -kickrotimpulse*axis*dir ); 
-                    object->body->applyCentralImpulse( btVector3(0,0,kickupimpulse) );
-                    object->onground = false;
-                    return 0; // return if we should stop input from the button
-                }
 
-            }
         }
     }
     else
@@ -882,6 +881,8 @@ Player::walk( float dt, int dir )
 
     }
     return dir; // +-1 if continuous motion is ok to continue.  0 if not.
+}
+    return 0;
 }
 
 int
