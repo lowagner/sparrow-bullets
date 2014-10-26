@@ -420,7 +420,9 @@ LowLevels::reset()
             blocks.push_back(  Cube( btVector3(2*i-6,xyreverse*xy*(2*i-6),10), 0xFF0F )  );
         }
         standard_physics_init();
-        for ( int i=0; i<blocks.size(); i++ )
+        for ( int i=0; i<3; i++ )
+            blocks[i].set_alpha(0);
+        for ( int i=4; i<7; i++ )
             blocks[i].set_alpha(0);
     }
     else if ( level == 11 )
