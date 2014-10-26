@@ -163,7 +163,8 @@ Play::Play( int levelset_, int level_, char* message_ ) // init play class
     cameracenter = btVector3();
     cameradistance = spFloatToFixed( -25.0f );
     cameraaxis = SP_PI * 0.1; // for rotation around the z axis
-    cameraincline = spFloatToFixed( -0.8f ); // closer to zero - more from top down.
+    set_camera_incline();
+    //cameraincline = spFloatToFixed( -0.8f ); // closer to zero - more from top down.
 
     font=NULL;
     checkertexture=NULL;
@@ -629,7 +630,9 @@ int Play::update( Uint32 dt )
         // key S on a QWERTY
         //spGetInput()->button[SP_BUTTON_x] = 0; // can only allow input once if desired
         cameradistance -= 1000*dt;
-        cameraincline +=dt * (1+abs(cameraincline)/1000 * abs(SP_PI+cameraincline)/50000);
+        //cameraincline = spFloatToFixed(3.5)/( 1 + (abs(cameradistance)/(SP_ONE/5)))-10*SP_PI / ( 1 + (abs(cameradistance)/(SP_ONE/3)) ) ;
+        set_camera_incline();
+        //cameraincline +=dt * abs(cameraincline)/1000 * abs(SP_PI+cameraincline)/50000;
         //std::cout << " cameradistance/SP_ONE =  " << (cameradistance/SP_ONE) << "\n";
     }
     else if ( spGetInput()->button[SP_BUTTON_Y] )
@@ -637,7 +640,9 @@ int Play::update( Uint32 dt )
         // key W on a QWERTY
         //spGetInput()->button[SP_BUTTON_Y] = 0;
         cameradistance += 1000*dt ;
-        cameraincline -= dt *(1+ abs(cameraincline)/1000* abs(SP_PI+cameraincline)/50000);
+        set_camera_incline();
+        //cameraincline = spFloatToFixed(3.5)/( 1 + (abs(cameradistance)/(SP_ONE/5))) -10*SP_PI / ( 1 + (abs(cameradistance)/(SP_ONE/3)) ) ;
+        //cameraincline -= dt * abs(cameraincline)/1000* abs(SP_PI+cameraincline)/50000;
         //std::cout << " cameradistance/SP_ONE =  " << (cameradistance/SP_ONE) << "\n";
     }
 
@@ -666,6 +671,16 @@ int Play::update( Uint32 dt )
 
     // return a value
     return gamestate; // always return your own value if you want to continue updating
+}
+
+void Play::set_camera_incline()
+{
+//    if ( cameradistance < -25*SP_ONE )
+//        cameraincline = 100*SP_PI / ( 1 - cameradistance / (SP_ONE/100) );
+//    else
+//        cameraincline = spFloatToFixed(-0.8f);
+    
+    cameraincline = spFloatToFixed(3.5)/( 1 + (abs(cameradistance)/(SP_ONE/5)))-10*SP_PI / ( 1 + (abs(cameradistance)/(SP_ONE/3)) ) ;
 }
 
 int Play::update_hero( btScalar fdt )

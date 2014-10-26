@@ -90,6 +90,7 @@ public:
     int set_value( const char* name, float value);
     void write_settings();
     void deinit();
+    virtual void set_camera_incline();
 
     void set_alert( const char* alert, btScalar deltat = 3 );
 

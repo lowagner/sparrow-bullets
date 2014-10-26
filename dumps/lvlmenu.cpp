@@ -146,7 +146,7 @@ MainMenu::reset()
             blocks[9].set_alpha(100); // out of 255
             blocks.push_back( Cube( btVector3(-2,8,5), 0x343A, 10, numbertexture[10] ) );
             blocks[10].set_alpha(80); // out of 255
-            blocks.push_back( Cube( btVector3(-2,6,5), 0x05FF, 11, numbertexture[11] ) );
+            blocks.push_back( Cube( btVector3(-2,6,5), 0xF00F, 11, numbertexture[11] ) );
 
             blocks.push_back( Cube( btVector3(3,4,8), 0x05FF, 12, numbertexture[12] ) );
           
