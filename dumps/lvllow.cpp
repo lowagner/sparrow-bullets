@@ -215,7 +215,7 @@ LowLevels::reset()
         // add some blocks pieces
         for ( int i=0; i<5; i++ )
         {
-            blocks.push_back(  Cube( btVector3(2*i-3.5,-1,10+2*i), 0x0F0F )  );
+            blocks.push_back(  Cube( btVector3(2*i-3.5,-1,10+3*i), 0x0F0F )  );
         }
         blocks[4].impulse( btVector3(0,10,0) );
         blocks[3].impulse( btVector3(10,15,0) );
