@@ -34,8 +34,6 @@ protected:
     btScalar objecttime;
     short int cyclepositionindex;
 
-    Physics* physics;
-
     btRigidBody* body;
 
     btScalar mass;
@@ -54,6 +52,8 @@ protected:
     std::vector<std::string> text;
 
 public:
+    Physics* physics;
+
     void add_text( char* text_ );
 
     int id;
@@ -115,9 +115,9 @@ protected:
     float maxrotspeed2, rotacceleration, flyingrotacceleration;
     float siderotacceleration;
     float sidewalkacceleration;
-    float kickrotimpulse, kickupimpulse;
+    float wrigglerotimpulse, wriggleupimpulse;
 
-    float jumpimpulse;
+    float jumpimpulse, kickimpulse, kickupimpulse, kickairrotimpulse;
 
     void check_surroundings();
 
@@ -133,6 +133,8 @@ public:
     virtual void update( float dt );
 
     int jump();
+    int kick();
+
     int walk( float dt, int dir=1 );
     int turn( float dt, int dir );
     int quick_turn();

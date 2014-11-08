@@ -31,6 +31,7 @@ Play::Play( int levelset_, int level_, char* message_ ) // init play class
     // and conveniently 0 is not a selectable menu item, it is the title of the menu.
     menuitems.push_back( "Game Menu" ); // not allowed to select this guy, menu > 0
     menuitems.push_back( "Return to play" );
+    menuitems.push_back( "Reset level" );
     menuitems.push_back( "Next level" );
     menuitems.push_back( "Camera follow speed" ); 
     menuitems.push_back( "Camera align speed" ); 
@@ -39,14 +40,16 @@ Play::Play( int levelset_, int level_, char* message_ ) // init play class
     menuitems.push_back( "Exit" );
     
     std::vector<float> emptylist;
-    menuitemvalues.push_back( emptylist );
+    menuitemvalues.push_back( emptylist ); // game menu
         menuitemvalueindices.push_back( 0 );
-    menuitemvalues.push_back( emptylist );
+    menuitemvalues.push_back( emptylist ); // return to play
         menuitemvalueindices.push_back( 0 );
-    menuitemvalues.push_back( emptylist );
+    menuitemvalues.push_back( emptylist ); // reset level
+        menuitemvalueindices.push_back( 0 );
+    menuitemvalues.push_back( emptylist ); // next level
         menuitemvalueindices.push_back( 0 );
     {
-        std::vector<float> camerafollowspeedvalues;
+        std::vector<float> camerafollowspeedvalues; // camera follow speed
         camerafollowspeedvalues.push_back(0.f);
         camerafollowspeedvalues.push_back(0.4f);
         camerafollowspeedvalues.push_back(0.8f);
@@ -58,7 +61,7 @@ Play::Play( int levelset_, int level_, char* message_ ) // init play class
             menuitemvalueindices.push_back( 2 );
     }
     {
-        std::vector<float> cameraalignspeedvalues;
+        std::vector<float> cameraalignspeedvalues; // camera align speed
         cameraalignspeedvalues.push_back(0.f);
         cameraalignspeedvalues.push_back(0.4f);
         cameraalignspeedvalues.push_back(0.8f);
@@ -109,17 +112,17 @@ Play::Play( int levelset_, int level_, char* message_ ) // init play class
             if ( name == "camerafollowspeed" )
             {
                 camerafollowspeed = value;
-                index = 3; // index of the menu item of camera follow hero...
+                index = 4; // index of the menu item of camera follow hero...
             }
             else if (name == "cameraalignspeed" )
             {
                 cameraalignspeed = value; // index of the menu item of camera align with hero...
-                index = 4;
+                index = 5;
             }
             else if (name == "cameratimeout" )
             {
                 cameratimeout = value; // index of the menu item of camera timeout
-                index = 5;
+                index = 6;
             }
 
             if ( index > 0 )
@@ -342,7 +345,7 @@ void Play::draw( SDL_Surface* screen )
                 sprintf( buffer, "%s", menuitems[i] );
             spFontDrawMiddle( screen->w / 2, y, 0, buffer, font );
             y += font->maxheight + 4;
-            if ( i == 2 || i == 5 )
+            if ( i == 3 || i == 6 )
                 y += (font->maxheight*2/5);
         } 
         
@@ -350,7 +353,7 @@ void Play::draw( SDL_Surface* screen )
     }
     else
     {   // no menu
-        spFontDraw( 2, 2, 0, "[L] Reset", font ); 
+        spFontDraw( 2, 2, 0, "[L] Kick", font ); 
         spFontDrawRight( screen->w - 2 , 2, 0, "[R] Jump", font );
 
         spFontDrawRight( screen->w - 2 , font-> maxheight+2, 0, "[S] Menu", font );
@@ -553,23 +556,32 @@ int Play::update( Uint32 dt )
                     pause=0;
                     return gamestate;
                     break;
-                case 2: // Next level
+                case 2: // reset level
+                    lives -= 1; // penalize the player
+                    clock = 0.0;
+                    return reset();
+                case 3: // Next level
                     menu=0; // unmenu
                     pause=0; // unpause
-                    if ( lives < 100000 )
-                        lives -= 10; // penalize the player
-                    clock=1000.0f; // penalize the player
-                    won = true; // the player "won"...
-                    return reset();
+                    if ( lives >= 6 )
+                    {
+                        if ( lives < 100000 )
+                            lives -= 6; // penalize the player
+                        clock=1000.0f; // penalize the player
+                        won = true; // the player "won"...
+                        return reset();
+                    }
+                    else
+                        set_alert( "Not enough lives to skip a level" );
                     break;
-                case 3: // camerafollowspeed
-                case 4: // cameraalignspeed
-                case 5: // cameratimeout
+                case 4: // camerafollowspeed
+                case 5: // cameraalignspeed
+                case 6: // cameratimeout
                     menu=0;
                     pause=0;
                     return gamestate;
                     break;
-                case 6: // return to menu
+                case 7: // return to menu
                     menu=0;
                     pause=0;
                     if ( gamestate == GAMESTATEmenu )
@@ -588,7 +600,7 @@ int Play::update( Uint32 dt )
                     }
                     return GAMESTATEmenu;
                     break; 
-                case 7: // Exit
+                case 8: // Exit
                     return GAMESTATEquit;
                     break; 
             }
@@ -653,11 +665,8 @@ int Play::update( Uint32 dt )
     }
 
     if ( spGetInput()->button[SP_BUTTON_L] )
-    {   // the reset button
-        spGetInput()->button[SP_BUTTON_L] = 0;
-        lives -= 1;
-        clock = 0.f;
-        return reset();
+    {   // attempt to kick.  this is key Q on a keyboard
+        spGetInput()->button[SP_BUTTON_L] = hero.kick();
     }
 
     if (!(pause))
@@ -815,7 +824,7 @@ int Play::update_level( btScalar fdt )
             {
                 //std::cout << "\n WARNING!  block " << i << " out of bounds!\n";
                 blocks[i].remove_physics();  // remove this guy from physics world
-                if ( killboxfromblockid )
+                if ( killboxfromblockid || addboxfromblockid )
                 { // here we kill any boxes which have the same id as block j
 
                     int blockid = blocks[i].id;
@@ -828,33 +837,50 @@ int Play::update_level( btScalar fdt )
                         if ( boxes[j].id == blockid )
                         {
                             //std::cout << "deleting  box " << boxes[j].id << "; "; 
-                            boxes[j].remove_physics();  // remove this guy from physics world
-                            boxes.erase(boxes.begin() + j);
-                            boxsize --;
+                            if ( boxes[j].physics )
+                            {
+                                if ( killboxfromblockid )
+                                {
+                                    boxes[j].remove_physics();  // remove this guy from physics world
+                                    if ( addboxfromblockid )
+                                        boxes[j].set_alpha( 128 );
+                                    else
+                                        boxes[j].set_alpha( 0 );
+                                }
+                            }
+                            else
+                            {
+                                if ( addboxfromblockid )
+                                    boxes[j].add_physics( physics );  // add this guy from physics world
+                            }
+                            //boxes.erase(boxes.begin() + j);
+                            //boxsize --;
                             activate = true;
                         }
-                        else
-                        {
-                            //std::cout << "skipping  box " << boxes[j].id << "; "; 
-                            j++;
-                        }
-                    }
-                }
-                else if ( addboxfromblockid )
-                {
-                    int blockid = blocks[i].id;
-                    int j=0;
-                    int boxsize = boxes.size();
-                    while ( j < boxsize )
-                    {
-                        if ( boxes[j].id == blockid )
-                        {
-                            boxes[j].add_physics( physics );  // add this guy to physics world
-                        }
                         j++;
+//                        else
+//                        {
+//                            //std::cout << "skipping  box " << boxes[j].id << "; "; 
+//                            j++;
+//                        }
                     }
-                    
                 }
+//                else if ( addboxfromblockid )
+//                {
+//                    int blockid = blocks[i].id;
+//                    int j=0;
+//                    int boxsize = boxes.size();
+//                    while ( j < boxsize )
+//                    {
+//                        if ( boxes[j].id == blockid )
+//                        {
+//                            boxes[j].add_physics( physics );  // add this guy to physics world
+//                        }
+//                        j++;
+//                    }
+//                    
+//                }
+                // finally, destroy this block from existence
                 blocks.erase(blocks.begin() + i);
                 blocksize --;
                 //std::cout << "\n deleted  block " << i << " since it was out of bounds.\n";

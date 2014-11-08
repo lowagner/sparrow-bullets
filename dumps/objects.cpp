@@ -720,11 +720,14 @@ Player::init()
     flyingrotacceleration = 5;
     siderotacceleration = 0.1;
     sidewalkacceleration = 1.8;
-    kickrotimpulse = 20;
-    kickupimpulse = 0.5;
+    wrigglerotimpulse = 20;
+    wriggleupimpulse = 0.5;
     canjump = false;
     object->onground = false;
     jumpimpulse = 15;
+    kickimpulse = 25;
+    kickupimpulse = 10;
+    kickairrotimpulse = 0.5; // how fast to rotate in air when kicking
 }
 
 void
@@ -854,12 +857,14 @@ if (object->dynamics == 3)
         {
             // either you're on your head or you're on your face or you're on your back
             btVector3 axis = get_side();
-            float omegadiff2 = maxrotspeed2- (object->lastomega.length2());
+            btScalar omega2 = (object->lastomega.length2());
+            float omegadiff2 = maxrotspeed2- omega2;
             if ( omegadiff2 > 0 )
             {
                 object->body->forceActivationState(1);
-                object->body->applyTorqueImpulse( -kickrotimpulse*axis*dir ); 
-                object->body->applyCentralImpulse( btVector3(0,0,kickupimpulse) );
+                // divide by omega2 so that your rotational speed doesn't go crazy
+                object->body->applyTorqueImpulse( -1*wrigglerotimpulse*axis*dir/(1.0+omega2) ); 
+                object->body->applyCentralImpulse( btVector3(0,0,wriggleupimpulse) );
                 object->onground = false;
                 return 0; // return if we should stop input from the button
             }
@@ -899,8 +904,8 @@ Player::turn( float dt, int dir )
             if ( omegadiff2 > 0 )
             {
                 object->body->forceActivationState(1);
-                object->body->applyTorqueImpulse( kickrotimpulse*axis*dir ); 
-                object->body->applyCentralImpulse( btVector3(0,0,kickupimpulse) );
+                object->body->applyTorqueImpulse( wrigglerotimpulse*axis*dir ); 
+                object->body->applyCentralImpulse( btVector3(0,0,wriggleupimpulse) );
                 object->onground = false;
                 return 0; // return if we should stop input from the button
             }
@@ -1051,6 +1056,92 @@ Player::jump()
     return 1; // if it's ok to keep holding down jump button
 }
 
+int
+Player::kick()
+{
+if (object->physics)
+{
+
+    btVector3 rayfrom( object->lastposition );
+    btVector3 forward( get_forward() );
+    btVector3 rayto = rayfrom + 1.2* (object->size.x())*forward;
+    ClosestNotMe ray(object->body);
+
+    object->physics->dworld->rayTest( rayfrom, rayto, ray );
+
+    // this is a hack to make it possible to 
+    if ( ray.hasHit() )
+    {
+        btVector3 playerup( get_up() );
+        // check if the ground is moving.
+        // we'll need to help the object along
+        const btRigidBody* kickee( btRigidBody::upcast(ray.getHitter()) ); 
+        btScalar kickeeimass = kickee->getInvMass();
+
+        if ( object->onground )
+        {
+            if ( kickeeimass == 0.0 )
+            { // kicked object has infinite mass
+                btVector3 impulse = ( forward*kickimpulse + kickupimpulse*playerup );
+                object->activate();
+                object->body->applyCentralImpulse( -0.5*impulse );
+            }
+            else
+            { // kicked object has mass
+                kickee->forceActivationState(1);
+                // if we are on the ground...
+                kickee->applyCentralImpulse( ( object->lastvelocity + forward*kickimpulse + kickupimpulse*playerup ) );
+            }
+        }
+        else
+        {
+            btScalar myimass = 1.0 / object->mass;
+            btScalar kickme = myimass / ( kickeeimass + myimass );
+            btScalar kickit = 1.0 - kickme;
+            btVector3 impulse = ( forward*kickimpulse + kickupimpulse*playerup );
+            if ( kickit > 0.0 )
+            {
+                kickee->forceActivationState(1);
+                kickee->applyCentralImpulse( kickit*impulse );
+            }
+            if ( kickme > 0.0 )
+            {
+                object->activate();
+                object->body->applyCentralImpulse( -kickme*impulse );
+            }
+        }
+    }
+    else
+    {
+    // swing and a miss
+        object->body->forceActivationState(1);
+        btVector3 axis = get_side();
+        if ( object->onground )
+        {
+            // do a charlie brown
+            btScalar velocity2 = object->lastvelocity.length2();
+            // multiply by velocity2 so that you do a flying kick and end up on your back
+            object->body->applyCentralImpulse( btVector3(0,0,wriggleupimpulse) * velocity2 );
+            // divide by velocity2 so you spin less if you have high velocity.  (this is
+            // important because with a bigger up impulse you need less torque.)
+            object->body->applyTorqueImpulse( -10*wrigglerotimpulse*axis/(10.0+velocity2) ); 
+        }
+        else
+        { // in the air, only allow torsion
+            float omegadiff2 = maxrotspeed2- (object->lastomega.length2());
+            if ( omegadiff2 > 0 )
+            {
+                object->body->forceActivationState(1);
+                object->body->applyTorqueImpulse( kickairrotimpulse*axis ); 
+            }
+
+        }
+    }
+
+    return 0;
+}
+}
+
 Player::~Player()
 {
     object = NULL;
@@ -1065,9 +1156,12 @@ Player::Player( const Player& other ) // copy constructor
     maxrotspeed2 = other.maxrotspeed2;
     rotacceleration = other.rotacceleration;
     jumpimpulse = other.jumpimpulse;
-    flyingrotacceleration = other.flyingrotacceleration;
+    kickimpulse = other.kickimpulse;
     kickupimpulse = other.kickupimpulse;
-    kickrotimpulse = other.kickrotimpulse;
+    kickairrotimpulse = other.kickairrotimpulse;
+    flyingrotacceleration = other.flyingrotacceleration;
+    wriggleupimpulse = other.wriggleupimpulse;
+    wrigglerotimpulse = other.wrigglerotimpulse;
     siderotacceleration = other.siderotacceleration;
     sidewalkacceleration = other.sidewalkacceleration;
 }
@@ -1081,9 +1175,12 @@ Player::operator = ( Player other ) // Copy Assignment Operator
     maxrotspeed2 = other.maxrotspeed2;
     rotacceleration = other.rotacceleration;
     jumpimpulse = other.jumpimpulse;
-    flyingrotacceleration = other.flyingrotacceleration;
+    kickimpulse = other.kickimpulse;
     kickupimpulse = other.kickupimpulse;
-    kickrotimpulse = other.kickrotimpulse;
+    kickairrotimpulse = other.kickairrotimpulse;
+    flyingrotacceleration = other.flyingrotacceleration;
+    wriggleupimpulse = other.wriggleupimpulse;
+    wrigglerotimpulse = other.wrigglerotimpulse;
     siderotacceleration = other.siderotacceleration;
     sidewalkacceleration = other.sidewalkacceleration;
     return *this;
