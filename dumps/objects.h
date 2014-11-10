@@ -107,12 +107,17 @@ public:
 class Player 
 { 
 protected:
+    spSound* jumpsound;
+    spSound* kicksound;
+    spSound* misssound;
+    
     bool canjump;
     int topsideup, facesideup;
     
 
-    float maxwalkspeed2, walkacceleration;
-    float maxrotspeed2, rotacceleration, flyingrotacceleration;
+    float maxwalkspeed2, walkacceleration, currentacceleration;
+    float maxrotspeed2, rotacceleration, flyingrotacceleration, currentrotacceleration;
+    float jerk, rotjerk;
     float siderotacceleration;
     float sidewalkacceleration;
     float wrigglerotimpulse, wriggleupimpulse;
@@ -133,7 +138,7 @@ public:
     virtual void update( float dt );
 
     int jump();
-    int kick();
+    int kick( int forwarddir );
 
     int walk( float dt, int dir=1 );
     int turn( float dt, int dir );

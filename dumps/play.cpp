@@ -3,9 +3,7 @@ Check the LICENSE file included for copyright information.
 */
 //#include <cmath>
 #include "play.h"
-//#include <strings.h>
 #include <string>
-//using std::string;
 #include <iostream>
 #include <fstream>
 #include "util.h"
@@ -40,7 +38,7 @@ Play::Play( int levelset_, int level_, char* message_ ) // init play class
     menuitems.push_back( "Exit" );
     
     std::vector<float> emptylist;
-    menuitemvalues.push_back( emptylist ); // game menu
+    menuitemvalues.push_back( emptylist ); // game menu.  a never-used placeholder
         menuitemvalueindices.push_back( 0 );
     menuitemvalues.push_back( emptylist ); // return to play
         menuitemvalueindices.push_back( 0 );
@@ -666,7 +664,9 @@ int Play::update( Uint32 dt )
 
     if ( spGetInput()->button[SP_BUTTON_L] )
     {   // attempt to kick.  this is key Q on a keyboard
-        spGetInput()->button[SP_BUTTON_L] = hero.kick();
+        // check if player is pressing forward or back
+        spGetInput()->axis[1] = hero.kick( spGetInput()->axis[1] );
+        spGetInput()->button[SP_BUTTON_L] = 0;
     }
 
     if (!(pause))

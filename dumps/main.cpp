@@ -40,6 +40,14 @@ void init()
     //sparrow3D Init
     //spSetDefaultWindowSize( 800, 480 ); //Creates a 800x480 window at PC instead of 320x240
     spInitCore();
+    //
+    if ( spSoundInit() == 0 )
+    {
+        std::cerr << " error starting sound " << std::endl;
+    }
+    spSoundSetChannels(32);
+    spSoundSetVolume(SP_VOLUME_MAX/2);
+    spSoundSetMusicVolume(SP_VOLUME_MAX/2);
     //Setup
     screen = spCreateDefaultWindow();
 
@@ -117,6 +125,8 @@ void exit() // destructor
     delete gamechunk;
     // this is where the gamechunk destructor method ~GameChunk is called.
 
+    //spSoundStopMusic(0);
+    spSoundQuit();
     spQuitCore();
 }
 

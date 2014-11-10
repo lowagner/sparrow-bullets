@@ -715,6 +715,10 @@ Player::init()
 {
     maxwalkspeed2 = 50;
     walkacceleration = 2.1;
+    currentacceleration = 0.;
+    jerk = 40.;
+    currentrotacceleration = 0.;
+    rotjerk = 80.;
     maxrotspeed2 = 15;
     rotacceleration = 7;
     flyingrotacceleration = 5;
@@ -725,14 +729,36 @@ Player::init()
     canjump = false;
     object->onground = false;
     jumpimpulse = 15;
-    kickimpulse = 25;
-    kickupimpulse = 10;
+    kickimpulse = 30;
+    kickupimpulse = 13;
     kickairrotimpulse = 0.5; // how fast to rotate in air when kicking
+
+    // wiggle-staccato could be a death sound
+    // miss-C could be the full miss:  charlie brown jump fall
+    misssound = spSoundLoad("../sounds/Bbm-3arp.wav");  // like this for small misses
+    jumpsound = spSoundLoad("../sounds/jump-C-arp.wav");
+    kicksound = spSoundLoad("../sounds/kick-Cm-atonal.wav");
 }
 
 void
 Player::update( float dt )
 {
+    if ( currentacceleration > 0. )
+    {
+        currentacceleration -= jerk * dt;
+        if ( currentacceleration < 0. )
+        {
+            currentacceleration = 0.;
+        }
+    }
+    if ( currentrotacceleration > 0. )
+    {
+        currentrotacceleration -= rotjerk * dt;
+        if ( currentrotacceleration < 0. )
+        {
+            currentrotacceleration = 0.;
+        }
+    }
     object->update( dt );
     check_surroundings();
 }
@@ -808,15 +834,20 @@ if (object->dynamics == 3)
     if ( canjump )
     {  
         // get the cube-x direction in world coordinates
+
         float multiplier = get_up().dot( btVector3(0,0,1));
         if ( multiplier > 0 )
         {
+            currentacceleration += 2*jerk * dt;
+            if ( currentacceleration > walkacceleration )
+                currentacceleration = walkacceleration;
+
             float veldiff2 = maxwalkspeed2- (object->lastvelocity.length2());
             if ( veldiff2 > 0 )
             {
                 btVector3 forward = get_forward();
                 object->body->forceActivationState(1);
-                object->body->applyCentralImpulse( walkacceleration*veldiff2*forward*multiplier*dt*(-dir) );
+                object->body->applyCentralImpulse( currentacceleration*veldiff2*forward*multiplier*dt*(-dir) );
             }
     //        else
     //            std::cerr << "moving too fast, can't walk properly" << std::endl;
@@ -929,12 +960,14 @@ Player::turn( float dt, int dir )
     {   // player is fine, on the ground or in the air, but able to turn freely.
         // get the cube-z direction in world coordinates
         btVector3 up = get_up();
-
+        currentrotacceleration += 2*rotjerk * dt;
+        if ( currentrotacceleration > rotacceleration )
+            currentrotacceleration = rotacceleration;
         float omegadiff2 = maxrotspeed2- (object->lastomega.length2());
         if ( omegadiff2 > 0 )
         {
             object->body->forceActivationState(1);
-            object->body->applyTorqueImpulse( -rotacceleration*(omegadiff2)*up*dt*dir ); 
+            object->body->applyTorqueImpulse( -currentrotacceleration*(omegadiff2)*up*dt*dir ); 
         }
         // else
         // std::cerr << " player is spinning out of control " << std::endl;
@@ -1040,6 +1073,8 @@ Player::jump()
 //
     if ( canjump && (object->dynamics == 3) )
     {
+        spSoundPlay( jumpsound, -1,0,0,0 );
+
         canjump = false;
         object->onground = false;
 
@@ -1057,7 +1092,7 @@ Player::jump()
 }
 
 int
-Player::kick()
+Player::kick( int forwardpress )
 {
 if (object->physics)
 {
@@ -1072,17 +1107,31 @@ if (object->physics)
     // this is a hack to make it possible to 
     if ( ray.hasHit() )
     {
+        spSoundPlay( kicksound, -1,0,0,0 );
+
         btVector3 playerup( get_up() );
         // check if the ground is moving.
         // we'll need to help the object along
         const btRigidBody* kickee( btRigidBody::upcast(ray.getHitter()) ); 
         btScalar kickeeimass = kickee->getInvMass();
 
+        btVector3 impulse;
+        if ( forwardpress == -1 )
+            // pressing forward
+            impulse = ( forward*kickimpulse + kickupimpulse*playerup );
+        else if ( forwardpress == 0 )
+            // pressing nothing in the forward/backward direction
+            impulse = 0.5*(kickimpulse+kickupimpulse)*( forward + playerup );
+        else
+            // pressing backwards
+            impulse = ( forward*kickupimpulse + kickimpulse*playerup );
+        //std::cout << " kick forward = " << -forwardpress << "\n";
+
         if ( object->onground )
         {
             if ( kickeeimass == 0.0 )
             { // kicked object has infinite mass
-                btVector3 impulse = ( forward*kickimpulse + kickupimpulse*playerup );
+
                 object->activate();
                 object->body->applyCentralImpulse( -0.5*impulse );
             }
@@ -1090,7 +1139,7 @@ if (object->physics)
             { // kicked object has mass
                 kickee->forceActivationState(1);
                 // if we are on the ground...
-                kickee->applyCentralImpulse( ( object->lastvelocity + forward*kickimpulse + kickupimpulse*playerup ) );
+                kickee->applyCentralImpulse( impulse );
             }
         }
         else
@@ -1098,7 +1147,6 @@ if (object->physics)
             btScalar myimass = 1.0 / object->mass;
             btScalar kickme = myimass / ( kickeeimass + myimass );
             btScalar kickit = 1.0 - kickme;
-            btVector3 impulse = ( forward*kickimpulse + kickupimpulse*playerup );
             if ( kickit > 0.0 )
             {
                 kickee->forceActivationState(1);
@@ -1116,12 +1164,16 @@ if (object->physics)
     // swing and a miss
         object->body->forceActivationState(1);
         btVector3 axis = get_side();
+        spSoundPlay( misssound, -1,0,0,0 );
+
         if ( object->onground )
         {
             // do a charlie brown
             btScalar velocity2 = object->lastvelocity.length2();
+            if ( velocity2 > 500.0 )
+                velocity2 = 500.0;
             // multiply by velocity2 so that you do a flying kick and end up on your back
-            object->body->applyCentralImpulse( btVector3(0,0,wriggleupimpulse) * velocity2 );
+            object->body->applyCentralImpulse( btVector3(0,0,wriggleupimpulse)*velocity2 );
             // divide by velocity2 so you spin less if you have high velocity.  (this is
             // important because with a bigger up impulse you need less torque.)
             object->body->applyTorqueImpulse( -10*wrigglerotimpulse*axis/(10.0+velocity2) ); 
@@ -1137,14 +1189,16 @@ if (object->physics)
 
         }
     }
-
-    return 0;
 }
+    return forwardpress;
 }
 
 Player::~Player()
 {
     object = NULL;
+    spSoundDelete(jumpsound);
+    spSoundDelete(misssound);
+    spSoundDelete(kicksound);
 }
 
 Player::Player( const Player& other ) // copy constructor
@@ -1153,6 +1207,10 @@ Player::Player( const Player& other ) // copy constructor
     object = other.object;
     maxwalkspeed2 = other.maxwalkspeed2;
     walkacceleration = other.walkacceleration;
+    currentacceleration = other.currentacceleration;
+    jerk = other.jerk;
+    currentrotacceleration = other.currentrotacceleration;
+    rotjerk = other.rotjerk;
     maxrotspeed2 = other.maxrotspeed2;
     rotacceleration = other.rotacceleration;
     jumpimpulse = other.jumpimpulse;
@@ -1172,6 +1230,12 @@ Player::operator = ( Player other ) // Copy Assignment Operator
     object = other.object;
     maxwalkspeed2 = other.maxwalkspeed2;
     walkacceleration = other.walkacceleration;
+
+    currentacceleration = other.currentacceleration;
+    jerk = other.jerk;
+    currentrotacceleration = other.currentrotacceleration;
+    rotjerk = other.rotjerk;
+
     maxrotspeed2 = other.maxrotspeed2;
     rotacceleration = other.rotacceleration;
     jumpimpulse = other.jumpimpulse;
