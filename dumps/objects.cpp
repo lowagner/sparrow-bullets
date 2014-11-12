@@ -952,7 +952,7 @@ Player::turn( float dt, int dir )
             if ( omegadiff2 > 0 )
             {
                 object->body->forceActivationState(1);
-                object->body->applyTorqueImpulse( -rotacceleration*(omegadiff2)*axis*dt*dir ); 
+                object->body->applyTorqueImpulse( -facesideup*rotacceleration*(omegadiff2)*axis*dt*dir ); 
             }
 
         }
