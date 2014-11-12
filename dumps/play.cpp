@@ -690,17 +690,17 @@ int Play::update( Uint32 dt )
 
 void Play::set_camera_incline()
 {
-    if ( cameradistance < -20*SP_ONE )
+    if ( cameradistance < -15*SP_ONE )
         // -10*SP_PI / ( 1 + 25*SP_ONE / (SP_ONE/5) ) = -10*SP_PI / (1 + 25*5)
         // = -10*SP_PI / 126  = -approx 0.249333 * SP_ONE
         // = -SP_ONE / 4.01
         //cameraincline = -SP_ONE / 4.01; //cameradistance / 6; 
         //cameraincline = cameradistance/100.32 - (cameradistance+25*SP_ONE)*0.13;
-        cameraincline = spSqrt(-cameradistance*0.11) - 2.75*SP_ONE;
-    else if ( cameradistance < -8*SP_ONE )
-        cameraincline = -(cameradistance+20*SP_ONE)*0.05 - 1.27*SP_ONE;
+        cameraincline = -0.87*SP_ONE - 0.04*(cameradistance+15*SP_ONE);//spSqrt(-(cameradistance+20*SP_ONE)*0.05) - 0.87*SP_ONE;
+    else if ( cameradistance < -5*SP_ONE )
+        cameraincline = -(cameradistance+15*SP_ONE)*0.07 - 0.87*SP_ONE;
     else
-        cameraincline = SP_ONE * (-1.87);
+        cameraincline = SP_ONE * (-10*0.07-0.87);
 
     
     //cameraincline = spFloatToFixed(-0.2) -10*SP_PI / ( 1 + (abs(cameradistance)/(SP_ONE/3)) ) ;

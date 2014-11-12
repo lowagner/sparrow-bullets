@@ -743,6 +743,7 @@ Player::init()
 void
 Player::update( float dt )
 {
+    //std::cout << " player speed = " << object->lastvelocity.length2() << "\n";
     if ( currentacceleration > 0. )
     {
         currentacceleration -= jerk * dt;
@@ -1168,15 +1169,19 @@ if (object->physics)
 
         if ( object->onground )
         {
-            // do a charlie brown
-            btScalar velocity2 = object->lastvelocity.length2();
-            if ( velocity2 > 500.0 )
-                velocity2 = 500.0;
-            // multiply by velocity2 so that you do a flying kick and end up on your back
-            object->body->applyCentralImpulse( btVector3(0,0,wriggleupimpulse)*velocity2 );
-            // divide by velocity2 so you spin less if you have high velocity.  (this is
-            // important because with a bigger up impulse you need less torque.)
-            object->body->applyTorqueImpulse( -10*wrigglerotimpulse*axis/(10.0+velocity2) ); 
+            if ( topsideup == 1 )
+            {
+                // do a charlie brown
+                btScalar velocity2 = object->lastvelocity.length2();
+                if ( velocity2 < maxwalkspeed2 )
+                {
+                    // multiply by velocity2 so that you do a flying kick and end up on your back
+                    object->body->applyCentralImpulse( btVector3(0,0,wriggleupimpulse)*velocity2 );
+                    // divide by velocity2 so you spin less if you have high velocity.  (this is
+                    // important because with a bigger up impulse you need less torque.)
+                    object->body->applyTorqueImpulse( -10*wrigglerotimpulse*axis/(10.0+velocity2) ); 
+                }
+            }
         }
         else
         { // in the air, only allow torsion
