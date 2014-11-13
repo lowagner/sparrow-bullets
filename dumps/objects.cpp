@@ -735,9 +735,9 @@ Player::init()
 
     // wiggle-staccato could be a death sound
     // miss-C could be the full miss:  charlie brown jump fall
-    misssound = spSoundLoad("../sounds/Bbm-3arp.wav");  // like this for small misses
-    jumpsound = spSoundLoad("../sounds/jump-C-arp.wav");
-    kicksound = spSoundLoad("../sounds/kick-Cm-atonal.wav");
+    misssound = spSoundLoad("../sounds/misssound.wav");  // like this for small misses
+    jumpsound = spSoundLoad("../sounds/jumpsound.wav");
+    kicksound = spSoundLoad("../sounds/kicksound.wav");
 }
 
 void
