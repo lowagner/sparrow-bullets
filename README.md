@@ -41,7 +41,7 @@ cubey messes!  Compile with `make` and run with `./dump`.
 On a PC, the keyboard controls:
 - WASD control the camera
 - E jumps
-- Q resets play
+- Q kicks the blocks in front of you (be careful, if you miss you will pull a Charlie Brown)
 - [Enter] opens gameplay menu 
 - [Backspace] pauses/unpauses
 - Arrow keys move the checkered dumptruck, RELATIVE motion!
@@ -49,7 +49,7 @@ On a PC, the keyboard controls:
 On an open-source handheld (e.g. Pandora):
 - Face buttons control the camera
 - Right shoulder button jumps
-- Left shoulder button resets play
+- Left shoulder button kicks (be careful, missing makes you flip!)
 - Start opens menu
 - Select pauses
 - D-pad moves the dumptruck
