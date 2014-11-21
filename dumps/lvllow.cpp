@@ -463,8 +463,7 @@ LowLevels::reset()
 
         boxes[4].push_cycle( btVector3(6,0,7) ); // blue block
         boxes[4].push_cycle( btVector3(6,0,11), 4 );
-
-        
+ 
         
         addboxfromblockid = true;
 
@@ -492,6 +491,55 @@ LowLevels::reset()
         
         for ( int i=0; i<boxes.size()-2; i++ ) // -2 is INTENTIONAL
             boxes[i].add_physics( physics );
+    }
+    else if ( level == 12 )
+    {
+        outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
+
+        // this guy includes the floor.  all static rectangular prisms.
+        //boxes.push_back( Box( btVector3(7,7,1), btVector3(0,0,-5), 0x05FF ) ); // half-sizes, pos, color
+        boxes.push_back( Box( btVector3(4,4,1), btVector3(7,7,-3), 0x0000 ) ); 
+        boxes.push_back( Box( btVector3(4,4,1), btVector3(-7,7,-3), 0x0000 ) );
+        boxes.push_back( Box( btVector3(2.33,2.33,1), btVector3(8,-8,5), 0x0000 ) );
+        boxes.push_back( Box( btVector3(1,1,1), btVector3(4,-4,-3), 0x0000 ) );
+        boxes.push_back( Box( btVector3(1,1,1), btVector3(10,-4,-3), 0x0000 ) );
+        boxes.push_back( Box( btVector3(1,1,1), btVector3(4,-10,-3), 0x0000 ) );
+        boxes.push_back( Box( btVector3(4,4,1), btVector3(-7,-7,-3), 0x0000 ) );
+        boxes.push_back( Box( btVector3(2,2,1), btVector3(13.33,-13.33,7), 0x0000 ) );
+
+        boxes.push_back( Box( btVector3(1,1,1), btVector3(-1.33,-10,-1), 0xFF0F, 100 ) );
+        boxes.push_back( Box( btVector3(1,1,1), btVector3(1.33,-10,1), 0xFF0F, 100 ) );
+        boxes.push_back( Box( btVector3(1,1,1), btVector3(4,-10,3), 0xFF0F, 100 ) );
+        boxes.push_back( Box( btVector3(2,3.66,1), btVector3(13.33,-6.66,5), 0xFF0F, 100 ) );
+        boxes.push_back( Box( btVector3(1,1,1), btVector3(10,1.33,-1), 0xAAF9, 200 ) );
+        boxes.push_back( Box( btVector3(1,1,1), btVector3(10,-1.33,1), 0xAAF9, 200 ) );
+        boxes.push_back( Box( btVector3(1,1,1), btVector3(10,-4,3), 0xAAF9, 200 ) );
+        boxes.push_back( Box( btVector3(3.66,2,1), btVector3(6.66,-13.33,5), 0xAAF9, 200 ) );
+
+        hero = Player( btVector3(4,4,5), 0xF00F, checkertexture );
+        hero.object->rotateZ( M_PI/4 );
+        hero.object->debug = true;
+       
+        // add some blocks pieces
+        blocks.push_back(  Cube( btVector3(-6,-6,0), 0xFFFF )  );
+        blocks.push_back(  Cube( btVector3(4,-4,0), 0xFFFF )  );
+        blocks.push_back(  Cube( btVector3(10,-4,0), 0xAAF9, 200 )  ); // F0FF = magenta
+        blocks.push_back(  Cube( btVector3(4,-10,0), 0xFF0F, 100 ) ); // 0FFF = cyan
+        blocks.push_back(  Cube( btVector3(-6,6,0), 0xFFFF )  );  // FF0F = yellow
+        blocks.push_back(  Cube( btVector3(6,6,0), 0xFFFF )  );
+        blocks.push_back(  Cube( btVector3(8,8,0), 0xFFFF )  );
+        blocks.push_back(  Cube( btVector3(6,8,0), 0xFFFF )  );
+        blocks.push_back(  Cube( btVector3(8,6,0), 0xFFFF )  );
+        blocks.push_back(  Cube( btVector3(8,-8,7), 0xAAAA, 0, NULL, true, 10, 2*SP_ONE )  );
+        blocks.push_back(  Cube( btVector3(12.33,-12.33,10), 0xFFFF )  );
+        
+        addboxfromblockid = true;
+       
+        standard_physics_init();
+        for ( int i = 8; i < boxes.size(); i++ )
+        {
+            boxes[i].remove_physics();
+        }
     }
     else
     {

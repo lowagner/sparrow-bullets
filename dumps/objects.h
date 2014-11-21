@@ -107,9 +107,6 @@ public:
 class Player 
 { 
 protected:
-    spSound* jumpsound;
-    spSound* kicksound;
-    spSound* misssound;
     
     bool canjump;
     int topsideup, facesideup;

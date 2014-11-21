@@ -7,9 +7,9 @@
 extern int GAMESTATEquit; // quit asap
 extern int GAMESTATEmenu; // menu.  = 1, probably.
 extern int GAMESTATElovels; // low levels, = 2.
-
-// not implemented yet
 extern int GAMESTATEsplash; // loading
+
+
 
 // base class of gamechunks which are indexed by the above
 class GameChunk

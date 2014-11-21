@@ -148,7 +148,7 @@ MainMenu::reset()
             blocks[10].set_alpha(80); // out of 255
             blocks.push_back( Cube( btVector3(-2,6,5), 0xF00F, 11, numbertexture[11] ) );
 
-            blocks.push_back( Cube( btVector3(3,4,8), 0x05FF, 12, numbertexture[12] ) );
+            blocks.push_back( Cube( btVector3(3,4,8), 0xAAAA, 12, numbertexture[12] ) );
           
             int i = 1;
             std::cout << "LEVELSET " << levelset << " BEST TIMES:\n";

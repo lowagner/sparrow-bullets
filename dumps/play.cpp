@@ -439,7 +439,7 @@ void Play::draw( SDL_Surface* screen )
     if ( camerafollowspeed > 0.f )
         spTranslate( spFloatToFixed( -cameracenter.x() ), 
                      spFloatToFixed( -cameracenter.y() ), 
-                     spFloatToFixed( -cameracenter.z() ) + cameradistance/20  ); // previous -SP_ONE
+                     spFloatToFixed( -cameracenter.z() ) + cameradistance/5  ); // previous -SP_ONE
    
     // grab the camera matrix for later usage.
     Sint32 matrix[16]; //pointer to array of 16 Sint32's.
@@ -696,7 +696,7 @@ void Play::set_camera_incline()
         // = -SP_ONE / 4.01
         //cameraincline = -SP_ONE / 4.01; //cameradistance / 6; 
         //cameraincline = cameradistance/100.32 - (cameradistance+25*SP_ONE)*0.13;
-        cameraincline = -0.87*SP_ONE - 0.04*(cameradistance+15*SP_ONE);//spSqrt(-(cameradistance+20*SP_ONE)*0.05) - 0.87*SP_ONE;
+        cameraincline = -0.87*SP_ONE  - 0.014*(cameradistance+15*SP_ONE);//spSqrt(-(cameradistance+20*SP_ONE)*0.05) - 0.87*SP_ONE;
     else if ( cameradistance < -5*SP_ONE )
         cameraincline = -(cameradistance+15*SP_ONE)*0.07 - 0.87*SP_ONE;
     else

@@ -3,6 +3,7 @@ Check the LICENSE file included for copyright information.
 */
 #include "splash.h"
 #include "play.h"
+#include "sounds.h"
 #include <SDL_image.h>
 #include <math.h>
 #include <string.h>
@@ -14,6 +15,12 @@ Check the LICENSE file included for copyright information.
 int GAMESTATEquit = 0; // quit asap
 int GAMESTATEmenu = 1; // main menu
 int GAMESTATElovels = 2; // low levels
+
+spSound* misssound = NULL; //spSoundLoad("../sounds/misssound.wav");  // like this for small misses
+spSound* jumpsound = NULL; //spSoundLoad("../sounds/jumpsound.wav");
+spSound* kicksound = NULL; //spSoundLoad("../sounds/kicksound.wav");
+
+
 
 // NOT IMPLEMENTED YET
 int GAMESTATEsplash = -1; // splash screen (first to see), also win/lose screen
@@ -48,12 +55,16 @@ void init()
     spSoundSetChannels(32);
     spSoundSetVolume(SP_VOLUME_MAX/2);
     spSoundSetMusicVolume(SP_VOLUME_MAX/2);
-    //Setup
+
+    misssound = spSoundLoad("../sounds/misssound.wav");
+    jumpsound = spSoundLoad("../sounds/jumpsound.wav");    
+    kicksound = spSoundLoad("../sounds/kicksound.wav");    //Setup
+
     screen = spCreateDefaultWindow();
 
     // set gamestate and gamechunk to the right variables...
     gamestate = GAMESTATEsplash;
-    gamechunk = //new LowLevels(2,11); 
+    gamechunk = //new LowLevels(2,12); 
                 new Splash(2,0); // will default to level 0 of levelset 2
                                  // NOTE:  change when there are more levelsets available.
 
@@ -126,6 +137,10 @@ void exit() // destructor
     // this is where the gamechunk destructor method ~GameChunk is called.
 
     //spSoundStopMusic(0);
+    spSoundDelete(jumpsound);
+    spSoundDelete(misssound);
+    spSoundDelete(kicksound);
+
     spSoundQuit();
     spQuitCore();
 }

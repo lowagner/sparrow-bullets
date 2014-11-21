@@ -3,6 +3,7 @@ Check the LICENSE file included for copyright information.
 */
 #include "objects.h"
 #include "shapes.h" // necessary to do separately, for Player class.
+#include "sounds.h"   // for sounds
 
 
 BaseObject::BaseObject()
@@ -667,6 +668,7 @@ BaseObject::out_of_bounds( btVector3 outofbounds )
 void
 BaseObject::remove_physics()
 {
+    selfa = 128;
     if (physics)
     {
         physics->dworld->removeRigidBody(body);
@@ -735,9 +737,6 @@ Player::init()
 
     // wiggle-staccato could be a death sound
     // miss-C could be the full miss:  charlie brown jump fall
-    misssound = spSoundLoad("../sounds/misssound.wav");  // like this for small misses
-    jumpsound = spSoundLoad("../sounds/jumpsound.wav");
-    kicksound = spSoundLoad("../sounds/kicksound.wav");
 }
 
 void
@@ -1105,8 +1104,18 @@ if (object->physics)
 
     object->physics->dworld->rayTest( rayfrom, rayto, ray );
 
+    bool hit = ray.hasHit();
+    if ( !hit )
+    {
+        rayfrom -= get_up()*(object->size.z())*0.8; // go lower on body
+        rayto = rayfrom + 1.4* (object->size.x())*forward; // go further out
+        
+        object->physics->dworld->rayTest( rayfrom, rayto, ray );
+        hit = ray.hasHit();
+    }
+
     // this is a hack to make it possible to 
-    if ( ray.hasHit() )
+    if ( hit )
     {
         spSoundPlay( kicksound, -1,0,0,0 );
 
@@ -1201,9 +1210,6 @@ if (object->physics)
 Player::~Player()
 {
     object = NULL;
-    spSoundDelete(jumpsound);
-    spSoundDelete(misssound);
-    spSoundDelete(kicksound);
 }
 
 Player::Player( const Player& other ) // copy constructor

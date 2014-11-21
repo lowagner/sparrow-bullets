@@ -43,7 +43,7 @@ $(PROGRAM): copySparrow main.cpp splash.o play.o $(LEVELS_O) physics.o main.o ob
 	$(CPP) $(CFLAGS) main.o splash.o play.o $(LEVELS_O) physics.o objects.o shapes.o util.o $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(LIB) $(SDL_LIB) $(STATIC) $(DYNAMIC) -o $(BUILD)/$(PROGRAM) $(BULLET_DYNAMIC_LIB)
 	rm main.o
 
-main.o: main.cpp play.h splash.h
+main.o: main.cpp play.h splash.h sounds.h
 	$(CPP) $(CFLAGS) -c $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE) -o $@ $<
 
 splash.o: splash.cpp splash.h meta.h
@@ -58,7 +58,7 @@ lvl%.o: lvl%.cpp play.h
 physics.o: physics.cpp physics.h 
 	$(CPP) $(CFLAGS) -c $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE) -o $@ $<
 
-objects.o: objects.cpp objects.h physics.h 
+objects.o: objects.cpp objects.h physics.h sounds.h
 	$(CPP) $(CFLAGS) -c $(SDL) $(INCLUDE) -I$(BULLET_INCLUDE) -I$(SPARROW_FOLDER) $(SDL_INCLUDE) $(SPARROW_INCLUDE) -o $@ $<
 
 shapes.o: shapes.cpp physics.h objects.h shapes.h
