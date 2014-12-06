@@ -8,6 +8,7 @@ extern int GAMESTATEquit; // quit asap
 extern int GAMESTATEmenu; // menu.  = 1, probably.
 extern int GAMESTATElovels; // low levels, = 2.
 extern int GAMESTATEsplash; // loading
+extern int GAMESTATEsoccer; // soccer
 
 
 

@@ -54,6 +54,32 @@ void BaseObject::set_velocity( btVector3 vel)
     lastvelocity = vel;
 }
 
+void BaseObject::set_omega( btVector3 omega )
+{
+    lastomega = omega;
+}
+
+void BaseObject::set_position( btVector3 pos)
+{
+    lastposition = pos;
+    lastpor[0] = SP_ONE;
+    lastpor[1] = 0;
+    lastpor[2] = 0;
+    lastpor[3] = 0;
+    lastpor[4] = 0; 
+    lastpor[5] = SP_ONE;
+    lastpor[6] = 0;
+    lastpor[7] = 0;
+    lastpor[8] = 0;
+    lastpor[9] = 0;
+    lastpor[10] = SP_ONE;
+    lastpor[11] = 0;
+    lastpor[12] = spFloatToFixed( pos.getX() );
+    lastpor[13] = spFloatToFixed( pos.getY() );
+    lastpor[14] = spFloatToFixed( pos.getZ() );
+    lastpor[15] = SP_ONE;
+}
+
 void BaseObject::push_cycle( btVector3 position, btScalar dt )
 {
     if ( cyclepositions.size() )
@@ -68,7 +94,7 @@ void BaseObject::push_cycle( btVector3 position, btScalar dt )
 }
 
 btVector3 
-BaseObject::get_pos()
+BaseObject::get_position()
 {
     return lastposition;
 }

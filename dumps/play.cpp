@@ -715,6 +715,7 @@ int Play::update_hero( btScalar fdt )
         clock = 0;
         alive = false;
         return 1;
+        hero.object->remove_physics();
     }
 
     if ( camerafollowspeed > 0.f )

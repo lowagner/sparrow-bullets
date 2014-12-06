@@ -115,5 +115,16 @@ public:
     int reset();
 };
 
+class Soccer : public Play
+{
+protected:
+    btScalar halfdistancetogoal, halfgoalwidth;
+public:
+    int points, antipoints;
+    Soccer( int levelset_ = 999, int level_ = 1, char* message_ = "" );
+    int reset();
+    int update_level( btScalar fdt );
+};
+
 
 #endif

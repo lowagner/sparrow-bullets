@@ -12,9 +12,11 @@ Check the LICENSE file included for copyright information.
 
 
 // various gamestates to be in
-int GAMESTATEquit = 0; // quit asap
+int GAMESTATEsplash = -1; // splash screen (first to see), also win/lose screen
+int GAMESTATEquit = 0; // quit ASAP
 int GAMESTATEmenu = 1; // main menu
 int GAMESTATElovels = 2; // low levels
+int GAMESTATEsoccer = 999; // soccer
 
 spSound* misssound = NULL; 
 spSound* jumpsound = NULL; 
@@ -22,10 +24,6 @@ spSound* kicksound = NULL;
 spSound* gotsound = NULL;  
 spSound* deathsound = NULL;
 
-
-
-// NOT IMPLEMENTED YET
-int GAMESTATEsplash = -1; // splash screen (first to see), also win/lose screen
 
 GameChunk* gamechunk;  // pointer to the currently active game chunk
 SDL_Surface* screen;   // pointer to the screen.
@@ -68,7 +66,8 @@ void init()
 
     // set gamestate and gamechunk to the right variables...
     gamestate = GAMESTATEsplash;
-    gamechunk = //new LowLevels(2,12); 
+    gamechunk = //new Soccer(999,1);
+                //new LowLevels(2,12); 
                 new Splash(2,0); // will default to level 0 of levelset 2
                                  // NOTE:  change when there are more levelsets available.
 
@@ -119,6 +118,12 @@ int update( Uint32 dt )
             std::cout << "initiating low levels at level " << level << std::endl;
             delete gamechunk;
             gamechunk = new LowLevels( levelset, level, message ); 
+        }
+        else if ( newgamestate == GAMESTATEsoccer )
+        {
+            std::cout << "initiating soccer stage " << level << std::endl;
+            delete gamechunk;
+            gamechunk = new Soccer( levelset, level, message ); 
         }
         else
         {

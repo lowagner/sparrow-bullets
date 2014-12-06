@@ -64,10 +64,12 @@ public:
     void set_alpha( short int selfa_ );
 
     void set_velocity( btVector3 vel );
+    void set_omega( btVector3 omega );
+    void set_position( btVector3 pos );
 
     void push_cycle( btVector3 position, btScalar dt = 2 );
 
-    btVector3 get_pos();
+    btVector3 get_position();
 
     virtual void update( float dt );
 

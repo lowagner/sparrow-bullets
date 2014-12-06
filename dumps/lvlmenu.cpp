@@ -87,9 +87,13 @@ MainMenu::reset()
             boxes[1].add_text( "push a lvl cube off" );
             boxes[1].add_text( "to play that level" );
 
-            blocks.push_back( Cube( btVector3(0,0,5), 0x05FF, 2 ) ); // half-sizes, pos, color
+            blocks.push_back( Cube( btVector3(0,0,5), 0x05FF, GAMESTATElovels ) ); // half-sizes, pos, color
             blocks[0].add_text( "low" );
             blocks[0].add_text( "lvls" );
+            
+            blocks.push_back( Cube( btVector3(4,2,5), 0xFFFF, 
+                                    GAMESTATEsoccer, checkertexture ) ); // half-sizes, pos, color
+            blocks[1].add_text( "soccer" );
 
             hero = Player( btVector3(0,4,5), 0xF00F, checkertexture );
             hero.object->rotateZ( 3*M_PI/2 );
@@ -201,6 +205,33 @@ MainMenu::reset()
             std::cout << " playing single level " << level << " in level set " << levelset << "\n";
             levelset = 0; 
             return GAMESTATElovels;
+        }
+    }
+    else if ( levelset == GAMESTATEsoccer )
+    {
+        if ( level == 0 )
+        { // choose your level of the low levels
+            sprintf( lvltext, "soccer stages" );
+            set_alert( "- choose soccer stage -" );
+
+            outofbounds = btVector3(20,20,20); //anything outside of these half-lengths is considered OB!
+
+            // this guy includes the floor.  all static rectangular prisms.
+            boxes.push_back( Box( btVector3(10,4,1), btVector3(0,0,-3), 0x85B7 ) ); 
+            blocks.push_back( Cube( btVector3(0,0,5), 0x0F00, 1, numbertexture[1] ) );
+
+            hero = Player( btVector3(4,0,5), 0xF00F, checkertexture );
+            hero.object->rotateZ( M_PI );
+            hero.object->debug = true;
+            
+            hero.object->add_text("hero");
+        }
+        else
+        {   
+            // single level play
+            std::cout << " playing soccer stage " << level << "\n";
+            levelset = 0; 
+            return GAMESTATEsoccer;
         }
     }
     else
