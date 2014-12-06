@@ -38,6 +38,7 @@ MainMenu::reset()
         }
         else
         {
+            spSoundPlay(deathsound, -1,0,0,0);
             std::cout << " Going back one level in main menu. " << std::endl;
             levelset = 1;
             level = 1;

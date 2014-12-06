@@ -335,6 +335,7 @@ BaseObject::locate_and_move( btScalar dt )
                 btVector3 groundvelocity = ground->getLinearVelocity();
                 if ( fabs(groundvelocity.z()) > 0.1 )
                 {
+                    //std::cout << " moving ground " << std::endl;
                     activate();
 //                    std::cout << " ground vel = " << groundvelocity.x() << ", "
 //                                                  << groundvelocity.y() << ", "
@@ -718,9 +719,9 @@ Player::init()
     maxwalkspeed2 = 50;
     walkacceleration = 2.1;
     currentacceleration = 0.;
-    jerk = 40.;
+    jerk = 100.;
     currentrotacceleration = 0.;
-    rotjerk = 80.;
+    rotjerk = 100.;
     maxrotspeed2 = 15;
     rotacceleration = 7;
     flyingrotacceleration = 5;
@@ -1114,14 +1115,12 @@ if (object->physics)
         hit = ray.hasHit();
     }
 
-    // this is a hack to make it possible to 
     if ( hit )
     {
         spSoundPlay( kicksound, -1,0,0,0 );
 
         btVector3 playerup( get_up() );
-        // check if the ground is moving.
-        // we'll need to help the object along
+        // check what the object is
         const btRigidBody* kickee( btRigidBody::upcast(ray.getHitter()) ); 
         btScalar kickeeimass = kickee->getInvMass();
 

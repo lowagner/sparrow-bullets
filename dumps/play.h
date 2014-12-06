@@ -8,6 +8,7 @@ Check the LICENSE file included for copyright information.
 #include "objects.h"
 #include "shapes.h"
 #include "meta.h"
+#include "sounds.h"
 #include <vector>
 //#include <time.h>  // for timer functionality
 //#include <unistd.h> // for sleep function

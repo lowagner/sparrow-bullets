@@ -782,9 +782,10 @@ int Play::update_hero( btScalar fdt )
         spGetInput()->axis[0] = hero.turn( fdt, spGetInput()->axis[0] );
         //std::cout << " turning hero " << (spGetInput()->axis[0]) << std::endl;
     }
-    // this function will check to see if the hero can actually walk.
     if ( spGetInput()->axis[1] )
+        // hero.walk will check to see if the hero can actually walk.
         spGetInput()->axis[1] = hero.walk( fdt, spGetInput()->axis[1] );
+        // will return 0 if somehow we need to stop pressing walk button
 
     if ( spGetInput()->button[SP_BUTTON_R] )
     {
@@ -822,6 +823,8 @@ int Play::update_level( btScalar fdt )
 
             if (  blocks[i].out_of_bounds( outofbounds )   )
             {
+                spSoundPlay( gotsound, -1,0,0,0 ); // play getting the box sound
+
                 //std::cout << "\n WARNING!  block " << i << " out of bounds!\n";
                 blocks[i].remove_physics();  // remove this guy from physics world
                 if ( killboxfromblockid || addboxfromblockid )

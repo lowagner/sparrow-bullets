@@ -50,6 +50,9 @@ LowLevels::reset()
     }
     else
     {    // probably died and restarted the level
+        if ( not alive )
+            spSoundPlay(deathsound, -1,0,0,0);
+
         if ( levelset == 0 )
         {
             lives = 99999;
@@ -103,16 +106,12 @@ LowLevels::reset()
 
         hero = Player( btVector3(0,8,5), 0xF00F, checkertexture );
         hero.object->debug = true;
-       
-        // add some blocks pieces
-        for ( int i=0; i<5; i++ )
-        {
-            blocks.push_back(  Cube( btVector3(2*i-3,0,10+2*i), 0x0F0F )  );
-        }
-        blocks[4].impulse( btVector3(0,10,0) );
-        blocks[3].impulse( btVector3(10,15,0) );
-        blocks[2].impulse( btVector3(-10,-10,0) );
-        blocks[1].impulse( btVector3(-5,-10,0) );
+      
+        blocks.push_back( Cube( btVector3(7,7,5), 0x0F0F ) );
+        blocks.push_back( Cube( btVector3(0,5,5), 0x0F0F ) );
+        blocks.push_back( Cube( btVector3(8,0,0), 0x0F0F ) );
+        blocks.push_back( Cube( btVector3(-8,-8,0), 0x0F0F ) );
+        blocks.push_back( Cube( btVector3(8,-8,0), 0x0F0F ) );
         standard_physics_init();
     }
     else if ( level == 2 )

@@ -16,9 +16,11 @@ int GAMESTATEquit = 0; // quit asap
 int GAMESTATEmenu = 1; // main menu
 int GAMESTATElovels = 2; // low levels
 
-spSound* misssound = NULL; //spSoundLoad("../sounds/misssound.wav");  // like this for small misses
-spSound* jumpsound = NULL; //spSoundLoad("../sounds/jumpsound.wav");
-spSound* kicksound = NULL; //spSoundLoad("../sounds/kicksound.wav");
+spSound* misssound = NULL; 
+spSound* jumpsound = NULL; 
+spSound* kicksound = NULL; 
+spSound* gotsound = NULL;  
+spSound* deathsound = NULL;
 
 
 
@@ -58,7 +60,9 @@ void init()
 
     misssound = spSoundLoad("../sounds/misssound.wav");
     jumpsound = spSoundLoad("../sounds/jumpsound.wav");    
-    kicksound = spSoundLoad("../sounds/kicksound.wav");    //Setup
+    kicksound = spSoundLoad("../sounds/kicksound.wav");  
+    gotsound = spSoundLoad("../sounds/gotsound.wav");    
+    deathsound = spSoundLoad("../sounds/deathsound.wav");    
 
     screen = spCreateDefaultWindow();
 
