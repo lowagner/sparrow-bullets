@@ -706,16 +706,22 @@ void Play::set_camera_incline()
     //cameraincline = spFloatToFixed(-0.2) -10*SP_PI / ( 1 + (abs(cameradistance)/(SP_ONE/3)) ) ;
 }
 
+int Play::ob_hero()
+{
+    lives -= 1;
+    clock = 0;
+    alive = false;
+    return 1;
+    hero.object->remove_physics();
+}
+
 int Play::update_hero( btScalar fdt )
 {
     hero.update( fdt );
     if ( hero.object->out_of_bounds( outofbounds ) )
     {
-        lives -= 1;
-        clock = 0;
-        alive = false;
-        return 1;
-        hero.object->remove_physics();
+        if ( ob_hero() )
+            return 1;
     }
 
     if ( camerafollowspeed > 0.f )

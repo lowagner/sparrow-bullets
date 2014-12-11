@@ -81,6 +81,7 @@ public:
 
     virtual int reset();
     virtual int update( Uint32 dt );
+    virtual int ob_hero();
     virtual int update_hero( btScalar fdt );
     virtual int update_level( btScalar fdt );
     virtual void handle( SDL_Event* event );
@@ -124,6 +125,7 @@ public:
     Soccer( int levelset_ = 999, int level_ = 1, char* message_ = "" );
     int reset();
     int update_level( btScalar fdt );
+    int ob_hero();
 };
 
 

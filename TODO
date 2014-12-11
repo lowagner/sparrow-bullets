@@ -2,40 +2,12 @@ ROADMAP FOR DUMPS
 
 DOWN IN THE DUMPS.
 
-Low levels:
-Level 12.  Moving boxes, small and huge blocks you have to push off, also another stairway.
+lvlsoccer:
+    shouldn't reset when player dies
+
+
 
 CONTROLS:
-
-Motion:
-    initially pressing a direction gives very little acceleration in that direction.
-    holding down any motion button for a long time gives a larger acceleration for any direction.
-    this way you can line up jumps a bit easier.
-        implementation:
-        make a "currentacceleration" parameter which increases at a rate of "jerk*dt" up
-        to a max acceleration of "walkacceleration" when either forward or backward is pressed.
-        do the same with "rotacceleration", but using rotjerk*dt, when either left/right is pressed.
-        ignore spinning around on the ground, that's not important to get fine fixes
-
-Kick:  
-    if you press down while kicking, make object fly farther up (lobbed kick)
-    if you press up while kicking, make object fly further forward (little up component)
-    no press, middle behavior (somewhere in between - little lob)
-        if you connect with something, set the axis[1] button to 0.
-
-    if desired, can add the result of a ray from bottom of cube out a bit further, so that hit-tests
-    are a bit more generous.  
-
-    BUGS:
-        something or twothings are wonky.  if pressing kick continually, you can
-        do an uber somersault of doom backwards
-
-        you can also spin on the ground like a beast, if you're on your side.  need to check omega2
-
-
-Camera:
-    still a bit wonky.  make it rotate angle faster at larger distances.
-    closer distances, feels a bit slow and angle is also funny.
 
 BUGS:  
     FORCE_ACTIVATION doesn't always work.  when removing blocks, need to get a little
@@ -79,7 +51,6 @@ need to figure out how to get contact call backs talking to player object.
     sum over all contacts processed, to give a final "intensity" to play a sound file at.
 
 sounds:
-    death sound
     reset sound
     lose screen sound
     win screen sound
@@ -101,7 +72,7 @@ music...?
 
 LONG TERM STUFF
     get two player action all up-ons
-    indoor SOCCER, heck yes
+    SOCCER, heck yes
 
 
 BaseObject:

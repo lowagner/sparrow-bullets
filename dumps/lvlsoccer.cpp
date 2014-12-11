@@ -21,6 +21,7 @@ Soccer::Soccer( int levelset_, int level_, char* message_ )
     gamestate = GAMESTATEsoccer;
 
     won = false;
+    alive = true;
     reset();
     srand(time(0));
 }
@@ -31,6 +32,8 @@ int
 Soccer::reset()
 {   
     points = 0;
+    antipoints = 0;
+
     if ( message != "" )
     {
         set_alert( message );
@@ -100,15 +103,6 @@ Soccer::reset()
 
 int Soccer::update_level( btScalar fdt )
 {
-    if ( not alive )
-    {
-        alive = true;
-        hero.object->remove_physics();
-        hero.object->set_position( btVector3(-5,0,5) );
-        hero.object->set_velocity( btVector3() );
-        hero.object->set_omega( btVector3() );
-        hero.object->add_physics(physics);
-    }
 
     // update boxes
     for ( int i=0; i<boxes.size(); i++ )
@@ -240,3 +234,13 @@ int Soccer::update_level( btScalar fdt )
     return 0; // no reset if update_level doesn't do nothing
 }
 
+int Soccer::ob_hero()
+{
+    hero.object->remove_physics();
+    hero.object->set_position( btVector3(-5,0,5) );
+    hero.object->set_velocity( btVector3() );
+    hero.object->set_omega( btVector3() );
+    hero.object->add_physics(physics);
+    spSoundPlay(deathsound, -1,0,0,0 );
+    return 0;
+}
