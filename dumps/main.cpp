@@ -26,7 +26,6 @@ spSound* deathsound = NULL;
 
 
 GameChunk* gamechunk;  // pointer to the currently active game chunk
-SDL_Surface* screen;   // pointer to the screen.
 int gamestate;   // which gamestate you are in; can tell you to change gamechunks
 
 void resize( Uint16 w, Uint16 h )
@@ -35,7 +34,7 @@ void resize( Uint16 w, Uint16 h )
 }
 void draw( void )
 {
-    gamechunk->draw( screen );
+    gamechunk->draw( spGetWindowSurface() );
 }
 void handle( SDL_Event* event )
 {
@@ -62,7 +61,7 @@ void init()
     gotsound = spSoundLoad("../sounds/gotsound.wav");    
     deathsound = spSoundLoad("../sounds/deathsound.wav");    
 
-    screen = spCreateDefaultWindow();
+    SDL_Surface *screen = spCreateDefaultWindow();
 
     // set gamestate and gamechunk to the right variables...
     gamestate = GAMESTATEsplash;
